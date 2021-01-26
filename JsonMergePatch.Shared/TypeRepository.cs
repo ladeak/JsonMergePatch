@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace JsonMergePatch.Shared
+namespace LaDeak.JsonMergePatch.Shared
 {
     public class TypeRepository : ITypeRepository
     {

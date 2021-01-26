@@ -1,3 +1,4 @@
+using LaDeak.JsonMergePatch.Generated;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LaDeak.JsonMergePatch;
 
 namespace CoreWebApi
 {
@@ -28,7 +28,6 @@ namespace CoreWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers().AddJsonMergePatch();
             services.AddSwaggerGen(c =>
             {
@@ -51,7 +50,6 @@ namespace CoreWebApi
             app.UseRouting();
 
             app.UseAuthorization();
-            HelloWorldGenerated.HelloWorld.SayHello();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

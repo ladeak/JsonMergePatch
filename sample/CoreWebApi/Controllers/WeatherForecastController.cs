@@ -1,24 +1,22 @@
-﻿using LaDeak.JsonMergePatch;
-using LaDeak.JsonMergePatch.Shared;
+﻿using LaDeak.JsonMergePatch.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace CoreWebApi.Controllers
 {
-    //public class WeatherForecast
-    //{
-    //    public DateTime Date { get; set; }
+    public class WeatherForecast
+    {
+        public DateTime Date { get; set; }
 
-    //    public int TemperatureC { get; set; }
+        public int TemperatureC { get; set; }
 
-    //    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 
-    //    public string Summary { get; set; }
-    //}
+        public string Summary { get; set; }
+    }
 
     [ApiController]
     [Route("[controller]")]

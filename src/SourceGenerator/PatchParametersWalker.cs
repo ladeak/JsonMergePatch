@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SourceGenerator
 {
@@ -28,7 +28,7 @@ namespace SourceGenerator
             if (node?.Type != null)
             {
                 var typeInfo = _semantics.GetTypeInfo(node.Type).Type as INamedTypeSymbol;
-                if (typeInfo != null && typeInfo.Name == "Patch" && typeInfo.ContainingAssembly.Name == "JsonMergePatch" && typeInfo.TypeArguments.Count() == 1)
+                if (typeInfo?.Name == "Patch" && typeInfo.ContainingAssembly.Name == "JsonMergePatch.Shared" && typeInfo.TypeArguments.Count() == 1)
                 {
                     _typeNames.Add(typeInfo.TypeArguments.First());
                 }

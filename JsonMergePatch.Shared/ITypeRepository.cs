@@ -1,7 +1,6 @@
-﻿using LaDeak.JsonMergePatch.Shared;
-using System;
+﻿using System;
 
-namespace JsonMergePatch.Shared
+namespace LaDeak.JsonMergePatch.Shared
 {
     public interface ITypeRepository
     {
