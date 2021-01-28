@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace CoreWebApi.Controllers
 {
@@ -11,6 +12,7 @@ namespace CoreWebApi.Controllers
     {
         public DateTime Date { get; set; }
 
+        [JsonPropertyName("temp")]
         public int TemperatureC { get; set; }
 
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
