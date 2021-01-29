@@ -8,5 +8,6 @@ namespace SourceGenerator
         public string Name { get; set; }
         public string SourceTypeName { get; set; }
         public List<IPropertySymbol> Properties { get; set; }
+        public ITypeSymbol TypeSymbol { get; set; }
     }
 }
