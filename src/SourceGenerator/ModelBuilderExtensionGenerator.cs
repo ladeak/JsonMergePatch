@@ -9,7 +9,6 @@ namespace SourceGenerator
         {
             StringBuilder sb = new StringBuilder(@"
 using LaDeak.JsonMergePatch;
-using LaDeak.JsonMergePatch.Shared;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 
