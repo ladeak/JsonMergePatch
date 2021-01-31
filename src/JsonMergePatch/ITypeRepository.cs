@@ -9,7 +9,7 @@ namespace LaDeak.JsonMergePatch
         /// </summary>
         /// <typeparam name="TSource">The user type.</typeparam>
         /// <typeparam name="TWrapper">Type that wraps the user type.</typeparam>
-        void TryAdd<TSource, TWrapper>() where TWrapper : Patch<TSource>;
+        void Add<TSource, TWrapper>() where TWrapper : Patch<TSource>;
 
         /// <summary>
         /// Returns the wrapper type for a registered user type.

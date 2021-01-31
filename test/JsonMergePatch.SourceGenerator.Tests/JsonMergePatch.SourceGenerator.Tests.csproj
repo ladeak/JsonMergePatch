@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\JsonMergePatch\JsonMergePatch.csproj" />
+    <ProjectReference Include="..\..\src\SourceGenerator\JsonMergePatch.SourceGenerator.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,10 +3,10 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
-namespace SourceGenerator
+namespace JsonMergePatch.SourceGenerator
 {
     [Generator]
-    public class HelloWorldGenerator : ISourceGenerator
+    public class JsonMergePatchSourceGenerator : ISourceGenerator
     {
         public void Execute(GeneratorExecutionContext context)
         {

@@ -1,4 +1,4 @@
-﻿namespace SourceGenerator
+﻿namespace JsonMergePatch.SourceGenerator
 {
     public class Casing
     {

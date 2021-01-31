@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace SourceGenerator
+namespace JsonMergePatch.SourceGenerator
 {
     public class TypeBuilder
     {
@@ -48,7 +48,7 @@ namespace SourceGenerator
         public void BuildClassDeclaration(BuilderState state, Action<BuilderState> addBody = null)
         {
             BuildAttributes(state, state.TypeInfo.TypeSymbol.GetAttributes());
-            state.AppendLine($"public class {state.TypeInfo.Name} : LaDeak.JsonMergePatch.Shared.Patch<{state.TypeInfo.SourceTypeName}>");
+            state.AppendLine($"public class {state.TypeInfo.Name} : LaDeak.JsonMergePatch.Patch<{state.TypeInfo.SourceTypeName}>");
             state.AppendLine("{");
             addBody?.Invoke(state.IncrementIdentation());
             state.AppendLine("}");

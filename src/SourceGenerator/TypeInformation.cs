@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace SourceGenerator
+namespace JsonMergePatch.SourceGenerator
 {
     public class TypeInformation
     {
