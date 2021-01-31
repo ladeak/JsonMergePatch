@@ -1,10 +1,9 @@
-﻿using LaDeak.JsonMergePatch.Shared;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace LaDeak.JsonMergePatch.Shared
+namespace LaDeak.JsonMergePatch
 {
-    public class TypeRepository : ITypeRepository
+    public sealed class TypeRepository : ITypeRepository
     {
         private Dictionary<Type, Type> _repository = new Dictionary<Type, Type>();
 

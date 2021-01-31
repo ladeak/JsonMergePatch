@@ -8,9 +8,5 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\JsonMergePatch.Shared\JsonMergePatch.Shared.csproj" />
-  </ItemGroup>
   
 </Project>
