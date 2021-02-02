@@ -6,6 +6,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <PackageVersion>0.0.1</PackageVersion>
+    <RootNamespace>LaDeak.JsonMergePatch.SourceGenerator</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,6 +1,6 @@
 ﻿using LaDeak.JsonMergePatch;
 
-namespace JsonMergePatch.Tests
+namespace LaDeak.JsonMergePatch.Tests
 {
     public class WrappedTestDto : Patch<TestDto>
     {

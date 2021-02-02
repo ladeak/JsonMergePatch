@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.CodeAnalysis;
 
-namespace JsonMergePatch.SourceGenerator
+namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public class BuilderState
     {

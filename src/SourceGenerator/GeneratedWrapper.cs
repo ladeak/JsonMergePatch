@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace JsonMergePatch.SourceGenerator
+namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public class GeneratedWrapper
     {

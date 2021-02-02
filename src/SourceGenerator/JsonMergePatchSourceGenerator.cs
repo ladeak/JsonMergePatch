@@ -3,7 +3,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
-namespace JsonMergePatch.SourceGenerator
+namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     [Generator]
     public class JsonMergePatchSourceGenerator : ISourceGenerator

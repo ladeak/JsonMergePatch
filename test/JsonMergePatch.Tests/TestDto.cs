@@ -1,4 +1,4 @@
-﻿namespace JsonMergePatch.Tests
+﻿namespace LaDeak.JsonMergePatch.Tests
 {
     public class TestDto
     {

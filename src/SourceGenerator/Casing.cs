@@ -1,4 +1,4 @@
-﻿namespace JsonMergePatch.SourceGenerator
+﻿namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public class Casing
     {

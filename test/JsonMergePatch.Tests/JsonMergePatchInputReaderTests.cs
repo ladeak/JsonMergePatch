@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using NSubstitute;
 using Xunit;
 
-namespace JsonMergePatch.Tests
+namespace LaDeak.JsonMergePatch.Tests
 {
     public class JsonMergePatchInputReaderTests
     {

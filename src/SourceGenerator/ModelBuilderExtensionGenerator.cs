@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
-namespace JsonMergePatch.SourceGenerator
+namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public class ModelBuilderExtensionGenerator
     {
@@ -21,7 +22,7 @@ namespace LaDeak.JsonMergePatch.Generated
             var typeRepository = new TypeRepository();
 ");
 
-            foreach ((var originalType, var generatedType) in typeRegistrations)
+            foreach ((var originalType, var generatedType) in typeRegistrations ?? Enumerable.Empty<(string, string)>())
                 sb.AppendLine($"            typeRepository.Add<{originalType}, {generatedType}>();");
 
             sb.Append(@"            builder.Services.AddSingleton<ITypeRepository>(typeRepository);
@@ -33,6 +34,6 @@ namespace LaDeak.JsonMergePatch.Generated
             return sb.ToString();
         }
 
-       
+
     }
 }

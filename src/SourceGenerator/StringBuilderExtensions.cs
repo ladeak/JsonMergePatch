@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace JsonMergePatch.SourceGenerator
+namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public static class StringBuilderExtensions
     {

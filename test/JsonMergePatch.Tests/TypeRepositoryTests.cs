@@ -2,7 +2,7 @@ using System;
 using LaDeak.JsonMergePatch;
 using Xunit;
 
-namespace JsonMergePatch.Tests
+namespace LaDeak.JsonMergePatch.Tests
 {
     public class TypeRepositoryTests
     {
