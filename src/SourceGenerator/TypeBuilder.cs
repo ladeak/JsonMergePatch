@@ -12,7 +12,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             var name = GetName(typeInfo);
             var state = InitializeState(typeInfo, name, sourceTypeName);
             BuildFile(state);
-            return new GeneratedWrapper() { 
+            return new GeneratedWrapper()
+            {
                 FileName = $"LaDeakJsonMergePatch{name}",
                 SourceCode = state.Builder.ToString(),
                 SourceTypeFullName = sourceTypeName,
@@ -67,7 +68,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         public void BuildPropery(BuilderState state, IPropertySymbol propertySymbol, int propertyId)
         {
             state.ToProcessTypeSymbols.Add(propertySymbol.Type);
-            string fieldName = $"_{ Casing.ToCamelCase(propertySymbol.Name)}";
+            string fieldName = Casing.PrefixUnderscoreCamelCase(propertySymbol.Name);
             var propertyTypeName = $"{propertySymbol.Type.ContainingNamespace}.{propertySymbol.Type.Name}";
             state.AppendLine($"private {propertyTypeName} {fieldName};");
             BuildAttributes(state, propertySymbol.GetAttributes());
