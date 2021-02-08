@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <!--<PackageReference Include="SourceGenerator" Version="0.0.1" />-->
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.0.2" />
   </ItemGroup>
 
   <ItemGroup>
