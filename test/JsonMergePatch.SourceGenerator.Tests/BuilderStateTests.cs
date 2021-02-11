@@ -2,7 +2,7 @@
 using LaDeak.JsonMergePatch.SourceGenerator;
 using Xunit;
 
-namespace JsonMergePatch.SourceGenerator.Tests
+namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 {
     public class BuilderStateTests
     {

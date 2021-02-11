@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 
 namespace LaDeak.JsonMergePatch.SourceGenerator
 {
-    public class TypeBuilder
+    public class TypeBuilder : ITypeBuilder
     {
         public GeneratedWrapper BuildWrapperType(ITypeSymbol typeInfo, string sourceTypeName)
         {
@@ -22,13 +22,13 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             };
         }
 
-        public string GetName(ITypeSymbol typeInfo) => $"{typeInfo.Name}Wrapped";
+        private string GetName(ITypeSymbol typeInfo) => $"{typeInfo.Name}Wrapped";
 
-        public void BuildFile(BuilderState state) => BuildNameSpace(state, BuildClass);
+        private void BuildFile(BuilderState state) => BuildNameSpace(state, BuildClass);
 
-        public void BuildClass(BuilderState state) => BuildClassDeclaration(state, s => BuildClassBody(s));
+        private void BuildClass(BuilderState state) => BuildClassDeclaration(state, s => BuildClassBody(s));
 
-        public BuilderState InitializeState(ITypeSymbol typeInfo, string name, string sourceTypeName)
+        private BuilderState InitializeState(ITypeSymbol typeInfo, string name, string sourceTypeName)
         {
             var typeInformation = new TypeInformation() { Name = name, SourceTypeName = sourceTypeName, TypeSymbol = typeInfo };
             typeInformation.Properties = typeInfo.GetMembers().OfType<IPropertySymbol>()
@@ -38,7 +38,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             return new BuilderState(typeInformation);
         }
 
-        public void BuildNameSpace(BuilderState state, Action<BuilderState> addBody = null)
+        private void BuildNameSpace(BuilderState state, Action<BuilderState> addBody = null)
         {
             state.AppendLine("namespace LaDeak.JsonMergePatch.Generated");
             state.AppendLine("{");
@@ -46,7 +46,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             state.AppendLine("}");
         }
 
-        public void BuildClassDeclaration(BuilderState state, Action<BuilderState> addBody = null)
+        private void BuildClassDeclaration(BuilderState state, Action<BuilderState> addBody = null)
         {
             BuildAttributes(state, state.TypeInfo.TypeSymbol.GetAttributes());
             state.AppendLine($"public class {state.TypeInfo.Name} : LaDeak.JsonMergePatch.Patch<{state.TypeInfo.SourceTypeName}>");
@@ -55,7 +55,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             state.AppendLine("}");
         }
 
-        public void BuildConstructor(BuilderState state, Action<BuilderState> addBody = null)
+        private void BuildConstructor(BuilderState state, Action<BuilderState> addBody = null)
         {
             state.AppendLine($"public {state.TypeInfo.Name}()");
             state.AppendLine("{");
@@ -65,7 +65,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             state.AppendLine("}");
         }
 
-        public void BuildPropery(BuilderState state, IPropertySymbol propertySymbol, int propertyId)
+        private void BuildPropery(BuilderState state, IPropertySymbol propertySymbol, int propertyId)
         {
             state.ToProcessTypeSymbols.Add(propertySymbol.Type);
             string fieldName = Casing.PrefixUnderscoreCamelCase(propertySymbol.Name);
@@ -85,15 +85,15 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             state.AppendLine("}");
         }
 
-        public void BuildAttributes(BuilderState state, IEnumerable<AttributeData> attributes)
+        private void BuildAttributes(BuilderState state, IEnumerable<AttributeData> attributes)
         {
             foreach (var attribute in attributes)
                 BuildAttribute(state, attribute);
         }
 
-        public void BuildAttribute(BuilderState state, AttributeData attribute) => state.AppendLine($"[{attribute}]");
+        private void BuildAttribute(BuilderState state, AttributeData attribute) => state.AppendLine($"[{attribute}]");
 
-        public void BuildAllProperties(BuilderState state)
+        private void BuildAllProperties(BuilderState state)
         {
             for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
             {
@@ -102,7 +102,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             }
         }
 
-        public void BuildClassBody(BuilderState state)
+        private void BuildClassBody(BuilderState state)
         {
             BuildConstructor(state);
             state.AppendLine();
@@ -110,7 +110,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             BuildApplyPath(state);
         }
 
-        public void BuildApplyPath(BuilderState state)
+        private void BuildApplyPath(BuilderState state)
         {
             state.AppendLine($"public override {state.TypeInfo.SourceTypeName} ApplyPatch({state.TypeInfo.SourceTypeName} input)");
             state.AppendLine("{");

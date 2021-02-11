@@ -9,7 +9,6 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         public string CreateModelBuilder(IEnumerable<(string, string)> typeRegistrations)
         {
             StringBuilder sb = new StringBuilder(@"
-using LaDeak.JsonMergePatch;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 

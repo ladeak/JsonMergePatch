@@ -19,7 +19,7 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore -p:Version=${VERSION}
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet test
     - name: Create package
       run: dotnet pack --configuration Release --no-build --include-symbols -p:Version=${VERSION}
     - name: Publish

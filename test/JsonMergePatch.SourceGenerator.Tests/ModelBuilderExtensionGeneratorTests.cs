@@ -97,7 +97,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 
         private Func<IMvcBuilder, JsonOptions, IMvcBuilder> GetMethodDelegate(string code, IEnumerable<MetadataReference> metadataReferences = null)
         {
-            return GeneratedSourceBuilder.GetMethod(GeneratedSourceBuilder.CompileMvcToAssembly(code, metadataReferences), "LaDeak.JsonMergePatch.Generated.MvcBuilderExtensions", "AddJsonMergePatch");
+            return SourceBuilder.GetMethod(SourceBuilder.CompileMvcToAssembly(code, metadataReferences), "LaDeak.JsonMergePatch.Generated.MvcBuilderExtensions", "AddJsonMergePatch");
         }
 
 

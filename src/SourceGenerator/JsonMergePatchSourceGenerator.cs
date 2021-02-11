@@ -10,7 +10,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
     {
         public void Execute(GeneratorExecutionContext context)
         {
-            var typeBuilder = new TypeBuilderGenerator(context.Compilation.SyntaxTrees, context.Compilation);
+            var typeBuilder = new MultiTypeBuilder(context.Compilation.SyntaxTrees, context.Compilation, new TypeBuilder(), new PatchParametersWalker());
             var types = typeBuilder.Generate();
             foreach(var generatedType in types)
                 context.AddSource(generatedType.FileName, SourceText.From(generatedType.SourceCode, Encoding.UTF8));

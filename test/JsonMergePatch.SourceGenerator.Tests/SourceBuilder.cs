@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 {
-    public static class GeneratedSourceBuilder
+    public static class SourceBuilder
     {
         public static Assembly CompileToAssembly(string code, IEnumerable<MetadataReference> metadataReferences = null)
         {
@@ -24,6 +24,13 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             stream.Seek(0, SeekOrigin.Begin);
             var assembly = Assembly.Load(stream.ToArray());
             return assembly;
+        }
+
+        public static Assembly CompileMvcToAssembly(string code, IEnumerable<MetadataReference> metadataReferences = null)
+        {
+            metadataReferences ??= Enumerable.Empty<MetadataReference>();
+            List<MetadataReference> references = GetMvcMetadataReferences();
+            return CompileToAssembly(code, metadataReferences.Concat(references));
         }
 
         public static (CSharpCompilation Compilation, SyntaxTree Tree) Compile(string code, IEnumerable<MetadataReference> metadataReferences = null)
@@ -41,16 +48,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             return (compilation, syntaxTree);
         }
 
-        public static Func<IMvcBuilder, JsonOptions, IMvcBuilder> GetMethod(Assembly assembly, string type, string methodName)
+        public static (CSharpCompilation Compilation, SyntaxTree Tree) CompileMvc(string code, IEnumerable<MetadataReference> metadataReferences = null)
         {
-            var method = assembly.GetType(type).GetMethod(methodName);
-            Func<IMvcBuilder, JsonOptions, IMvcBuilder> result = method.CreateDelegate<Func<IMvcBuilder, JsonOptions, IMvcBuilder>>();
-            return result;
+            return Compile(code, GetMvcMetadataReferences());
         }
 
-        public static Assembly CompileMvcToAssembly(string code, IEnumerable<MetadataReference> metadataReferences = null)
+
+        private static List<MetadataReference> GetMvcMetadataReferences()
         {
-            metadataReferences ??= Enumerable.Empty<MetadataReference>();
             var references = new List<MetadataReference>();
             references.Add(MetadataReference.CreateFromFile(typeof(IServiceCollection).Assembly.Location));
             references.Add(MetadataReference.CreateFromFile(typeof(IServiceProvider).Assembly.Location));
@@ -58,7 +63,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             references.Add(MetadataReference.CreateFromFile(typeof(ITypeRepository).Assembly.Location));
             references.Add(MetadataReference.CreateFromFile(typeof(JsonOptions).Assembly.Location));
             references.Add(MetadataReference.CreateFromFile(typeof(FormatterCollection<>).Assembly.Location));
-            return CompileToAssembly(code, metadataReferences.Concat(references));
+            return references;
+        }
+
+        public static Func<IMvcBuilder, JsonOptions, IMvcBuilder> GetMethod(Assembly assembly, string type, string methodName)
+        {
+            var method = assembly.GetType(type).GetMethod(methodName);
+            Func<IMvcBuilder, JsonOptions, IMvcBuilder> result = method.CreateDelegate<Func<IMvcBuilder, JsonOptions, IMvcBuilder>>();
+            return result;
         }
     }
 }

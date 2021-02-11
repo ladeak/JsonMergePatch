@@ -17,10 +17,10 @@ public class Controller
     public void TestMethod(LaDeak.JsonMergePatch.Patch<SomeType> input) { }
 }";
 
-            var compilation = GeneratedSourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
+            var compilation = SourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
 
-            var sut = new PatchParametersWalker(compilation.Compilation.GetSemanticModel(compilation.Tree));
-            var result = sut.Process(await compilation.Tree.GetRootAsync());
+            var sut = new PatchParametersWalker();
+            var result = sut.Process(await compilation.Tree.GetRootAsync(), compilation.Compilation.GetSemanticModel(compilation.Tree));
             Assert.Equal("SomeType", result.Single().Name);
         }
 
@@ -35,10 +35,10 @@ public class Controller
     public void TestMethod2(LaDeak.JsonMergePatch.Patch<bool> input) { }
 }";
 
-            var compilation = GeneratedSourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
+            var compilation = SourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
 
-            var sut = new PatchParametersWalker(compilation.Compilation.GetSemanticModel(compilation.Tree));
-            var result = sut.Process(await compilation.Tree.GetRootAsync());
+            var sut = new PatchParametersWalker();
+            var result = sut.Process(await compilation.Tree.GetRootAsync(), compilation.Compilation.GetSemanticModel(compilation.Tree));
             Assert.Equal("SomeType", result.First().Name);
             Assert.Equal("Boolean", result.Last().Name);
             Assert.Equal("System", result.Last().ContainingNamespace.Name);
@@ -55,10 +55,10 @@ public class Controller
     public void TestMethod2(Patch<bool> input) { }
 }";
 
-            var compilation = GeneratedSourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
+            var compilation = SourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
 
-            var sut = new PatchParametersWalker(compilation.Compilation.GetSemanticModel(compilation.Tree));
-            var result = sut.Process(await compilation.Tree.GetRootAsync());
+            var sut = new PatchParametersWalker();
+            var result = sut.Process(await compilation.Tree.GetRootAsync(), compilation.Compilation.GetSemanticModel(compilation.Tree));
             Assert.Equal("SomeType", result.Single().Name);
         }
 
@@ -73,10 +73,10 @@ public class Controller
     public void TestMethod1(Patch<SomeType> input) { }
 }";
 
-            var compilation = GeneratedSourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
+            var compilation = SourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
 
-            var sut = new PatchParametersWalker(compilation.Compilation.GetSemanticModel(compilation.Tree));
-            var result = sut.Process(await compilation.Tree.GetRootAsync());
+            var sut = new PatchParametersWalker();
+            var result = sut.Process(await compilation.Tree.GetRootAsync(), compilation.Compilation.GetSemanticModel(compilation.Tree));
             Assert.Equal("SomeType", result.Single().Name);
             Assert.Equal("Controller", result.Single().ContainingType.Name);
         }
@@ -90,10 +90,10 @@ public class Controller
     public void TestMethod1(SomeType input) { }
 }";
 
-            var compilation = GeneratedSourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
+            var compilation = SourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
 
-            var sut = new PatchParametersWalker(compilation.Compilation.GetSemanticModel(compilation.Tree));
-            var result = sut.Process(await compilation.Tree.GetRootAsync());
+            var sut = new PatchParametersWalker();
+            var result = sut.Process(await compilation.Tree.GetRootAsync(), compilation.Compilation.GetSemanticModel(compilation.Tree));
             Assert.Empty(result);
         }
     }

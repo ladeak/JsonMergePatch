@@ -1,7 +1,6 @@
-﻿using LaDeak.JsonMergePatch.SourceGenerator;
-using Xunit;
+﻿using Xunit;
 
-namespace JsonMergePatch.SourceGenerator.Tests
+namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 {
     public class CasingTests
     {
