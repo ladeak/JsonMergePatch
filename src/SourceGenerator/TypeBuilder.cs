@@ -69,14 +69,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         {
             state.ToProcessTypeSymbols.Add(propertySymbol.Type);
             string fieldName = Casing.PrefixUnderscoreCamelCase(propertySymbol.Name);
-            var propertyTypeName = $"{propertySymbol.Type.ContainingNamespace}.{propertySymbol.Type.Name}";
+            var propertyTypeName = $"{propertySymbol.Type.ContainingNamespace.ToDisplayString()}.{propertySymbol.Type.Name}";
             state.AppendLine($"private {propertyTypeName} {fieldName};");
             BuildAttributes(state, propertySymbol.GetAttributes());
             state.AppendLine($"public {propertyTypeName} {propertySymbol.Name}");
             state.AppendLine("{");
             var getterSetter = state.IncrementIdentation();
             getterSetter.AppendLine($"get {{ return {fieldName}; }}");
-            getterSetter.AppendLine($"init");
+            getterSetter.AppendLine("init");
             getterSetter.AppendLine("{");
             var setterBody = getterSetter.IncrementIdentation();
             setterBody.AppendLine($"Properties[{propertyId}] = true;");
