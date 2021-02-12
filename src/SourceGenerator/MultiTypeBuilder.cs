@@ -24,6 +24,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
 
         public IEnumerable<GeneratedWrapper> Generate()
         {
+            _typesToWrap.Clear();
             var result = new List<GeneratedWrapper>();
             foreach (SyntaxTree tree in _syntaxTrees)
                 WalkTree(result, tree);
