@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 {
@@ -11,14 +10,6 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
     /// </summary>
     public class JsonMergePatchSourceGeneratorTests
     {
-        private readonly ITestOutputHelper _testOutputHelper;
-
-        public JsonMergePatchSourceGeneratorTests(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
-
-
         [Fact]
         public void SinglePatchType_ExtensionAndTypeAddedToSource()
         {
@@ -103,12 +94,32 @@ namespace TestCode3
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
             driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
 
-            foreach (var item in diagnostics)
-                _testOutputHelper.WriteLine(item.ToString());
-
             Assert.True(diagnostics.IsEmpty);
             Assert.True(outputCompilation.SyntaxTrees.Count() == 3);
             Assert.True(outputCompilation.GetDiagnostics().IsEmpty);
+        }
+
+        private static (Compilation Input, Compilation Output) CreateInputOutputCompilation()
+        {
+            Compilation inputCompilation = CreateCompilation(@"
+namespace TestCode3
+{
+    public class Dto1 { public System.Int32 NumberProp { get; set; } }
+
+    public class Dto4 { public System.String Property { get; set; } public Dto1 OtherDto { get; set; } }
+
+    public class Program2
+    {
+        public void SomeMethod2(LaDeak.JsonMergePatch.Patch<Dto4> data)
+        {
+        }
+    }
+}
+");
+            JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+            driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
+            return (inputCompilation, outputCompilation);
         }
 
         private static Compilation CreateCompilation(string source) => SourceBuilder.CompileMvc(source).Compilation;

@@ -7,6 +7,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public class TypeBuilder : ITypeBuilder
     {
+        private const string Namespace = "LaDeak.JsonMergePatch.Generated";
+
         public GeneratedWrapper BuildWrapperType(ITypeSymbol typeInfo, string sourceTypeName)
         {
             var name = GetName(typeInfo);
@@ -40,7 +42,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
 
         private void BuildNameSpace(BuilderState state, Action<BuilderState> addBody = null)
         {
-            state.AppendLine("namespace LaDeak.JsonMergePatch.Generated");
+            state.AppendLine($"namespace {Namespace}");
             state.AppendLine("{");
             addBody?.Invoke(state.IncrementIdentation());
             state.AppendLine("}");
@@ -69,7 +71,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         {
             state.ToProcessTypeSymbols.Add(propertySymbol.Type);
             string fieldName = Casing.PrefixUnderscoreCamelCase(propertySymbol.Name);
-            var propertyTypeName = $"{propertySymbol.Type.ContainingNamespace.ToDisplayString()}.{propertySymbol.Type.Name}";
+            string propertyTypeName = GetPropertyTypeName(propertySymbol);
             state.AppendLine($"private {propertyTypeName} {fieldName};");
             BuildAttributes(state, propertySymbol.GetAttributes());
             state.AppendLine($"public {propertyTypeName} {propertySymbol.Name}");
@@ -83,6 +85,15 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             setterBody.AppendLine($"{fieldName} = value;");
             getterSetter.AppendLine("}");
             state.AppendLine("}");
+        }
+
+        private string GetPropertyTypeName(IPropertySymbol propertySymbol)
+        {
+            if (GeneratedTypeFilter.IsGeneratableType(propertySymbol.Type))
+            {
+                return $"{Namespace}.{GetName(propertySymbol.Type)}";
+            }
+            return $"{propertySymbol.Type.ContainingNamespace.ToDisplayString()}.{propertySymbol.Type.Name}";
         }
 
         private void BuildAttributes(BuilderState state, IEnumerable<AttributeData> attributes)
@@ -115,13 +126,19 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             state.AppendLine($"public override {state.TypeInfo.SourceTypeName} ApplyPatch({state.TypeInfo.SourceTypeName} input)");
             state.AppendLine("{");
             var bodyState = state.IncrementIdentation();
+            bodyState.AppendLine($"input ??= new {state.TypeInfo.SourceTypeName}();");
             for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
             {
                 bodyState.AppendLine($"if (Properties[{i}])");
-                bodyState.IncrementIdentation().AppendLine($"input.{state.TypeInfo.Properties[i].Name} = {state.TypeInfo.Properties[i].Name};");
+                var currentProperty = state.TypeInfo.Properties[i];
+                if (GeneratedTypeFilter.IsGeneratableType(currentProperty.Type))
+                    bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}.ApplyPatch(input.{currentProperty.Name});");
+                else
+                    bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name};");
             }
             bodyState.AppendLine("return input;");
             state.AppendLine("}");
         }
+
     }
 }

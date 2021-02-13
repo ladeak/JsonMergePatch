@@ -86,6 +86,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 
         public override SourceName ApplyPatch(SourceName input)
         {
+            input ??= new SourceName();
             return input;
         }
     }
@@ -126,6 +127,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 
         public override SourceName ApplyPatch(SourceName input)
         {
+            input ??= new SourceName();
             return input;
         }
     }
@@ -166,6 +168,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 
         public override SourceName ApplyPatch(SourceName input)
         {
+            input ??= new SourceName();
             return input;
         }
     }
@@ -196,6 +199,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 
         public override SourceName ApplyPatch(SourceName input)
         {
+            input ??= new SourceName();
             return input;
         }
     }
@@ -237,6 +241,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 
         public override SourceName ApplyPatch(SourceName input)
         {
+            input ??= new SourceName();
             if (Properties[0])
                 input.TestProp = TestProp;
             return input;
@@ -293,6 +298,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 
         public override SourceName ApplyPatch(SourceName input)
         {
+            input ??= new SourceName();
             if (Properties[0])
                 input.TestProp0 = TestProp0;
             if (Properties[1])
@@ -326,8 +332,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[2];
         }
 
-        private Test.Dto _testProp0;
-        public Test.Dto TestProp0
+        private LaDeak.JsonMergePatch.Generated.DtoWrapped _testProp0;
+        public LaDeak.JsonMergePatch.Generated.DtoWrapped TestProp0
         {
             get { return _testProp0; }
             init
@@ -350,8 +356,9 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 
         public override SourceName ApplyPatch(SourceName input)
         {
+            input ??= new SourceName();
             if (Properties[0])
-                input.TestProp0 = TestProp0;
+                input.TestProp0 = TestProp0.ApplyPatch(input.TestProp0);
             if (Properties[1])
                 input.TestProp1 = TestProp1;
             return input;
@@ -398,6 +405,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 
         public override SourceName ApplyPatch(SourceName input)
         {
+            input ??= new SourceName();
             if (Properties[0])
                 input.TestProp = TestProp;
             return input;
@@ -411,6 +419,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         {
             var propertyTypeSymbol = Substitute.For<INamedTypeSymbol>();
             propertyTypeSymbol.Name.Returns(typeName);
+            SpecialType specialType = GetSpecialTypeFlag(typeName);
+            propertyTypeSymbol.SpecialType.Returns(specialType);
             var namespaceSymbol = Substitute.For<INamespaceSymbol>();
             namespaceSymbol.ToDisplayString().Returns(typeNamespaceName);
             propertyTypeSymbol.ContainingNamespace.Returns(namespaceSymbol);
@@ -420,5 +430,13 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             property.GetAttributes().Returns(attribute == null ? ImmutableArray.Create<AttributeData>() : ImmutableArray.Create(attribute));
             return property;
         }
+
+        private SpecialType GetSpecialTypeFlag(string typeName) =>
+            typeName switch
+            {
+                "Int32" => SpecialType.System_Int32,
+                "String" => SpecialType.System_String,
+                _ => SpecialType.None,
+            };
     }
 }
