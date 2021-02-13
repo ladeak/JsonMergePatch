@@ -60,6 +60,19 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         }
 
         [Fact]
+        public void NullArgument_ApplyPatch_ReturnsObject()
+        {
+            Compilation outputCompilation = CreateWrappedTypeCompilation();
+            var assembly = SourceBuilder.EmitToAssembly(outputCompilation);
+
+            var wrappedSubDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.Dto1Wrapped");
+            var subDto = wrappedSubDtoMetadata.GetConstructor(new Type[0]).Invoke(null);
+
+            var result = wrappedSubDtoMetadata.GetMethod("ApplyPatch").Invoke(subDto, new object[] { null });
+            Assert.NotNull(result);
+        }
+
+        [Fact]
         public void ApplyPatch_SetsPropertiesWithValues_ToTargetObject()
         {
             var compilation = CreateWrappedTypeCompilation();
