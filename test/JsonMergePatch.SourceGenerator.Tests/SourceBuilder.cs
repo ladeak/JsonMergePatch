@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.CodeAnalysis;
@@ -52,7 +53,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             return (compilation, syntaxTree);
         }
 
-        public static (CSharpCompilation Compilation, SyntaxTree Tree) CompileMvc(string code, IEnumerable<MetadataReference> metadataReferences = null)
+        public static (CSharpCompilation Compilation, SyntaxTree Tree) CompileMvc(string code)
         {
             return Compile(code, GetMvcMetadataReferences());
         }
@@ -73,6 +74,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             references.Add(MetadataReference.CreateFromFile(typeof(ITypeRepository).Assembly.Location));
             references.Add(MetadataReference.CreateFromFile(typeof(JsonOptions).Assembly.Location));
             references.Add(MetadataReference.CreateFromFile(typeof(FormatterCollection<>).Assembly.Location));
+            references.Add(MetadataReference.CreateFromFile(typeof(JsonPropertyNameAttribute).Assembly.Location));
             return references;
         }
 
