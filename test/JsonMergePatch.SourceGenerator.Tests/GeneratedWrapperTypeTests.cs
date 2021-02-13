@@ -66,10 +66,31 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var assembly = SourceBuilder.EmitToAssembly(outputCompilation);
 
             var wrappedSubDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.Dto1Wrapped");
-            var subDto = wrappedSubDtoMetadata.GetConstructor(new Type[0]).Invoke(null);
+            var sut = wrappedSubDtoMetadata.GetConstructor(new Type[0]).Invoke(null);
 
-            var result = wrappedSubDtoMetadata.GetMethod("ApplyPatch").Invoke(subDto, new object[] { null });
+            var result = wrappedSubDtoMetadata.GetMethod("ApplyPatch").Invoke(sut, new object[] { null });
             Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void ApplyPatch_CallsApplyPath_OnSubDto()
+        {
+            Compilation outputCompilation = CreateWrappedTypeCompilation();
+            var assembly = SourceBuilder.EmitToAssembly(outputCompilation);
+
+            var wrappedDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.Dto4Wrapped");
+            var wrappedSubDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.Dto1Wrapped");
+            var sut = wrappedDtoMetadata.GetConstructor(new Type[0]).Invoke(null);
+            var subDto = wrappedSubDtoMetadata.GetConstructor(new Type[0]).Invoke(null);
+            wrappedDtoMetadata.GetProperty("OtherDto").SetValue(sut, subDto);
+            wrappedSubDtoMetadata.GetProperty("NumberProp").SetValue(subDto, 100);
+
+            var result = wrappedDtoMetadata.GetMethod("ApplyPatch").Invoke(sut, new object[] { null });
+            var targetDtoMetadata = assembly.GetType("TestCode3.Dto4");
+            var targetSubDtoMetadata = assembly.GetType("TestCode3.Dto1");
+            var subDtoResult = targetDtoMetadata.GetProperty("OtherDto").GetValue(result);
+            Assert.NotNull(subDtoResult);
+            Assert.Equal(100, targetSubDtoMetadata.GetProperty("NumberProp").GetValue(subDtoResult));
         }
 
         [Fact]
@@ -88,6 +109,61 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             wrappedTypeMetadata.GetMethod("ApplyPatch").Invoke(sut, new[] { targetObject });
 
             Assert.Equal(100, targetTypeMetadata.GetProperty("NumberProp").GetValue(targetObject));
+        }
+
+        [Fact]
+        public void ApplyPatch_DoesNotSet_ValuePropertyWithoutValue()
+        {
+            var compilation = CreateWrappedTypeCompilation();
+            var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
+
+            var wrappedTypeMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.Dto1Wrapped");
+            var sut = wrappedTypeMetadata.GetConstructor(new Type[0]).Invoke(null);
+
+            var targetTypeMetadata = outputAssembly.GetType("TestCode3.Dto1");
+            var targetObject = targetTypeMetadata.GetConstructor(new Type[0]).Invoke(null);
+            targetTypeMetadata.GetProperty("NumberProp").SetValue(targetObject, 100);
+
+            wrappedTypeMetadata.GetMethod("ApplyPatch").Invoke(sut, new[] { targetObject });
+
+            Assert.Equal(100, targetTypeMetadata.GetProperty("NumberProp").GetValue(targetObject));
+        }
+
+        [Fact]
+        public void ApplyPatch_DoesNotSet_ReferencePropertyWithoutValue()
+        {
+            var compilation = CreateWrappedTypeCompilation();
+            var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
+
+            var wrappedTypeMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.Dto4Wrapped");
+            var sut = wrappedTypeMetadata.GetConstructor(new Type[0]).Invoke(null);
+
+            var targetTypeMetadata = outputAssembly.GetType("TestCode3.Dto4");
+            var targetObject = targetTypeMetadata.GetConstructor(new Type[0]).Invoke(null);
+            targetTypeMetadata.GetProperty("Property").SetValue(targetObject, "hello world");
+
+            wrappedTypeMetadata.GetMethod("ApplyPatch").Invoke(sut, new[] { targetObject });
+
+            Assert.Equal("hello world", targetTypeMetadata.GetProperty("Property").GetValue(targetObject));
+        }
+
+        [Fact]
+        public void ApplyPatch_PropertyToDelete_SetsNullOnTarget()
+        {
+            var compilation = CreateWrappedTypeCompilation();
+            var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
+
+            var wrappedTypeMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.Dto4Wrapped");
+            var sut = wrappedTypeMetadata.GetConstructor(new Type[0]).Invoke(null);
+            wrappedTypeMetadata.GetProperty("Property").SetValue(sut, null);
+
+            var targetTypeMetadata = outputAssembly.GetType("TestCode3.Dto4");
+            var targetObject = targetTypeMetadata.GetConstructor(new Type[0]).Invoke(null);
+            targetTypeMetadata.GetProperty("Property").SetValue(targetObject, "hello world");
+
+            wrappedTypeMetadata.GetMethod("ApplyPatch").Invoke(sut, new[] { targetObject });
+
+            Assert.Null(targetTypeMetadata.GetProperty("Property").GetValue(targetObject));
         }
 
         private static (Compilation Input, Compilation Output) CreateInputOutputCompilation()
