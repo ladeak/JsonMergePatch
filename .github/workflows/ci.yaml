@@ -18,4 +18,8 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Test
-      run: dotnet test
+      run: dotnet test --collect:"XPlat Code Coverage" --settings ./.github/codecoverage.runsettings
+    - name: Upload Test Coverage
+      uses: codecov/codecov-action@v1
+      with:
+        flags: dotnet
