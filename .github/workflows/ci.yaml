@@ -20,6 +20,6 @@ jobs:
     - name: Test
       run: dotnet test --collect:"XPlat Code Coverage"
     - name: Upload Test Coverage
-        uses: codecov/codecov-action@v1
-        with:
-          flags: dotnet
+      uses: codecov/codecov-action@v1
+      with:
+        flags: dotnet
