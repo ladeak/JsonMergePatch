@@ -6,7 +6,7 @@
       <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
           <Format>cobertura</Format>
-          <IncludeDirectory>./src/</IncludeDirectory>
+          <Exclude>[coverlet.*.tests?]*,[*]Coverlet.Core*,*.Tests.dll</Exclude>
         </Configuration>
       </DataCollector>
     </DataCollectors>
