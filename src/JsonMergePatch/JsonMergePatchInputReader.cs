@@ -36,21 +36,22 @@ namespace LaDeak.JsonMergePatch
             if (encoding == null)
                 throw new ArgumentNullException(nameof(encoding));
 
-            object model = null;
+            object? model;
             var httpContext = context.HttpContext;
             var typeRepository = httpContext.RequestServices.GetRequiredService<ITypeRepository>();
-            if (!typeRepository.TryGet(context.ModelType.GenericTypeArguments.FirstOrDefault(), out var targatType))
+            var registeredType = context.ModelType.GenericTypeArguments.FirstOrDefault();
+            if (registeredType == null || !typeRepository.TryGet(registeredType, out var targetType))
             {
                 return InputFormatterResult.Failure();
             }
             var (inputStream, usesTranscodingStream) = GetInputStream(httpContext, encoding);
             try
             {
-                model = await JsonSerializer.DeserializeAsync(inputStream, targatType, SerializerOptions);
+                model = await JsonSerializer.DeserializeAsync(inputStream, targetType, SerializerOptions);
             }
             catch (JsonException jsonException)
             {
-                var path = jsonException.Path;
+                var path = jsonException.Path ?? string.Empty;
                 var formatterException = new InputFormatterException(jsonException.Message, jsonException);
                 context.ModelState.TryAddModelError(path, formatterException, context.Metadata);
                 return InputFormatterResult.Failure();

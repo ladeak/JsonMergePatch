@@ -9,8 +9,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public class PatchParametersWalker : CSharpSyntaxWalker, IPatchParametersWalker
     {
-        private SemanticModel _semantics;
-        private List<ITypeSymbol> _typeNames;
+        private SemanticModel? _semantics;
+        private List<ITypeSymbol>? _typeNames;
 
         public IEnumerable<ITypeSymbol> Process(SyntaxNode node, SemanticModel semantics)
         {
@@ -27,7 +27,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                 var typeInfo = _semantics.GetTypeInfo(node.Type).Type as INamedTypeSymbol;
                 if (typeInfo?.Name == "Patch" && typeInfo.OriginalDefinition.ContainingSymbol.Name == "JsonMergePatch" && typeInfo.TypeArguments.Count() == 1)
                 {
-                    _typeNames.Add(typeInfo.TypeArguments.First());
+                    _typeNames?.Add(typeInfo.TypeArguments.First());
                 }
             }
 

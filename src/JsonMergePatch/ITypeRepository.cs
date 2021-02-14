@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LaDeak.JsonMergePatch
 {
@@ -17,6 +18,6 @@ namespace LaDeak.JsonMergePatch
         /// <param name="source">The user type.</param>
         /// <param name="wrapper">Type that wraps the user type.</param>
         /// <returns>True if the user type had a registration, otherwise false.</returns>
-        bool TryGet(Type source, out Type wrapper);
+        bool TryGet(Type source, [NotNullWhen(true)] out Type wrapper);
     }
 }

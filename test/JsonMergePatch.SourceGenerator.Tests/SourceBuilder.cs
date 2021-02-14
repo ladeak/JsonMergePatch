@@ -47,6 +47,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             references.Add(MetadataReference.CreateFromFile(typeof(object).Assembly.Location));
             references.Add(MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll"));
             references.Add(MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "netstandard.dll"));
+            references.Add(MetadataReference.CreateFromFile(typeof(IEnumerable<>).Assembly.Location));
             references.AddRange(metadataReferences ?? Enumerable.Empty<MetadataReference>());
             var compilation = CSharpCompilation.Create($"{Guid.NewGuid()}.dll", new[] { syntaxTree }, references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));

@@ -1,5 +1,4 @@
 using System;
-using LaDeak.JsonMergePatch;
 using Xunit;
 
 namespace LaDeak.JsonMergePatch.Tests

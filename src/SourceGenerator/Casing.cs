@@ -6,7 +6,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
     public class Casing
     {
         [ThreadStatic]
-        public static StringBuilder _builder;
+        public static StringBuilder? _builder;
 
         public static string PrefixUnderscoreCamelCase(string name)
         {

@@ -1,18 +1,48 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Linq;
+using Microsoft.CodeAnalysis;
 
 namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public static class GeneratedTypeFilter
     {
+        public static SymbolDisplayFormat SymbolFormat = new SymbolDisplayFormat(SymbolDisplayGlobalNamespaceStyle.Omitted, SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, SymbolDisplayGenericsOptions.IncludeTypeParameters, SymbolDisplayMemberOptions.None, SymbolDisplayDelegateStyle.NameOnly, SymbolDisplayExtensionMethodStyle.Default, SymbolDisplayParameterOptions.IncludeType, SymbolDisplayPropertyStyle.NameOnly, SymbolDisplayLocalOptions.None, SymbolDisplayKindOptions.None, SymbolDisplayMiscellaneousOptions.None);
+
         public static bool IsGeneratableType(ITypeSymbol typeInfo)
         {
-            return typeInfo.SpecialType == SpecialType.None && !typeInfo.IsAnonymousType && !typeInfo.IsAbstract;
-            // TODO check for default constructor
+            bool generic = false;
+            if (typeInfo is INamedTypeSymbol namedTypeInfo)
+                generic = namedTypeInfo.IsGenericType;
+            return typeInfo.SpecialType == SpecialType.None && !typeInfo.IsAnonymousType && !typeInfo.IsAbstract && !generic
+            && typeInfo.GetMembers().OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor).All(x => x.Parameters.Count() == 0);
+        }
+
+
+        public static bool TryGetGeneratableType(ITypeSymbol typeInfo, out ITypeSymbol generatableType)
+        {
+            if (typeInfo is INamedTypeSymbol namedTypeInfo)
+            {
+                if (namedTypeInfo.IsGenericType && !namedTypeInfo.IsUnboundGenericType && namedTypeInfo.TypeArguments.Count() == 1)
+                {
+                    var genericTypeArgument = namedTypeInfo.TypeArguments.First();
+                    if (IsGeneratableType(genericTypeArgument))
+                    {
+                        generatableType = genericTypeArgument;
+                        return true;
+                    }
+                }
+            }
+            if (IsGeneratableType(typeInfo))
+            {
+                generatableType = typeInfo;
+                return true;
+            }
+            generatableType = typeInfo;
+            return false;
         }
 
         public static string SourceTypeName(ITypeSymbol typeInfo)
         {
-            return $"{typeInfo.ContainingNamespace.ToDisplayString()}.{typeInfo.Name}";
+            return typeInfo.ToDisplayString(SymbolFormat);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
@@ -23,6 +22,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             DateTime? nullableDateTimePropertyExpected,
             double camelCasePropertyInput,
             double camelCasePropertyExpected,
+            int[] valuesInput,
+            int[] valuesExpected,
             string jsonInput)
         {
             var compilation = CreateWrappedTypeCompilation();
@@ -39,6 +40,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             {
                 targetParent = targetParentMetadata.GetConstructor(new Type[0]).Invoke(null);
                 targetParentMetadata.GetProperty("ParentStringProperty").SetValue(targetParent, parentStringPropertyInput);
+                targetParentMetadata.GetProperty("Values").SetValue(targetParent, valuesInput);
             }
             if (hasTargetSub)
             {
@@ -53,6 +55,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var patchedSub = targetParentMetadata.GetProperty("OtherDto").GetValue(patchedParent);
 
             Assert.Equal(parentStringPropertyExpected, targetParentMetadata.GetProperty("ParentStringProperty").GetValue(patchedParent));
+            Assert.Equal(valuesExpected, targetParentMetadata.GetProperty("Values").GetValue(patchedParent));
             Assert.Equal(numberPropExpected, targetSubMetadata.GetProperty("NumberProp").GetValue(patchedSub));
             Assert.Equal(nullableDateTimePropertyExpected, targetSubMetadata.GetProperty("NullableDateTimeProperty").GetValue(patchedSub));
             Assert.Equal(camelCasePropertyExpected, targetSubMetadata.GetProperty("CamelCaseProperty").GetValue(patchedSub));
@@ -65,9 +68,9 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode
 {
-    public class SubDto { public System.Int32 NumberProp { get; set; } public System.DateTime NullableDateTimeProperty { get; set; } [System.Text.Json.Serialization.JsonPropertyNameAttribute(""camelCaseProperty"")] public System.Double CamelCaseProperty { get; set; } }
+    public class SubDto { public System.Int32 NumberProp { get; set; } public System.DateTime? NullableDateTimeProperty { get; set; } [System.Text.Json.Serialization.JsonPropertyNameAttribute(""camelCaseProperty"")] public System.Double CamelCaseProperty { get; set; } }
 
-    public class ParentDto { public System.String ParentStringProperty { get; set; } public SubDto OtherDto { get; set; } }
+    public class ParentDto { public System.String ParentStringProperty { get; set; } public SubDto OtherDto { get; set; } public System.Collections.Generic.IEnumerable<int> Values { get; set; } }
 
     public class Program
     {
@@ -92,7 +95,7 @@ namespace TestCode
     {
         private readonly List<object[]> _data = new List<object[]>
         {
-            new object[] {false, false, null, "hello", 0, 1, DateTime.MinValue, new DateTime(2021,2,20),0,3.5, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 } }"  },
+            new object[] {false, false, null, "hello", 0, 1, DateTime.MinValue, new DateTime(2021,2,20), 0, 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }"  },
         };
 
         public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();

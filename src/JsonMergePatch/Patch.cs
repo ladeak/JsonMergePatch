@@ -1,4 +1,6 @@
-﻿namespace LaDeak.JsonMergePatch
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace LaDeak.JsonMergePatch
 {
     public abstract class Patch<T>
     {
@@ -12,6 +14,6 @@
         /// </summary>
         /// <param name="input">The entity to be patched.</param>
         /// <returns>The patched entity.</returns>
-        public abstract T ApplyPatch(T input);
+        public abstract T ApplyPatch([AllowNull] T input);
     }
 }

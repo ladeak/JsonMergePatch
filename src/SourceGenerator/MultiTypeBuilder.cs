@@ -41,9 +41,9 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                 var typeInfo = _typesToWrap.Pop();
                 var sourceTypeName = GeneratedTypeFilter.SourceTypeName(typeInfo);
                 if (!result.Any(x => x.SourceTypeFullName == sourceTypeName)
-                    && GeneratedTypeFilter.IsGeneratableType(typeInfo))
+                    && GeneratedTypeFilter.TryGetGeneratableType(typeInfo, out var typeInfoToGenerate))
                 {
-                    var generatedTypeResult = _typeBuilder.BuildWrapperType(typeInfo, sourceTypeName);
+                    var generatedTypeResult = _typeBuilder.BuildWrapperType(typeInfoToGenerate, sourceTypeName);
                     PushToWrap(generatedTypeResult.ToProcessTypes);
                     result.Add(generatedTypeResult);
                 }

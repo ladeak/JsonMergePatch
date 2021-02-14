@@ -24,6 +24,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             };
         }
 
+        //private string GetName(ITypeSymbol typeInfo) => $"{typeInfo.ToDisplayString(new SymbolDisplayFormat(SymbolDisplayGlobalNamespaceStyle.Omitted, SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, SymbolDisplayGenericsOptions.None, SymbolDisplayMemberOptions.None, SymbolDisplayDelegateStyle.NameOnly, SymbolDisplayExtensionMethodStyle.Default, SymbolDisplayParameterOptions.None, SymbolDisplayPropertyStyle.NameOnly, SymbolDisplayLocalOptions.None, SymbolDisplayKindOptions.None, SymbolDisplayMiscellaneousOptions.None))}Wrapped";
         private string GetName(ITypeSymbol typeInfo) => $"{typeInfo.Name}Wrapped";
 
         private void BuildFile(BuilderState state) => BuildNameSpace(state, BuildClass);
@@ -40,7 +41,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             return new BuilderState(typeInformation);
         }
 
-        private void BuildNameSpace(BuilderState state, Action<BuilderState> addBody = null)
+        private void BuildNameSpace(BuilderState state, Action<BuilderState>? addBody = null)
         {
             state.AppendLine($"namespace {Namespace}");
             state.AppendLine("{");
@@ -48,7 +49,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             state.AppendLine("}");
         }
 
-        private void BuildClassDeclaration(BuilderState state, Action<BuilderState> addBody = null)
+        private void BuildClassDeclaration(BuilderState state, Action<BuilderState>? addBody = null)
         {
             BuildAttributes(state, state.TypeInfo.TypeSymbol.GetAttributes());
             state.AppendLine($"public class {state.TypeInfo.Name} : LaDeak.JsonMergePatch.Patch<{state.TypeInfo.SourceTypeName}>");
@@ -57,7 +58,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             state.AppendLine("}");
         }
 
-        private void BuildConstructor(BuilderState state, Action<BuilderState> addBody = null)
+        private void BuildConstructor(BuilderState state, Action<BuilderState>? addBody = null)
         {
             state.AppendLine($"public {state.TypeInfo.Name}()");
             state.AppendLine("{");
@@ -71,7 +72,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         {
             state.ToProcessTypeSymbols.Add(propertySymbol.Type);
             string fieldName = Casing.PrefixUnderscoreCamelCase(propertySymbol.Name);
-            string propertyTypeName = GetPropertyTypeName(propertySymbol);
+            string propertyTypeName = GetGenericPropertyTypeName(propertySymbol.Type);
             state.AppendLine($"private {propertyTypeName} {fieldName};");
             BuildAttributes(state, propertySymbol.GetAttributes());
             state.AppendLine($"public {propertyTypeName} {propertySymbol.Name}");
@@ -87,13 +88,25 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             state.AppendLine("}");
         }
 
-        private string GetPropertyTypeName(IPropertySymbol propertySymbol)
+        private string GetGenericPropertyTypeName(ITypeSymbol propertyTypeSymbol)
         {
-            if (GeneratedTypeFilter.IsGeneratableType(propertySymbol.Type))
+            if (propertyTypeSymbol is INamedTypeSymbol namedType && namedType.IsGenericType)
             {
-                return $"{Namespace}.{GetName(propertySymbol.Type)}";
+                var underlyingType = GetPropertyTypeName(namedType.TypeArguments.First());
+                var withoutUnderlyingType = propertyTypeSymbol.ToDisplayString(new SymbolDisplayFormat(SymbolDisplayGlobalNamespaceStyle.Omitted, SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, SymbolDisplayGenericsOptions.None, SymbolDisplayMemberOptions.None, SymbolDisplayDelegateStyle.NameOnly, SymbolDisplayExtensionMethodStyle.Default, SymbolDisplayParameterOptions.IncludeType, SymbolDisplayPropertyStyle.NameOnly, SymbolDisplayLocalOptions.IncludeType, SymbolDisplayKindOptions.None, SymbolDisplayMiscellaneousOptions.ExpandNullable));
+                return $"{withoutUnderlyingType}<{underlyingType}>";
             }
-            return $"{propertySymbol.Type.ContainingNamespace.ToDisplayString()}.{propertySymbol.Type.Name}";
+
+            return GetPropertyTypeName(propertyTypeSymbol);
+        }
+
+        private string GetPropertyTypeName(ITypeSymbol propertyTypeSymbol)
+        {
+            if (GeneratedTypeFilter.IsGeneratableType(propertyTypeSymbol))
+            {
+                return $"{Namespace}.{GetName(propertyTypeSymbol)}";
+            }
+            return propertyTypeSymbol.ToDisplayString(GeneratedTypeFilter.SymbolFormat);
         }
 
         private void BuildAttributes(BuilderState state, IEnumerable<AttributeData> attributes)
