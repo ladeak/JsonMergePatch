@@ -13,6 +13,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         {
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<ITypeSymbol>();
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
@@ -25,6 +26,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<ITypeSymbol>();
             typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
             typeSymbol.ContainingNamespace.ToDisplayString().Returns("TestTypeNamespace");
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
@@ -37,6 +39,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         {
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<ITypeSymbol>();
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
@@ -48,6 +51,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         {
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<ITypeSymbol>();
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
@@ -60,6 +64,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<ITypeSymbol>();
             typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
@@ -72,6 +77,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<ITypeSymbol>();
             typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
@@ -101,6 +107,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
             typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
             var members = ImmutableArray.Create<ISymbol>(
                 Substitute.For<IFieldSymbol>(),
                 Substitute.For<IEventSymbol>(),
@@ -142,6 +149,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
             typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
             var readonlyProperty = Substitute.For<IPropertySymbol>();
             readonlyProperty.IsReadOnly.Returns(true);
             var abstractProperty = Substitute.For<IPropertySymbol>();
@@ -183,6 +191,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<ITypeSymbol>();
             typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
             var attributes = ImmutableArray.Create<AttributeData>(new TestAttribute(), new TestAttribute("Hello"));
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
@@ -214,6 +223,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
             typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
             var property = GetProperty("System", "String", "TestProp");
             typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
             var attributes = ImmutableArray.Create<AttributeData>();
@@ -259,6 +270,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
             typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
             var prop0 = GetProperty("System", "String", "TestProp0");
             var prop1 = GetProperty("System", "Int32", "TestProp1");
             typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(prop0, prop1));
@@ -317,6 +329,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
             typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
             var prop0 = GetProperty("Test", "Dto", "TestProp0");
             var prop1 = GetProperty("System", "Int32", "TestProp1");
             typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(prop0, prop1));
@@ -377,6 +390,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
             typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
             var property = GetProperty("System", "String", "TestProp", new TestAttribute("JsonPropertyName(\"temp\")"));
             typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
             var attributes = ImmutableArray.Create<AttributeData>();
@@ -414,6 +428,71 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
     }
 }
 ", result.SourceCode);
+        }
+
+        [Fact]
+        public void PropertiesInBaseTypeIncluded()
+        {
+            var sut = new TypeBuilder();
+            var typeSymbol = Substitute.For<INamedTypeSymbol>();
+            typeSymbol.Name.Returns("TestType");
+            var property = GetProperty("System", "String", "TestProp");
+
+            var baseTypeSymbol = Substitute.For<INamedTypeSymbol>();
+            baseTypeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+            var propertyBase = GetProperty("System", "Int32", "TestPropBase");
+            baseTypeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(propertyBase));
+            typeSymbol.BaseType.Returns(baseTypeSymbol);
+
+            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+            var attributes = ImmutableArray.Create<AttributeData>();
+            typeSymbol.GetAttributes().Returns(attributes);
+            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
+            Assert.Equal(
+@"namespace LaDeak.JsonMergePatch.Generated.S
+{
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    {
+        public TestTypeWrapped()
+        {
+            Properties = new bool[2];
+        }
+
+        private System.String _testProp;
+        public System.String TestProp
+        {
+            get { return _testProp; }
+            init
+            {
+                Properties[0] = true;
+                _testProp = value;
+            }
+        }
+
+        private System.Int32 _testPropBase;
+        public System.Int32 TestPropBase
+        {
+            get { return _testPropBase; }
+            init
+            {
+                Properties[1] = true;
+                _testPropBase = value;
+            }
+        }
+
+        public override SourceName ApplyPatch(SourceName input)
+        {
+            input ??= new SourceName();
+            if (Properties[0])
+                input.TestProp = TestProp;
+            if (Properties[1])
+                input.TestPropBase = TestPropBase;
+            return input;
+        }
+    }
+}
+", result.SourceCode);
+            Assert.Contains(result.ToProcessTypes, x => x.ToDisplayString() == "System.String");
         }
 
         private IPropertySymbol GetProperty(string namespaceName, string typeName, string name, AttributeData attribute = null)

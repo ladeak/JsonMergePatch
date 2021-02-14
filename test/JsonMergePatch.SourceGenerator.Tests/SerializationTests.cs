@@ -72,9 +72,17 @@ namespace TestCode
 
     public class ParentDto { public System.String ParentStringProperty { get; set; } public SubDto OtherDto { get; set; } public System.Collections.Generic.IEnumerable<int> Values { get; set; } }
 
+    public class SomeBase {  public System.Int32 NumberPropBase { get; set; } }
+
+    public class SomeDerived : SomeBase {  public System.String SomeDerivedProp { get; set; } }
+
     public class Program
     {
         public void SomeMethod(LaDeak.JsonMergePatch.Patch<ParentDto> data)
+        {
+        }
+
+        public void SomeMethod2(LaDeak.JsonMergePatch.Patch<SomeDerived> data)
         {
         }
     }

@@ -37,9 +37,15 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         private BuilderState InitializeState(ITypeSymbol typeInfo, string name, string sourceTypeName)
         {
             var typeInformation = new TypeInformation() { Name = name, SourceTypeName = sourceTypeName, TypeSymbol = typeInfo };
-            typeInformation.Properties = typeInfo.GetMembers().OfType<IPropertySymbol>()
-                .Where(x => !x.IsReadOnly && !x.IsWriteOnly && !x.IsIndexer && !x.IsStatic && !x.IsAbstract)
-                .ToList();
+            typeInformation.Properties = new List<IPropertySymbol>();
+
+            var currentType = typeInfo;
+            while (currentType != null && currentType.Name != "Object")
+            {
+                typeInformation.Properties.AddRange(currentType.GetMembers().OfType<IPropertySymbol>()
+                    .Where(x => !x.IsReadOnly && !x.IsWriteOnly && !x.IsIndexer && !x.IsStatic && !x.IsAbstract && !x.IsVirtual));
+                currentType = currentType.BaseType;
+            }
 
             return new BuilderState(typeInformation);
         }
