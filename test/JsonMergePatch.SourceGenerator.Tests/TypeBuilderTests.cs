@@ -25,10 +25,11 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<ITypeSymbol>();
             typeSymbol.Name.Returns("TestType");
+            typeSymbol.ContainingNamespace.ToDisplayString().Returns("TestTypeNamespace");
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal("LaDeak.JsonMergePatch.Generated.TestTypeWrapped", result.TargetTypeFullName);
+            Assert.Equal("LaDeak.JsonMergePatch.Generated.STestTypeNamespace.TestTypeWrapped", result.TargetTypeFullName);
         }
 
         [Fact]
@@ -62,7 +63,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal("LaDeakJsonMergePatchTestTypeWrapped", result.FileName);
+            Assert.Equal("LaDeakJsonMergePatchSTestTypeWrapped", result.FileName);
         }
 
         [Fact]
@@ -75,7 +76,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated
+@"namespace LaDeak.JsonMergePatch.Generated.S
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
     {
@@ -116,7 +117,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated
+@"namespace LaDeak.JsonMergePatch.Generated.S
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
     {
@@ -157,7 +158,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated
+@"namespace LaDeak.JsonMergePatch.Generated.S
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
     {
@@ -186,7 +187,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated
+@"namespace LaDeak.JsonMergePatch.Generated.S
 {
     [TestAttribute]
     [Hello]
@@ -213,13 +214,13 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
             typeSymbol.Name.Returns("TestType");
-            var property = GetProperty("System.String", "TestProp");
+            var property = GetProperty("System", "String", "TestProp");
             typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-    @"namespace LaDeak.JsonMergePatch.Generated
+@"namespace LaDeak.JsonMergePatch.Generated.S
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
     {
@@ -258,14 +259,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
             typeSymbol.Name.Returns("TestType");
-            var prop0 = GetProperty("System.String", "TestProp0");
-            var prop1 = GetProperty("System.Int32", "TestProp1");
+            var prop0 = GetProperty("System", "String", "TestProp0");
+            var prop1 = GetProperty("System", "Int32", "TestProp1");
             typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(prop0, prop1));
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-    @"namespace LaDeak.JsonMergePatch.Generated
+    @"namespace LaDeak.JsonMergePatch.Generated.S
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
     {
@@ -316,14 +317,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
             typeSymbol.Name.Returns("TestType");
-            var prop0 = GetProperty("Test.Dto", "TestProp0");
-            var prop1 = GetProperty("System.Int32", "TestProp1");
+            var prop0 = GetProperty("Test", "Dto", "TestProp0");
+            var prop1 = GetProperty("System", "Int32", "TestProp1");
             typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(prop0, prop1));
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-    @"namespace LaDeak.JsonMergePatch.Generated
+    @"namespace LaDeak.JsonMergePatch.Generated.S
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
     {
@@ -332,8 +333,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[2];
         }
 
-        private LaDeak.JsonMergePatch.Generated.Test.DtoWrapped _testProp0;
-        public LaDeak.JsonMergePatch.Generated.Test.DtoWrapped TestProp0
+        private LaDeak.JsonMergePatch.Generated.STest.DtoWrapped _testProp0;
+        public LaDeak.JsonMergePatch.Generated.STest.DtoWrapped TestProp0
         {
             get { return _testProp0; }
             init
@@ -376,13 +377,13 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
             typeSymbol.Name.Returns("TestType");
-            var property = GetProperty("System.String", "TestProp", new TestAttribute("JsonPropertyName(\"temp\")"));
+            var property = GetProperty("System", "String", "TestProp", new TestAttribute("JsonPropertyName(\"temp\")"));
             typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated
+@"namespace LaDeak.JsonMergePatch.Generated.S
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
     {
@@ -415,13 +416,16 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 ", result.SourceCode);
         }
 
-        private IPropertySymbol GetProperty(string fullTypeName, string name, AttributeData attribute = null)
+        private IPropertySymbol GetProperty(string namespaceName, string typeName, string name, AttributeData attribute = null)
         {
             var propertyTypeSymbol = Substitute.For<INamedTypeSymbol>();
-            propertyTypeSymbol.Name.Returns(fullTypeName);
-            SpecialType specialType = GetSpecialTypeFlag(fullTypeName);
+            propertyTypeSymbol.Name.Returns(typeName);
+            SpecialType specialType = GetSpecialTypeFlag(typeName);
             propertyTypeSymbol.SpecialType.Returns(specialType);
-            propertyTypeSymbol.ToDisplayString().ReturnsForAnyArgs(fullTypeName);
+            propertyTypeSymbol.ToDisplayString().ReturnsForAnyArgs($"{namespaceName}.{typeName}");
+            var namespaceSymbol = Substitute.For<INamespaceSymbol>();
+            namespaceSymbol.ToDisplayString().Returns(namespaceName);
+            propertyTypeSymbol.ContainingNamespace.Returns(namespaceSymbol);
             var property = Substitute.For<IPropertySymbol>();
             property.Name.Returns(name);
             property.Type.Returns(propertyTypeSymbol);
@@ -432,8 +436,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         private SpecialType GetSpecialTypeFlag(string typeName) =>
             typeName switch
             {
-                "System.Int32" => SpecialType.System_Int32,
-                "System.String" => SpecialType.System_String,
+                "Int32" => SpecialType.System_Int32,
+                "String" => SpecialType.System_String,
                 _ => SpecialType.None,
             };
     }

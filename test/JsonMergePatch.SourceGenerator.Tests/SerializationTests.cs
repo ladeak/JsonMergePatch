@@ -29,7 +29,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var compilation = CreateWrappedTypeCompilation();
             var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
 
-            var parentDtoWrappedMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.ParentDtoWrapped");
+            var parentDtoWrappedMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.ParentDtoWrapped");
             var targetParentMetadata = outputAssembly.GetType("TestCode.ParentDto");
             var targetSubMetadata = outputAssembly.GetType("TestCode.SubDto");
 
@@ -103,3 +103,4 @@ namespace TestCode
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
+

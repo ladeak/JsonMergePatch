@@ -16,16 +16,19 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             BuildFile(state);
             return new GeneratedWrapper()
             {
-                FileName = $"LaDeakJsonMergePatch{name}",
+                FileName = $"LaDeakJsonMergePatch{GetNamespaceExtension(typeInfo)}{name}",
                 SourceCode = state.Builder.ToString(),
                 SourceTypeFullName = sourceTypeName,
-                TargetTypeFullName = $"LaDeak.JsonMergePatch.Generated.{name}",
+                TargetTypeFullName = GetFullName(typeInfo),
                 ToProcessTypes = state.ToProcessTypeSymbols
             };
         }
 
-        //private string GetName(ITypeSymbol typeInfo) => $"{typeInfo.ToDisplayString(new SymbolDisplayFormat(SymbolDisplayGlobalNamespaceStyle.Omitted, SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, SymbolDisplayGenericsOptions.None, SymbolDisplayMemberOptions.None, SymbolDisplayDelegateStyle.NameOnly, SymbolDisplayExtensionMethodStyle.Default, SymbolDisplayParameterOptions.None, SymbolDisplayPropertyStyle.NameOnly, SymbolDisplayLocalOptions.None, SymbolDisplayKindOptions.None, SymbolDisplayMiscellaneousOptions.None))}Wrapped";
         private string GetName(ITypeSymbol typeInfo) => $"{typeInfo.Name}Wrapped";
+
+        private string GetNamespaceExtension(ITypeSymbol typeInfo) => $"S{typeInfo.ContainingNamespace.ToDisplayString()}";
+
+        private string GetFullName(ITypeSymbol typeInfo) => $"{Namespace}.{GetNamespaceExtension(typeInfo)}.{GetName(typeInfo)}";
 
         private void BuildFile(BuilderState state) => BuildNameSpace(state, BuildClass);
 
@@ -43,7 +46,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
 
         private void BuildNameSpace(BuilderState state, Action<BuilderState>? addBody = null)
         {
-            state.AppendLine($"namespace {Namespace}");
+            state.AppendLine($"namespace {Namespace}.{GetNamespaceExtension(state.TypeInfo.TypeSymbol)}");
             state.AppendLine("{");
             addBody?.Invoke(state.IncrementIdentation());
             state.AppendLine("}");
@@ -104,7 +107,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         {
             if (GeneratedTypeFilter.IsGeneratableType(propertyTypeSymbol))
             {
-                return $"{Namespace}.{GetName(propertyTypeSymbol)}";
+                return GetFullName(propertyTypeSymbol);
             }
             return propertyTypeSymbol.ToDisplayString(GeneratedTypeFilter.SymbolFormat);
         }
