@@ -107,7 +107,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             }
             var propertyTypeNameResult = GetPropertyTypeName(propertyTypeSymbol);
 
-            if (propertyTypeSymbol.IsValueType && !propertyTypeNameResult.IsGeneratedType)
+            if (propertyTypeSymbol.IsValueType)
             {
                 propertyInfo.IsConvertedToNullableType = true;
                 return $"System.Nullable<{propertyTypeNameResult.TypeName}>";
@@ -160,7 +160,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                 bodyState.AppendLine($"if (Properties[{i}])");
                 var currentProperty = state.TypeInfo.Properties[i].Property;
                 if (GeneratedTypeFilter.IsGeneratableType(currentProperty.Type))
-                    bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}.ApplyPatch(input.{currentProperty.Name});");
+                    bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name});");
                 else if (state.TypeInfo.Properties[i].IsConvertedToNullableType)
                     bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}.HasValue ? {currentProperty.Name}.Value : default;");
                 else

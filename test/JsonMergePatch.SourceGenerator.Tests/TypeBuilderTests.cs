@@ -298,8 +298,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             }
         }
 
-        private System.Int32 _testProp1;
-        public System.Int32 TestProp1
+        private System.Nullable<System.Int32> _testProp1;
+        public System.Nullable<System.Int32> TestProp1
         {
             get { return _testProp1; }
             init
@@ -315,7 +315,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             if (Properties[0])
                 input.TestProp0 = TestProp0;
             if (Properties[1])
-                input.TestProp1 = TestProp1;
+                input.TestProp1 = TestProp1.HasValue ? TestProp1.Value : default;
             return input;
         }
     }
@@ -357,8 +357,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             }
         }
 
-        private System.Int32 _testProp1;
-        public System.Int32 TestProp1
+        private System.Nullable<System.Int32> _testProp1;
+        public System.Nullable<System.Int32> TestProp1
         {
             get { return _testProp1; }
             init
@@ -372,9 +372,9 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         {
             input ??= new SourceName();
             if (Properties[0])
-                input.TestProp0 = TestProp0.ApplyPatch(input.TestProp0);
+                input.TestProp0 = TestProp0?.ApplyPatch(input.TestProp0);
             if (Properties[1])
-                input.TestProp1 = TestProp1;
+                input.TestProp1 = TestProp1.HasValue ? TestProp1.Value : default;
             return input;
         }
     }
@@ -469,8 +469,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             }
         }
 
-        private System.Int32 _testPropBase;
-        public System.Int32 TestPropBase
+        private System.Nullable<System.Int32> _testPropBase;
+        public System.Nullable<System.Int32> TestPropBase
         {
             get { return _testPropBase; }
             init
@@ -486,7 +486,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             if (Properties[0])
                 input.TestProp = TestProp;
             if (Properties[1])
-                input.TestPropBase = TestPropBase;
+                input.TestPropBase = TestPropBase.HasValue ? TestPropBase.Value : default;
             return input;
         }
     }
@@ -505,6 +505,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var namespaceSymbol = Substitute.For<INamespaceSymbol>();
             namespaceSymbol.ToDisplayString().Returns(namespaceName);
             propertyTypeSymbol.ContainingNamespace.Returns(namespaceSymbol);
+            propertyTypeSymbol.IsValueType.Returns(GetIsValueTypeFlag(typeName));
             var property = Substitute.For<IPropertySymbol>();
             property.Name.Returns(name);
             property.Type.Returns(propertyTypeSymbol);
@@ -518,6 +519,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
                 "Int32" => SpecialType.System_Int32,
                 "String" => SpecialType.System_String,
                 _ => SpecialType.None,
+            };
+
+        private bool GetIsValueTypeFlag(string typeName) =>
+            typeName switch
+            {
+                "Int32" => true,
+                "String" => false,
+                _ => false,
             };
     }
 }
