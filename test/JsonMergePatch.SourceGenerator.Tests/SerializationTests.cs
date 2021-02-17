@@ -103,7 +103,15 @@ namespace TestCode
     {
         private readonly List<object[]> _data = new List<object[]>
         {
-            new object[] {false, false, null, "hello", 0, 1, DateTime.MinValue, new DateTime(2021,2,20), 0, 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }"  },
+            new object[] {false, false, default(string), "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }"  },
+            new object[] {false, false, default(string), "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }"  },
+            new object[] {true, true, "world", "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }"  },
+            new object[] {true, true, "world", "hello", 10, 1, new DateTime(2021, 1, 20), new DateTime(2021, 2, 20), 100, 3.5, new int[] { 1, 2 }, new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }"  },
+            new object[] {true, true, "world", "world", 10, 10, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 100, new int[] { 1, 2 }, new[] { 1, 2, 3 }, @"{ ""Values"": [ 1, 2, 3 ] }"  },
+            new object[] {true, true, "world", "world", 10, 10, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 100, new int[] { 1, 2, 3, 4 }, new[] { 1, 2, 3 }, @"{ ""Values"": [ 1, 2, 3 ] }"  },
+            new object[] {true, true, "world", "world", 10, 1, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 3.5, new int[0], new int[0], @"{ ""OtherDto"": { ""NumberProp"": 1, ""camelCaseProperty"": 3.5 } }"  },
+            new object[] {true, true, "world", default(string), 10, 1, new DateTime(2021, 1, 20), default(DateTime?), 100, 3.5, new int[] { 1, 2 }, default(int[]), @"{ ""ParentStringProperty"": null, ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":null, ""camelCaseProperty"": 3.5 }, ""Values"": null }"  },
+            new object[] {true, true, "world", default(string), 10, 10, new DateTime(2021, 1, 20), default(DateTime?), 100, 3.5, new int[] { 1, 2 }, default(int[]), @"{ ""ParentStringProperty"": null, ""OtherDto"": { ""NullableDateTimeProperty"":null, ""camelCaseProperty"": 3.5 }, ""Values"": null }"  },
         };
 
         public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
