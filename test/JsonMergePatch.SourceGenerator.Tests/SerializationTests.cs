@@ -112,6 +112,7 @@ namespace TestCode
             new object[] {true, true, "world", "world", 10, 1, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 3.5, new int[0], new int[0], @"{ ""OtherDto"": { ""NumberProp"": 1, ""camelCaseProperty"": 3.5 } }"  },
             new object[] {true, true, "world", default(string), 10, 1, new DateTime(2021, 1, 20), default(DateTime?), 100, 3.5, new int[] { 1, 2 }, default(int[]), @"{ ""ParentStringProperty"": null, ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":null, ""camelCaseProperty"": 3.5 }, ""Values"": null }"  },
             new object[] {true, true, "world", default(string), 10, 10, new DateTime(2021, 1, 20), default(DateTime?), 100, 3.5, new int[] { 1, 2 }, default(int[]), @"{ ""ParentStringProperty"": null, ""OtherDto"": { ""NullableDateTimeProperty"":null, ""camelCaseProperty"": 3.5 }, ""Values"": null }"  },
+            new object[] {true, true, "world", "world", 5, 0, default(DateTime), default(DateTime), 10, 0, new int[0], new int[0], @"{ ""OtherDto"": { ""NumberProp"": null, ""camelCaseProperty"": null } }"  },
         };
 
         public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();

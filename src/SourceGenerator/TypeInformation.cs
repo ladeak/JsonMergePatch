@@ -7,7 +7,13 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
     {
         public string Name { get; set; }
         public string SourceTypeName { get; set; }
-        public List<IPropertySymbol> Properties { get; set; }
+        public List<PropertyInformation> Properties { get; } = new List<PropertyInformation>();
         public ITypeSymbol TypeSymbol { get; set; }
+    }
+
+    public class PropertyInformation
+    {
+        public IPropertySymbol Property { get; set; }
+        public bool IsConvertedToNullableType { get; set; }
     }
 }
