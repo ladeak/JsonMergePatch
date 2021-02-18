@@ -21,7 +21,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         {
             if (typeInfo is INamedTypeSymbol namedTypeInfo)
             {
-                if (namedTypeInfo.IsGenericType && !namedTypeInfo.IsUnboundGenericType && namedTypeInfo.TypeArguments.Count() == 1 && typeInfo.SpecialType != SpecialType.None)
+                if (namedTypeInfo.IsGenericType && !namedTypeInfo.IsUnboundGenericType && namedTypeInfo.TypeArguments.Count() == 1 && namedTypeInfo.SpecialType != SpecialType.None)
                 {
                     var genericTypeArgument = namedTypeInfo.TypeArguments.First();
                     if (IsGeneratableType(genericTypeArgument))
@@ -31,13 +31,9 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                     }
                 }
             }
-            if (IsGeneratableType(typeInfo))
-            {
-                generatableType = typeInfo;
-                return true;
-            }
+
             generatableType = typeInfo;
-            return false;
+            return IsGeneratableType(typeInfo);
         }
 
         public static string SourceTypeName(ITypeSymbol typeInfo)
