@@ -123,6 +123,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             foreach (var underlyingType in namedType.TypeArguments.Skip(1).OfType<INamedTypeSymbol>())
             {
                 var genericTypeParam = underlyingType.IsValueType ? $"System.Nullable<{GetPropertyTypeName(underlyingType).TypeName}>" : GetPropertyTypeName(underlyingType).TypeName;
+                propertyInfo.IsConvertedToNullableType = underlyingType.IsValueType;
                 genericResult += $", {genericTypeParam}";
             }
             genericResult += ">";
@@ -178,10 +179,10 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                 var currentProperty = state.TypeInfo.Properties[i].Property;
                 if (GeneratedTypeFilter.IsGeneratableType(currentProperty.Type))
                     bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name});");
-                else if (state.TypeInfo.Properties[i].IsConvertedToNullableType)
-                    bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}.HasValue ? {currentProperty.Name}.Value : default;");
                 else if (state.TypeInfo.Properties[i].IsGenericDictionary)
                     BuildDictionaryApplyPath(bodyState.IncrementIdentation(), state.TypeInfo.Properties[i]);
+                else if (state.TypeInfo.Properties[i].IsConvertedToNullableType)
+                    bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}.HasValue ? {currentProperty.Name}.Value : default;");
                 else
                     bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name};");
             }
@@ -199,7 +200,10 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             foreachBody.AppendLine("if(item.Value is null)");
             foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}.Remove(item.Key);");
             foreachBody.AppendLine("else");
-            foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}[item.Key] = item.Value.Value;");
+            if (propertyInformation.IsConvertedToNullableType)
+                foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}[item.Key] = item.Value.Value;");
+            else 
+                foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}[item.Key] = item.Value;");
             state.AppendLine("}");
         }
     }

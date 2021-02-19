@@ -8,6 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace CoreWebApi.Controllers
 {
+    public class CitiesData
+    {
+        public Dictionary<string, string> Cities { get; set; }
+    }
+
     public class WeatherForecast
     {
         public DateTime Date { get; set; }
@@ -22,16 +27,16 @@ namespace CoreWebApi.Controllers
 
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class SampleController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ILogger<SampleController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public SampleController(ILogger<SampleController> logger)
         {
             _logger = logger;
         }
@@ -49,10 +54,18 @@ namespace CoreWebApi.Controllers
             .ToArray();
         }
 
-        [HttpPatch]
-        public WeatherForecast Patch(Patch<WeatherForecast> input)
+        [HttpPatch("PatchWeather")]
+        public WeatherForecast PatchForecast(Patch<WeatherForecast> input)
         {
             var original = new WeatherForecast() { Date = DateTime.UtcNow, Summary = "Sample weather forecast", TemperatureC = 24 };
+            var result = input.ApplyPatch(original);
+            return result;
+        }
+
+        [HttpPatch("PatchCities")]
+        public CitiesData PatchCities(Patch<CitiesData> input)
+        {
+            var original = new CitiesData() { Cities = new Dictionary<string, string>() { { "Frankfurt", "Germany" }, { "New York", "US" }, { "London", "UK" } } };
             var result = input.ApplyPatch(original);
             return result;
         }

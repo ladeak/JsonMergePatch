@@ -432,7 +432,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         }
 
         [Fact]
-        public void DictionaryProperty_CreatesPatchToPatchEachValue()
+        public void DictionaryWithValueProperty_CreatesPatchToPatchEachValue()
         {
             var sut = new TypeBuilder();
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
@@ -546,6 +546,57 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
                         input.TestProp1.Remove(item.Key);
                     else
                         input.TestProp1[item.Key] = item.Value.Value;
+                }
+            return input;
+        }
+    }
+}
+", result.SourceCode);
+        }
+
+        [Fact]
+        public void DictionaryWithReferenceProperty_CreatesPatchToPatchEachValue()
+        {
+            var sut = new TypeBuilder();
+            var typeSymbol = Substitute.For<INamedTypeSymbol>();
+            typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+            var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetPropertyType("System", "String"), GetPropertyType("System", "String"));
+            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
+            Assert.Equal(
+@"namespace LaDeak.JsonMergePatch.Generated.S
+{
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    {
+        public TestTypeWrapped()
+        {
+            Properties = new bool[1];
+        }
+
+        private System.Collections.Generic.Dictionary<System.String, System.String> _testProp;
+        public System.Collections.Generic.Dictionary<System.String, System.String> TestProp
+        {
+            get { return _testProp; }
+            init
+            {
+                Properties[0] = true;
+                _testProp = value;
+            }
+        }
+
+        public override SourceName ApplyPatch(SourceName input)
+        {
+            input ??= new SourceName();
+            if (Properties[0])
+                input.TestProp ??= new();
+                foreach(var item in TestProp)
+                {
+                    if(item.Value is null)
+                        input.TestProp.Remove(item.Key);
+                    else
+                        input.TestProp[item.Key] = item.Value;
                 }
             return input;
         }
