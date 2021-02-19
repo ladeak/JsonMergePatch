@@ -100,19 +100,36 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         {
             var propertyTypeSymbol = propertyInfo.Property.Type;
             if (propertyTypeSymbol is INamedTypeSymbol namedType && namedType.IsGenericType)
-            {
-                var underlyingType = GetPropertyTypeName(namedType.TypeArguments.First()).TypeName;
-                var withoutUnderlyingType = namedType.ToDisplayString(new SymbolDisplayFormat(SymbolDisplayGlobalNamespaceStyle.Omitted, SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, SymbolDisplayGenericsOptions.None, SymbolDisplayMemberOptions.None, SymbolDisplayDelegateStyle.NameOnly, SymbolDisplayExtensionMethodStyle.Default, SymbolDisplayParameterOptions.IncludeType, SymbolDisplayPropertyStyle.NameOnly, SymbolDisplayLocalOptions.IncludeType, SymbolDisplayKindOptions.None, SymbolDisplayMiscellaneousOptions.ExpandNullable));
-                return $"{withoutUnderlyingType}<{underlyingType}>";
-            }
-            var propertyTypeNameResult = GetPropertyTypeName(propertyTypeSymbol);
+                return ConstructGenericTypeWithParameters(propertyInfo);
 
+            var propertyTypeNameResult = GetPropertyTypeName(propertyTypeSymbol);
             if (propertyTypeSymbol.IsValueType)
             {
                 propertyInfo.IsConvertedToNullableType = true;
                 return $"System.Nullable<{propertyTypeNameResult.TypeName}>";
             }
             return propertyTypeNameResult.TypeName;
+        }
+
+        private string ConstructGenericTypeWithParameters(PropertyInformation propertyInfo)
+        {
+            if (propertyInfo.Property.Type is not INamedTypeSymbol namedType || !namedType.IsGenericType)
+                throw new ArgumentException("Parameter is not generic type parameter.", nameof(propertyInfo));
+
+            var firstUnderlyingType = GetPropertyTypeName(namedType.TypeArguments.First()).TypeName;
+            var withoutUnderlyingType = namedType.ToDisplayString(new SymbolDisplayFormat(SymbolDisplayGlobalNamespaceStyle.Omitted, SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, SymbolDisplayGenericsOptions.None, SymbolDisplayMemberOptions.None, SymbolDisplayDelegateStyle.NameOnly, SymbolDisplayExtensionMethodStyle.Default, SymbolDisplayParameterOptions.IncludeType, SymbolDisplayPropertyStyle.NameOnly, SymbolDisplayLocalOptions.IncludeType, SymbolDisplayKindOptions.None, SymbolDisplayMiscellaneousOptions.ExpandNullable));
+
+            var genericResult = $"{withoutUnderlyingType}<{firstUnderlyingType}";
+            foreach (var underlyingType in namedType.TypeArguments.Skip(1).OfType<INamedTypeSymbol>())
+            {
+                var genericTypeParam = underlyingType.IsValueType ? $"System.Nullable<{GetPropertyTypeName(underlyingType).TypeName}>" : GetPropertyTypeName(underlyingType).TypeName;
+                genericResult += $", {genericTypeParam}";
+            }
+            genericResult += ">";
+            if (namedType.Name.Contains("Dictionary") && namedType.ContainingNamespace.ToDisplayString() == "System.Collections.Generic")
+                propertyInfo.IsGenericDictionary = true;
+
+            return genericResult;
         }
 
         private (bool IsGeneratedType, string TypeName) GetPropertyTypeName(ITypeSymbol propertyTypeSymbol)
@@ -163,13 +180,29 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                     bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name});");
                 else if (state.TypeInfo.Properties[i].IsConvertedToNullableType)
                     bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}.HasValue ? {currentProperty.Name}.Value : default;");
+                else if (state.TypeInfo.Properties[i].IsGenericDictionary)
+                    BuildDictionaryApplyPath(bodyState.IncrementIdentation(), state.TypeInfo.Properties[i]);
                 else
                     bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name};");
-
             }
             bodyState.AppendLine("return input;");
             state.AppendLine("}");
         }
 
+        private void BuildDictionaryApplyPath(BuilderState state, PropertyInformation propertyInformation)
+        {
+            if (!propertyInformation.IsGenericDictionary)
+                return;
+            var propertyName = propertyInformation.Property.Name;
+            state.AppendLine($"input.{propertyName} ??= new();");
+            state.AppendLine($"foreach(var item in {propertyName})");
+            state.AppendLine("{");
+            var foreachBody = state.IncrementIdentation();
+            foreachBody.AppendLine("if(item.Value is null)");
+            foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}.Remove(item.Key);");
+            foreachBody.AppendLine("else");
+            foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}[item.Key] = item.Value.Value;");
+            state.AppendLine("}");
+        }
     }
 }

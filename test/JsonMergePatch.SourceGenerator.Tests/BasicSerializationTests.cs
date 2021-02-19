@@ -7,10 +7,10 @@ using Xunit;
 
 namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 {
-    public class SerializationTests
+    public class BasicSerializationTests
     {
         [Theory]
-        [ClassData(typeof(SerializationData))]
+        [ClassData(typeof(BasicSerializationData))]
         public void ApplyPatch_PropertyToDelete_SetsNullOnTarget(
             bool hasTargetParent,
             bool hasTargetSub,
@@ -99,7 +99,7 @@ namespace TestCode
         private static Compilation CreateCompilation(string source) => SourceBuilder.CompileMvc(source).Compilation;
     }
 
-    public class SerializationData : IEnumerable<object[]>
+    public class BasicSerializationData : IEnumerable<object[]>
     {
         private readonly List<object[]> _data = new List<object[]>
         {

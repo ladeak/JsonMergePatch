@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using NSubstitute;
@@ -431,6 +432,129 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         }
 
         [Fact]
+        public void DictionaryProperty_CreatesPatchToPatchEachValue()
+        {
+            var sut = new TypeBuilder();
+            var typeSymbol = Substitute.For<INamedTypeSymbol>();
+            typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+            var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetPropertyType("System", "String"), GetPropertyType("System", "Int32"));
+            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
+            Assert.Equal(
+@"namespace LaDeak.JsonMergePatch.Generated.S
+{
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    {
+        public TestTypeWrapped()
+        {
+            Properties = new bool[1];
+        }
+
+        private System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> _testProp;
+        public System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> TestProp
+        {
+            get { return _testProp; }
+            init
+            {
+                Properties[0] = true;
+                _testProp = value;
+            }
+        }
+
+        public override SourceName ApplyPatch(SourceName input)
+        {
+            input ??= new SourceName();
+            if (Properties[0])
+                input.TestProp ??= new();
+                foreach(var item in TestProp)
+                {
+                    if(item.Value is null)
+                        input.TestProp.Remove(item.Key);
+                    else
+                        input.TestProp[item.Key] = item.Value.Value;
+                }
+            return input;
+        }
+    }
+}
+", result.SourceCode);
+        }
+
+        [Fact]
+        public void MultipleDictionaryProperty_CreatesPatchToPatchEachValue()
+        {
+            var sut = new TypeBuilder();
+            var typeSymbol = Substitute.For<INamedTypeSymbol>();
+            typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+            var property0 = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp0", GetPropertyType("System", "String"), GetPropertyType("System", "Int32"));
+            var property1 = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp1", GetPropertyType("System", "String"), GetPropertyType("System", "Int32"));
+            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property0, property1));
+            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
+            Assert.Equal(
+@"namespace LaDeak.JsonMergePatch.Generated.S
+{
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    {
+        public TestTypeWrapped()
+        {
+            Properties = new bool[2];
+        }
+
+        private System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> _testProp0;
+        public System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> TestProp0
+        {
+            get { return _testProp0; }
+            init
+            {
+                Properties[0] = true;
+                _testProp0 = value;
+            }
+        }
+
+        private System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> _testProp1;
+        public System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> TestProp1
+        {
+            get { return _testProp1; }
+            init
+            {
+                Properties[1] = true;
+                _testProp1 = value;
+            }
+        }
+
+        public override SourceName ApplyPatch(SourceName input)
+        {
+            input ??= new SourceName();
+            if (Properties[0])
+                input.TestProp0 ??= new();
+                foreach(var item in TestProp0)
+                {
+                    if(item.Value is null)
+                        input.TestProp0.Remove(item.Key);
+                    else
+                        input.TestProp0[item.Key] = item.Value.Value;
+                }
+            if (Properties[1])
+                input.TestProp1 ??= new();
+                foreach(var item in TestProp1)
+                {
+                    if(item.Value is null)
+                        input.TestProp1.Remove(item.Key);
+                    else
+                        input.TestProp1[item.Key] = item.Value.Value;
+                }
+            return input;
+        }
+    }
+}
+", result.SourceCode);
+        }
+
+        [Fact]
         public void PropertiesInBaseTypeIncluded()
         {
             var sut = new TypeBuilder();
@@ -495,7 +619,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Contains(result.ToProcessTypes, x => x.ToDisplayString() == "System.String");
         }
 
-        private IPropertySymbol GetProperty(string namespaceName, string typeName, string name, AttributeData attribute = null)
+        private ITypeSymbol GetPropertyType(string namespaceName, string typeName)
         {
             var propertyTypeSymbol = Substitute.For<INamedTypeSymbol>();
             propertyTypeSymbol.Name.Returns(typeName);
@@ -506,10 +630,36 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             namespaceSymbol.ToDisplayString().Returns(namespaceName);
             propertyTypeSymbol.ContainingNamespace.Returns(namespaceSymbol);
             propertyTypeSymbol.IsValueType.Returns(GetIsValueTypeFlag(typeName));
+            return propertyTypeSymbol;
+        }
+
+        private IPropertySymbol GetProperty(string namespaceName, string typeName, string name, AttributeData attribute = null)
+        {
+            var propertyTypeSymbol = GetPropertyType(namespaceName, typeName);
             var property = Substitute.For<IPropertySymbol>();
             property.Name.Returns(name);
             property.Type.Returns(propertyTypeSymbol);
             property.GetAttributes().Returns(attribute == null ? ImmutableArray.Create<AttributeData>() : ImmutableArray.Create(attribute));
+            return property;
+        }
+
+        private IPropertySymbol GetGenericProperty(string namespaceName, string typeName, string name, ITypeSymbol propertyTypeSymbol0, ITypeSymbol propertyTypeSymbol1)
+        {
+            var propertyTypeSymbol = Substitute.For<INamedTypeSymbol>();
+            propertyTypeSymbol.Name.Returns(typeName);
+            SpecialType specialType = GetSpecialTypeFlag(typeName);
+            propertyTypeSymbol.SpecialType.Returns(specialType);
+            propertyTypeSymbol.ToDisplayString().ReturnsForAnyArgs($"{namespaceName}.{typeName}");
+            var namespaceSymbol = Substitute.For<INamespaceSymbol>();
+            namespaceSymbol.ToDisplayString().Returns(namespaceName);
+            propertyTypeSymbol.ContainingNamespace.Returns(namespaceSymbol);
+            propertyTypeSymbol.IsValueType.Returns(GetIsValueTypeFlag(typeName));
+            propertyTypeSymbol.IsGenericType.Returns(true);
+            propertyTypeSymbol.TypeArguments.Returns(ImmutableArray.Create<ITypeSymbol>(propertyTypeSymbol0, propertyTypeSymbol1));
+            var property = Substitute.For<IPropertySymbol>();
+            property.Name.Returns(name);
+            property.Type.Returns(propertyTypeSymbol);
+            property.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
             return property;
         }
 
@@ -518,6 +668,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             {
                 "Int32" => SpecialType.System_Int32,
                 "String" => SpecialType.System_String,
+                "Dictionary<System.String, System.Int32>" => SpecialType.None,
                 _ => SpecialType.None,
             };
 

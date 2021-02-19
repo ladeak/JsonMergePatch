@@ -15,5 +15,6 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
     {
         public IPropertySymbol Property { get; set; }
         public bool IsConvertedToNullableType { get; set; }
+        public bool IsGenericDictionary { get; set; }
     }
 }

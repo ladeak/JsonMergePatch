@@ -21,10 +21,18 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         {
             if (typeInfo is INamedTypeSymbol namedTypeInfo)
             {
-                if (namedTypeInfo.IsGenericType && !namedTypeInfo.IsUnboundGenericType && namedTypeInfo.TypeArguments.Count() == 1 && namedTypeInfo.SpecialType != SpecialType.None)
+                if (namedTypeInfo.IsGenericType && !namedTypeInfo.IsUnboundGenericType)
                 {
-                    var genericTypeArgument = namedTypeInfo.TypeArguments.First();
-                    if (IsGeneratableType(genericTypeArgument))
+                    ITypeSymbol? genericTypeArgument = null;
+                    if (namedTypeInfo.TypeArguments.Count() == 1 && namedTypeInfo.SpecialType != SpecialType.None)
+                        genericTypeArgument = namedTypeInfo.TypeArguments.First();
+                    else if (namedTypeInfo.TypeArguments.Count() == 2 && namedTypeInfo.Name == "Dictionary" && namedTypeInfo.ContainingNamespace.ToDisplayString() == "System.Collections.Generic")
+                    {
+                        genericTypeArgument = namedTypeInfo.TypeArguments.Last();
+                        if (genericTypeArgument is INamedTypeSymbol dictionaryValueType && dictionaryValueType.IsGenericType && dictionaryValueType.SpecialType == SpecialType.System_Nullable_T)
+                            genericTypeArgument = dictionaryValueType.TypeArguments.First();
+                    }
+                    if (genericTypeArgument != null && IsGeneratableType(genericTypeArgument))
                     {
                         generatableType = genericTypeArgument;
                         return true;

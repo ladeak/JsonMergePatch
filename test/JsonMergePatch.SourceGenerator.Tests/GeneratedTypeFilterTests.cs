@@ -24,6 +24,45 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(innerTypeArgument, outParam);
         }
 
+        [Fact]
+        public void NullableTypeInDictionaryType_TryGetGeneratableType_ReturnsTrueAndValueType()
+        {
+            var dictionaryKeyType = GetGeneratableType();
+            var dictionaryValueType = GetGeneratableType();
+            INamedTypeSymbol nullableValueTypeArgument = GetNullableType(dictionaryValueType);
+            var input = Substitute.For<INamedTypeSymbol>();
+            input.IsGenericType.Returns(true);
+            input.IsUnboundGenericType.Returns(false);
+            input.TypeArguments.Returns(ImmutableArray.Create<ITypeSymbol>(dictionaryKeyType, nullableValueTypeArgument));
+            input.SpecialType.Returns(SpecialType.None);
+            input.Name.Returns("Dictionary");
+            input.ContainingNamespace.ToDisplayString().Returns("System.Collections.Generic");
+
+            var result = GeneratedTypeFilter.TryGetGeneratableType(input, out var outParam);
+
+            Assert.True(result);
+            Assert.Equal(dictionaryValueType, outParam);
+        }
+
+        [Fact]
+        public void DictionaryType_TryGetGeneratableType_ReturnsTrueAndValueType()
+        {
+            var dictionaryKeyType = GetGeneratableType();
+            var dictionaryValueType = GetGeneratableType();
+            var input = Substitute.For<INamedTypeSymbol>();
+            input.IsGenericType.Returns(true);
+            input.IsUnboundGenericType.Returns(false);
+            input.TypeArguments.Returns(ImmutableArray.Create<ITypeSymbol>(dictionaryKeyType, dictionaryValueType));
+            input.SpecialType.Returns(SpecialType.None);
+            input.Name.Returns("Dictionary");
+            input.ContainingNamespace.ToDisplayString().Returns("System.Collections.Generic");
+
+            var result = GeneratedTypeFilter.TryGetGeneratableType(input, out var outParam);
+
+            Assert.True(result);
+            Assert.Equal(dictionaryValueType, outParam);
+        }
+
         [Theory]
         [MemberData(nameof(GetTestTypes))]
         public void NonGenericType_TryGetGeneratableType_ReturnsExpected(INamedTypeSymbol input, bool expected)
@@ -100,6 +139,15 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             return input;
         }
 
-
+        private static INamedTypeSymbol GetNullableType(INamedTypeSymbol typeParameter)
+        {
+            var type = Substitute.For<INamedTypeSymbol>();
+            type.IsGenericType.Returns(true);
+            type.IsAnonymousType.Returns(false);
+            type.IsAbstract.Returns(false);
+            type.SpecialType.Returns(SpecialType.System_Nullable_T);
+            type.TypeArguments.Returns(ImmutableArray.Create<ITypeSymbol>(typeParameter));
+            return type;
+        }
     }
 }
