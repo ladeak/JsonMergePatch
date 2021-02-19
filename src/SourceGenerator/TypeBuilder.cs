@@ -191,8 +191,6 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
 
         private void BuildDictionaryApplyPath(BuilderState state, PropertyInformation propertyInformation)
         {
-            if (!propertyInformation.IsGenericDictionary)
-                return;
             var propertyName = propertyInformation.Property.Name;
             state.AppendLine($"input.{propertyName} ??= new();");
             state.AppendLine($"foreach(var item in {propertyName})");
