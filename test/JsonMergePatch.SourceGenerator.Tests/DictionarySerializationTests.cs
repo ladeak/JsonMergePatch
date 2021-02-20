@@ -12,11 +12,12 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         [Theory]
         [ClassData(typeof(DictionarySerializationData))]
         public void ApplyPatch_PropertyToDelete_SetsNullOnTarget(
-           Dictionary<string, int> input,
-           Dictionary<string, int> expected,
+            string source,
+            object input,
+            object expected,
             string jsonInput)
         {
-            var compilation = CreateWrappedTypeCompilation();
+            var compilation = CreateWrappedTypeCompilation(source);
             var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
 
             var dtoWrappedMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.DtoWrapped");
@@ -30,9 +31,47 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(expected, targetMetadata.GetProperty("Values").GetValue(patchedParent));
         }
 
-        private static (Compilation Input, Compilation Output) CreateInputOutputCompilation()
+        private static Compilation CreateWrappedTypeCompilation(string source)
         {
-            Compilation inputCompilation = CreateCompilation(@"
+            Compilation inputCompilation = CreateCompilation(source);
+            JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+            driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
+            return outputCompilation;
+        }
+
+        private static Compilation CreateCompilation(string source) => SourceBuilder.CompileMvc(source).Compilation;
+    }
+
+    public class DictionarySerializationData : IEnumerable<object[]>
+    {
+        private readonly List<object[]> _data = new List<object[]>
+        {
+            new object[] { ValueType, new Dictionary<string, int> { { "one", 1 }, { "two", 2 }, { "three", 3 } }, new Dictionary<string, int> { { "one", 1 }, { "three", 33 }, { "four", 4 } }, @"{ ""Values"": { ""two"" : null, ""three"" : 33, ""four"" : 4 } }"  },
+            new object[] { ReferenceType, new Dictionary<string, string> { { "one", "1" }, { "two", "2" }, { "three", "3" } }, new Dictionary<string, string> { { "one", "1" }, { "three", "33" }, { "four", "4" } }, @"{ ""Values"": { ""two"" : null, ""three"" : ""33"", ""four"" : ""4"" } }"  },
+            new object[] { NullableType, new Dictionary<string, int?> { { "one", 1 }, { "two", 2 }, { "three", null } }, new Dictionary<string, int?> { { "one", 1 }, { "three", 33 }, { "four", 4 } }, @"{ ""Values"": { ""two"" : null, ""three"" : 33, ""four"" : 4 } }"  },
+            new object[] { NullableType, new Dictionary<string, int?> { { "two", null }, { "three", null } }, new Dictionary<string, int?> { { "two", null } }, @"{ ""Values"": { ""three"" : null } }"  },
+        };
+
+        public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+
+        private const string NullableType = @"
+namespace TestCode
+{
+    public class Dto { public System.Collections.Generic.Dictionary<string, int?> Values { get; set; } }
+
+    public class Program
+    {
+        public void SomeMethod(LaDeak.JsonMergePatch.Patch<Dto> data)
+        {
+        }
+    }
+}
+";
+
+        private const string ValueType = @"
 namespace TestCode
 {
     public class Dto { public System.Collections.Generic.Dictionary<string, int> Values { get; set; } }
@@ -44,28 +83,23 @@ namespace TestCode
         }
     }
 }
-");
-            JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-            driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
-            return (inputCompilation, outputCompilation);
-        }
+";
 
-        private static Compilation CreateWrappedTypeCompilation() => CreateInputOutputCompilation().Output;
 
-        private static Compilation CreateCompilation(string source) => SourceBuilder.CompileMvc(source).Compilation;
-    }
+        private const string ReferenceType = @"
+namespace TestCode
+{
+    public class Dto { public System.Collections.Generic.Dictionary<string, string> Values { get; set; } }
 
-    public class DictionarySerializationData : IEnumerable<object[]>
+    public class Program
     {
-        private readonly List<object[]> _data = new List<object[]>
+        public void SomeMethod(LaDeak.JsonMergePatch.Patch<Dto> data)
         {
-            new object[] { new Dictionary<string, int> { { "one", 1 }, { "two", 2 }, { "three", 3 } }, new Dictionary<string, int> { { "one", 1 }, { "three", 33 }, { "four", 4 } }, @"{ ""Values"": { ""two"" : null, ""three"" : 33, ""four"" : 4 } }"  },
-        };
+        }
+    }
+}
+";
 
-        public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
 

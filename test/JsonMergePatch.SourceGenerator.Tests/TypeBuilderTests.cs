@@ -438,7 +438,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
             typeSymbol.Name.Returns("TestType");
             typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetPropertyType("System", "String"), GetPropertyType("System", "Int32"));
+            var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetType("System", "String"), GetType("System", "Int32"));
             typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
             typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
@@ -489,8 +489,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
             typeSymbol.Name.Returns("TestType");
             typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var property0 = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp0", GetPropertyType("System", "String"), GetPropertyType("System", "Int32"));
-            var property1 = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp1", GetPropertyType("System", "String"), GetPropertyType("System", "Int32"));
+            var property0 = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp0", GetType("System", "String"), GetType("System", "Int32"));
+            var property1 = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp1", GetType("System", "String"), GetType("System", "Int32"));
             typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property0, property1));
             typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
@@ -561,7 +561,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var typeSymbol = Substitute.For<INamedTypeSymbol>();
             typeSymbol.Name.Returns("TestType");
             typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetPropertyType("System", "String"), GetPropertyType("System", "String"));
+            var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetType("System", "String"), GetType("System", "String"));
             typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
             typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
@@ -577,6 +577,57 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 
         private System.Collections.Generic.Dictionary<System.String, System.String> _testProp;
         public System.Collections.Generic.Dictionary<System.String, System.String> TestProp
+        {
+            get { return _testProp; }
+            init
+            {
+                Properties[0] = true;
+                _testProp = value;
+            }
+        }
+
+        public override SourceName ApplyPatch(SourceName input)
+        {
+            input ??= new SourceName();
+            if (Properties[0])
+                input.TestProp ??= new();
+                foreach(var item in TestProp)
+                {
+                    if(item.Value is null)
+                        input.TestProp.Remove(item.Key);
+                    else
+                        input.TestProp[item.Key] = item.Value;
+                }
+            return input;
+        }
+    }
+}
+", result.SourceCode);
+        }
+
+        [Fact]
+        public void DictionaryWithNullableValueProperty_CreatesPatchToPatchEachValue()
+        {
+            var sut = new TypeBuilder();
+            var typeSymbol = Substitute.For<INamedTypeSymbol>();
+            typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+            var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetType("System", "String"), GetNullableType(GetType("System", "Int32")));
+            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
+            Assert.Equal(
+@"namespace LaDeak.JsonMergePatch.Generated.S
+{
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    {
+        public TestTypeWrapped()
+        {
+            Properties = new bool[1];
+        }
+
+        private System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> _testProp;
+        public System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> TestProp
         {
             get { return _testProp; }
             init
@@ -670,7 +721,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Contains(result.ToProcessTypes, x => x.ToDisplayString() == "System.String");
         }
 
-        private ITypeSymbol GetPropertyType(string namespaceName, string typeName)
+        private ITypeSymbol GetType(string namespaceName, string typeName)
         {
             var propertyTypeSymbol = Substitute.For<INamedTypeSymbol>();
             propertyTypeSymbol.Name.Returns(typeName);
@@ -681,12 +732,27 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             namespaceSymbol.ToDisplayString().Returns(namespaceName);
             propertyTypeSymbol.ContainingNamespace.Returns(namespaceSymbol);
             propertyTypeSymbol.IsValueType.Returns(GetIsValueTypeFlag(typeName));
+            propertyTypeSymbol.NullableAnnotation.Returns(NullableAnnotation.NotAnnotated);
             return propertyTypeSymbol;
+        }
+
+        private INamedTypeSymbol GetNullableType(ITypeSymbol typeParameter)
+        {
+            var type = Substitute.For<INamedTypeSymbol>();
+            type.IsGenericType.Returns(true);
+            type.IsAnonymousType.Returns(false);
+            type.IsAbstract.Returns(false);
+            type.SpecialType.Returns(SpecialType.System_Nullable_T);
+            type.TypeArguments.Returns(ImmutableArray.Create<ITypeSymbol>(typeParameter));
+            string name = $"System.Nullable<{typeParameter.ToDisplayString()}>";
+            type.ToDisplayString(GeneratedTypeFilter.SymbolFormat).ReturnsForAnyArgs(name);
+            type.NullableAnnotation.Returns(NullableAnnotation.Annotated);
+            return type;
         }
 
         private IPropertySymbol GetProperty(string namespaceName, string typeName, string name, AttributeData attribute = null)
         {
-            var propertyTypeSymbol = GetPropertyType(namespaceName, typeName);
+            var propertyTypeSymbol = GetType(namespaceName, typeName);
             var property = Substitute.For<IPropertySymbol>();
             property.Name.Returns(name);
             property.Type.Returns(propertyTypeSymbol);

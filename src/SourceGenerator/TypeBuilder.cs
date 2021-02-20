@@ -80,7 +80,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         {
             state.ToProcessTypeSymbols.Add(propertyInfo.Property.Type);
             string fieldName = Casing.PrefixUnderscoreCamelCase(propertyInfo.Property.Name);
-            string propertyTypeName = GetGenericPropertyTypeName(propertyInfo);
+            string propertyTypeName = GetPropertyTypeName(propertyInfo);
             state.AppendLine($"private {propertyTypeName} {fieldName};");
             BuildAttributes(state, propertyInfo.Property.GetAttributes());
             state.AppendLine($"public {propertyTypeName} {propertyInfo.Property.Name}");
@@ -96,22 +96,16 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             state.AppendLine("}");
         }
 
-        private string GetGenericPropertyTypeName(PropertyInformation propertyInfo)
+        private string GetPropertyTypeName(PropertyInformation propertyInfo)
         {
             var propertyTypeSymbol = propertyInfo.Property.Type;
             if (propertyTypeSymbol is INamedTypeSymbol namedType && namedType.IsGenericType)
-                return ConstructGenericTypeWithParameters(propertyInfo);
+                return CreateGenericTypeWithParameters(propertyInfo);
 
-            var propertyTypeNameResult = GetPropertyTypeName(propertyTypeSymbol);
-            if (propertyTypeSymbol.IsValueType)
-            {
-                propertyInfo.IsConvertedToNullableType = true;
-                return $"System.Nullable<{propertyTypeNameResult.TypeName}>";
-            }
-            return propertyTypeNameResult.TypeName;
+            return ConvertToNullableIfRequired(propertyInfo, propertyTypeSymbol);
         }
 
-        private string ConstructGenericTypeWithParameters(PropertyInformation propertyInfo)
+        private string CreateGenericTypeWithParameters(PropertyInformation propertyInfo)
         {
             if (propertyInfo.Property.Type is not INamedTypeSymbol namedType || !namedType.IsGenericType)
                 throw new ArgumentException("Parameter is not generic type parameter.", nameof(propertyInfo));
@@ -122,8 +116,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             var genericResult = $"{withoutUnderlyingType}<{firstUnderlyingType}";
             foreach (var underlyingType in namedType.TypeArguments.Skip(1).OfType<INamedTypeSymbol>())
             {
-                var genericTypeParam = underlyingType.IsValueType ? $"System.Nullable<{GetPropertyTypeName(underlyingType).TypeName}>" : GetPropertyTypeName(underlyingType).TypeName;
-                propertyInfo.IsConvertedToNullableType = underlyingType.IsValueType;
+                string genericTypeParam = ConvertToNullableIfRequired(propertyInfo, underlyingType);
                 genericResult += $", {genericTypeParam}";
             }
             genericResult += ">";
@@ -131,6 +124,18 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                 propertyInfo.IsGenericDictionary = true;
 
             return genericResult;
+        }
+
+        private string ConvertToNullableIfRequired(PropertyInformation propertyInfo, ITypeSymbol typeSymbol)
+        {
+            string genericTypeParam = GetPropertyTypeName(typeSymbol).TypeName;
+            if (typeSymbol.IsValueType && typeSymbol.SpecialType != SpecialType.System_Nullable_T && typeSymbol.NullableAnnotation == NullableAnnotation.NotAnnotated)
+            {
+                propertyInfo.IsConvertedToNullableType = true;
+                genericTypeParam = $"System.Nullable<{genericTypeParam}>";
+            }
+
+            return genericTypeParam;
         }
 
         private (bool IsGeneratedType, string TypeName) GetPropertyTypeName(ITypeSymbol propertyTypeSymbol)
@@ -202,7 +207,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             foreachBody.AppendLine("else");
             if (propertyInformation.IsConvertedToNullableType)
                 foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}[item.Key] = item.Value.Value;");
-            else 
+            else
                 foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}[item.Key] = item.Value;");
             state.AppendLine("}");
         }

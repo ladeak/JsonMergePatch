@@ -7,7 +7,7 @@ namespace LaDeak.JsonMergePatch
         /// <summary>
         /// List of properites used by the request.
         /// </summary>
-        public bool[] Properties;
+        protected bool[] Properties;
 
         /// <summary>
         /// Applies updates on input type using Json Merge Patch rules.
