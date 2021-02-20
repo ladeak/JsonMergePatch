@@ -1,11 +1,21 @@
-﻿using LaDeak.JsonMergePatch;
-
-namespace LaDeak.JsonMergePatch.Tests
+﻿namespace LaDeak.JsonMergePatch.Tests
 {
     public class WrappedTestDto : Patch<TestDto>
     {
-        public int Prop1 { get; set; }
+        public WrappedTestDto()
+        {
+            Properties = new bool[1];
+        }
 
-        public override TestDto ApplyPatch(TestDto input) => input;
+        private int? _prop1;
+        public int? Prop1 { get => _prop1; set { Properties[0] = true; _prop1 = value; } }
+
+        public override TestDto ApplyPatch(TestDto input)
+        {
+            input ??= new();
+            if (Properties[0])
+                input.Prop1 = Prop1.HasValue ? Prop1.Value : default;
+            return input;
+        }
     }
 }

@@ -25,13 +25,26 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             if (node?.Type != null)
             {
                 var typeInfo = _semantics.GetTypeInfo(node.Type).Type as INamedTypeSymbol;
-                if (typeInfo?.Name == "Patch" && typeInfo.OriginalDefinition.ContainingSymbol.Name == "JsonMergePatch" && typeInfo.TypeArguments.Count() == 1)
+                if (typeInfo?.Name == "Patch" && typeInfo.OriginalDefinition.ContainingNamespace.ToDisplayString() == "LaDeak.JsonMergePatch" && typeInfo.TypeArguments.Length == 1)
                 {
                     _typeNames?.Add(typeInfo.TypeArguments.First());
                 }
             }
 
             base.VisitParameter(node);
+        }
+
+        public override void VisitInvocationExpression(InvocationExpressionSyntax node)
+        {
+            if (node.Expression is MemberAccessExpressionSyntax memberAccess && memberAccess.Name.Identifier.ValueText == "ReadJsonPatchAsync")
+            {
+                if (_semantics?.GetSymbolInfo(node).Symbol is IMethodSymbol methodSymbol
+                    && methodSymbol.OriginalDefinition.ContainingType.Name == "HttpContentExtensions"
+                    && methodSymbol.OriginalDefinition.ContainingType.ContainingNamespace.ToDisplayString() == "LaDeak.JsonMergePatch"
+                    && !methodSymbol.TypeArguments.IsEmpty)
+                    _typeNames?.Add(methodSymbol.TypeArguments.First());
+            }
+            base.VisitInvocationExpression(node);
         }
 
     }

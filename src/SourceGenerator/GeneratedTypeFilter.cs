@@ -13,7 +13,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             if (typeInfo is INamedTypeSymbol namedTypeInfo)
                 generic = namedTypeInfo.IsGenericType;
             return typeInfo.SpecialType == SpecialType.None && !typeInfo.IsAnonymousType && !typeInfo.IsAbstract && !generic
-            && typeInfo.GetMembers().OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor).All(x => x.Parameters.Count() == 0);
+            && typeInfo.GetMembers().OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor).All(x => x.Parameters.IsEmpty);
         }
 
 
@@ -24,9 +24,9 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                 if (namedTypeInfo.IsGenericType && !namedTypeInfo.IsUnboundGenericType)
                 {
                     ITypeSymbol? genericTypeArgument = null;
-                    if (namedTypeInfo.TypeArguments.Count() == 1 && namedTypeInfo.SpecialType != SpecialType.None)
+                    if (namedTypeInfo.TypeArguments.Length == 1 && namedTypeInfo.SpecialType != SpecialType.None)
                         genericTypeArgument = namedTypeInfo.TypeArguments.First();
-                    else if (namedTypeInfo.TypeArguments.Count() == 2 && namedTypeInfo.Name == "Dictionary" && namedTypeInfo.ContainingNamespace.ToDisplayString() == "System.Collections.Generic")
+                    else if (namedTypeInfo.TypeArguments.Length == 2 && namedTypeInfo.Name == "Dictionary" && namedTypeInfo.ContainingNamespace.ToDisplayString() == "System.Collections.Generic")
                     {
                         genericTypeArgument = namedTypeInfo.TypeArguments.Last();
                         if (genericTypeArgument is INamedTypeSymbol dictionaryValueType && dictionaryValueType.IsGenericType && dictionaryValueType.SpecialType == SpecialType.System_Nullable_T)

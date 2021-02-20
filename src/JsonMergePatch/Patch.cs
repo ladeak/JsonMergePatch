@@ -15,5 +15,11 @@ namespace LaDeak.JsonMergePatch
         /// <param name="input">The entity to be patched.</param>
         /// <returns>The patched entity.</returns>
         public abstract T ApplyPatch([AllowNull] T input);
+
+        /// <summary>
+        /// Returns a  patched version of the default value of <see cref="T"/>.
+        /// </summary>
+        /// <returns>Object typed <see cref="T"/>.</returns>
+        public T ApplyOnDefault() => ApplyPatch(default(T));
     }
 }
