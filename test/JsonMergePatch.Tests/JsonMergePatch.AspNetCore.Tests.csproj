@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <RootNamespace>LaDeak.JsonMergePatch.Tests</RootNamespace>
+    <RootNamespace>LaDeak.JsonMergePatch.AspNetCore.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

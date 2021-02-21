@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.AspNetCore", "src\JsonMergePatch\JsonMergePatch.AspNetCore.csproj", "{D539E41C-F89E-44C7-B2FD-ABE4E55942F1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreWebApi", "sample\CoreWebApi\CoreWebApi.csproj", "{910E8728-872B-43EF-994F-B67953874BCB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreWebApi", "sample\AspNetCoreWebApi\AspNetCoreWebApi.csproj", "{910E8728-872B-43EF-994F-B67953874BCB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.AspNetCore.Tests", "test\JsonMergePatch.Tests\JsonMergePatch.AspNetCore.Tests.csproj", "{7FD5D0AB-6388-4C97-896B-E648CADD86E8}"
 EndProject
@@ -19,13 +19,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.Http.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.Tests", "test\JsonMergePatch.SourceGenerator.Abstractions.Tests\JsonMergePatch.SourceGenerator.Tests.csproj", "{02307264-F3C6-40F7-9735-044B14A9277C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadJsonPatchAsync", "sample\ReadJsonPatchAsync\ReadJsonPatchAsync.csproj", "{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "sample\ConsoleApp\ConsoleApp.csproj", "{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{0E750D74-69C7-433C-92C7-3F026083C255}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.AspNetCore", "src\SourceGenerator.AspNetCore\JsonMergePatch.SourceGenerator.AspNetCore.csproj", "{CE0B30FD-75D5-4D1A-83A0-9C3305FE2599}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.AspNetCore", "src\JsonMergePatch.SourceGenerator.AspNetCore\JsonMergePatch.SourceGenerator.AspNetCore.csproj", "{CE0B30FD-75D5-4D1A-83A0-9C3305FE2599}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator", "src\SourceGenerator\JsonMergePatch.SourceGenerator.csproj", "{CEB6F7B7-15A4-485E-8372-7687852EB929}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator", "src\JsonMergePatch.SourceGenerator\JsonMergePatch.SourceGenerator.csproj", "{CEB6F7B7-15A4-485E-8372-7687852EB929}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
