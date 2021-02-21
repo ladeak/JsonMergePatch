@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using NSubstitute;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator.Abstractions.Tests
+namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 {
     public class TestAttribute : AttributeData
     {

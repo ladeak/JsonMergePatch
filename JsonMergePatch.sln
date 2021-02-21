@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreWebApi", "sample\CoreWe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.AspNetCore.Tests", "test\JsonMergePatch.Tests\JsonMergePatch.AspNetCore.Tests.csproj", "{7FD5D0AB-6388-4C97-896B-E648CADD86E8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.AspNetCore", "src\SourceGenerator\JsonMergePatch.SourceGenerator.AspNetCore.csproj", "{CFE85679-E443-402A-B2D9-0FFDFAD18886}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.AspNetCore.Tests", "test\JsonMergePatch.SourceGenerator.Tests\JsonMergePatch.SourceGenerator.AspNetCore.Tests.csproj", "{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.Http", "src\JsonMergePatch.Http\JsonMergePatch.Http.csproj", "{C817634D-62FD-4958-A8BD-8661112891F6}"
@@ -19,13 +17,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.Abstractions
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.Http.Tests", "test\JsonMergePatch.Http.Tests\JsonMergePatch.Http.Tests.csproj", "{7A12F9DC-7326-477A-8888-169F37712BCB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.Abstractions", "src\SourceGenerator.Abstractions\JsonMergePatch.SourceGenerator.Abstractions.csproj", "{EBA8FB4C-92D5-4675-95EF-33097868643E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.Abstractions.Tests", "test\JsonMergePatch.SourceGenerator.Abstractions.Tests\JsonMergePatch.SourceGenerator.Abstractions.Tests.csproj", "{02307264-F3C6-40F7-9735-044B14A9277C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.Tests", "test\JsonMergePatch.SourceGenerator.Abstractions.Tests\JsonMergePatch.SourceGenerator.Tests.csproj", "{02307264-F3C6-40F7-9735-044B14A9277C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadJsonPatchAsync", "sample\ReadJsonPatchAsync\ReadJsonPatchAsync.csproj", "{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{0E750D74-69C7-433C-92C7-3F026083C255}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.AspNetCore", "src\SourceGenerator.AspNetCore\JsonMergePatch.SourceGenerator.AspNetCore.csproj", "{CE0B30FD-75D5-4D1A-83A0-9C3305FE2599}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator", "src\SourceGenerator\JsonMergePatch.SourceGenerator.csproj", "{CEB6F7B7-15A4-485E-8372-7687852EB929}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,10 +45,6 @@ Global
 		{7FD5D0AB-6388-4C97-896B-E648CADD86E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FD5D0AB-6388-4C97-896B-E648CADD86E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FD5D0AB-6388-4C97-896B-E648CADD86E8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CFE85679-E443-402A-B2D9-0FFDFAD18886}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CFE85679-E443-402A-B2D9-0FFDFAD18886}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CFE85679-E443-402A-B2D9-0FFDFAD18886}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CFE85679-E443-402A-B2D9-0FFDFAD18886}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -65,10 +61,6 @@ Global
 		{7A12F9DC-7326-477A-8888-169F37712BCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A12F9DC-7326-477A-8888-169F37712BCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A12F9DC-7326-477A-8888-169F37712BCB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EBA8FB4C-92D5-4675-95EF-33097868643E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EBA8FB4C-92D5-4675-95EF-33097868643E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EBA8FB4C-92D5-4675-95EF-33097868643E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EBA8FB4C-92D5-4675-95EF-33097868643E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{02307264-F3C6-40F7-9735-044B14A9277C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{02307264-F3C6-40F7-9735-044B14A9277C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02307264-F3C6-40F7-9735-044B14A9277C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -77,6 +69,14 @@ Global
 		{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE0B30FD-75D5-4D1A-83A0-9C3305FE2599}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE0B30FD-75D5-4D1A-83A0-9C3305FE2599}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE0B30FD-75D5-4D1A-83A0-9C3305FE2599}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE0B30FD-75D5-4D1A-83A0-9C3305FE2599}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEB6F7B7-15A4-485E-8372-7687852EB929}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEB6F7B7-15A4-485E-8372-7687852EB929}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEB6F7B7-15A4-485E-8372-7687852EB929}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEB6F7B7-15A4-485E-8372-7687852EB929}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

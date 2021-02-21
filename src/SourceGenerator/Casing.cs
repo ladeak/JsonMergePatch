@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator.Abstractions
+namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public class Casing
     {

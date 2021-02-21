@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <PackageVersion>0.0.1</PackageVersion>
-    <RootNamespace>LaDeak.JsonMergePatch.SourceGenerator.Abstractions</RootNamespace>
+    <RootNamespace>LaDeak.JsonMergePatch.SourceGenerator</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

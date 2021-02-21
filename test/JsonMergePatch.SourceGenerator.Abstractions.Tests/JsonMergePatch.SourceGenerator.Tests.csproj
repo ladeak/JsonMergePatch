@@ -24,7 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\JsonMergePatch.Abstractions\JsonMergePatch.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\JsonMergePatch.Http\JsonMergePatch.Http.csproj" />
-    <ProjectReference Include="..\..\src\SourceGenerator.Abstractions\JsonMergePatch.SourceGenerator.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\SourceGenerator\JsonMergePatch.SourceGenerator.csproj" />
   </ItemGroup>
 
 </Project>

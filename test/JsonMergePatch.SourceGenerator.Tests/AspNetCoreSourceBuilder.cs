@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using LaDeak.JsonMergePatch.Abstractions;
 using LaDeak.JsonMergePatch.AspNetCore;
-using LaDeak.JsonMergePatch.SourceGenerator.Abstractions.Tests;
+using LaDeak.JsonMergePatch.SourceGenerator.Tests;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.CodeAnalysis;

@@ -8,7 +8,7 @@ using LaDeak.JsonMergePatch.Http;
 using Microsoft.CodeAnalysis;
 using Xunit;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator.Abstractions.Tests
+namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 {
     public class PatchParameterWalkerTests
     {

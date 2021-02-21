@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator.Abstractions
+namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public static class GeneratedTypeFilter
     {

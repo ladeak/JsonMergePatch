@@ -26,12 +26,12 @@ namespace LaDeak.JsonMergePatch.Http
             if (content.Headers.ContentType?.MediaType != "application/merge-patch+json" && content.Headers.ContentType?.MediaType != "application/json")
                 return null;
 
+            var contentStream = await content.ReadAsStreamAsync().ConfigureAwait(false);
+#if NET5_0
             Encoding? encoding = content.Headers.ContentType?.CharSet != null ? GetEncoding(content.Headers.ContentType.CharSet) : null;
-            var contentStream = await content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-
             if (encoding != null && encoding != Encoding.UTF8)
                 contentStream = Encoding.CreateTranscodingStream(contentStream, encoding, Encoding.UTF8);
-
+#endif
             await using (contentStream.ConfigureAwait(false))
             {
                 var contentData = await JsonSerializer.DeserializeAsync(contentStream, wrapperType, options ?? _serializerOptions, cancellationToken).ConfigureAwait(false);

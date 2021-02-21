@@ -23,8 +23,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\JsonMergePatch\JsonMergePatch.AspNetCore.csproj" />
-    <ProjectReference Include="..\..\src\SourceGenerator\JsonMergePatch.SourceGenerator.AspNetCore.csproj" />
-    <ProjectReference Include="..\JsonMergePatch.SourceGenerator.Abstractions.Tests\JsonMergePatch.SourceGenerator.Abstractions.Tests.csproj" />
+    <ProjectReference Include="..\..\src\SourceGenerator.AspNetCore\JsonMergePatch.SourceGenerator.AspNetCore.csproj" />
+    <ProjectReference Include="..\JsonMergePatch.SourceGenerator.Abstractions.Tests\JsonMergePatch.SourceGenerator.Tests.csproj" />
     <ProjectReference Include="..\JsonMergePatch.Tests\JsonMergePatch.AspNetCore.Tests.csproj" />
   </ItemGroup>
 

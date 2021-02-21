@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator
+namespace LaDeak.JsonMergePatch.SourceGenerator.AspNetCore
 {
     public class ModelBuilderExtensionGenerator
     {

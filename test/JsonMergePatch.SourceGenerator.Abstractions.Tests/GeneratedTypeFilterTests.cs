@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using NSubstitute;
 using Xunit;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator.Abstractions.Tests
+namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 {
     public class GeneratedTypeFilterTests
     {

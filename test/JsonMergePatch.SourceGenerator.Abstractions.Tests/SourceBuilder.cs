@@ -8,7 +8,7 @@ using LaDeak.JsonMergePatch.Abstractions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator.Abstractions.Tests
+namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 {
     public static class SourceBuilder
     {

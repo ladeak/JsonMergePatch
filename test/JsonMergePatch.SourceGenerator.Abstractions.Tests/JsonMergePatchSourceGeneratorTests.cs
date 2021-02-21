@@ -3,12 +3,12 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator.Abstractions.Tests
+namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 {
     /// <summary>
     /// Testing documentation: https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.cookbook.md#unit-testing-of-generators
     /// </summary>
-    public class JsonMergePatchSourceGeneratorBaseTests
+    public class JsonMergePatchSourceGeneratorTests
     {
         [Fact]
         public void SinglePatchType_ExtensionAndTypeAddedToSource()

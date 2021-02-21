@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator.Abstractions
+namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public static class StringBuilderExtensions
     {

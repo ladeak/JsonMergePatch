@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator.Abstractions
+namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public class TypeRepositoryGenerator
     {

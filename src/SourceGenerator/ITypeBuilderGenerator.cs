@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator.Abstractions
+namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public interface ITypeBuilderGenerator
     {
