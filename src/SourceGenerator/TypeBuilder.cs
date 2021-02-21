@@ -107,8 +107,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
 
         private string CreateGenericTypeWithParameters(PropertyInformation propertyInfo)
         {
-            if (propertyInfo.Property.Type is not INamedTypeSymbol namedType || !namedType.IsGenericType)
-                throw new ArgumentException("Parameter is not generic type parameter.", nameof(propertyInfo));
+            if (propertyInfo?.Property?.Type is not INamedTypeSymbol namedType || !namedType.IsGenericType)
+                throw new InvalidOperationException("Parameter is not generic type parameter.");
 
             var firstUnderlyingType = GetPropertyTypeName(namedType.TypeArguments.First()).TypeName;
             var withoutUnderlyingType = namedType.ToDisplayString(new SymbolDisplayFormat(SymbolDisplayGlobalNamespaceStyle.Omitted, SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, SymbolDisplayGenericsOptions.None, SymbolDisplayMemberOptions.None, SymbolDisplayDelegateStyle.NameOnly, SymbolDisplayExtensionMethodStyle.Default, SymbolDisplayParameterOptions.IncludeType, SymbolDisplayPropertyStyle.NameOnly, SymbolDisplayLocalOptions.IncludeType, SymbolDisplayKindOptions.None, SymbolDisplayMiscellaneousOptions.ExpandNullable));

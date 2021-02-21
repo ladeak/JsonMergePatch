@@ -22,6 +22,16 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.AspNetCore.Tests
             GetMethodDelegate(code);
         }
 
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public void NoTypeRepository_Compiles(string input)
+        {
+            var sut = new ModelBuilderExtensionGenerator();
+            var code = sut.CreateModelBuilder(input);
+            GetMethodDelegate(code);
+        }
+
         [Fact]
         public void Adds_ITypeRepository_MvcOptions_ServiceRegistrations()
         {
