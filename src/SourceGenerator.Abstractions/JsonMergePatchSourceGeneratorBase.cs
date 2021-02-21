@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace LaDeak.JsonMergePatch.SourceGenerator.Abstractions
 {
     [Generator]
-    public class JsonMergePatchSourceGeneratorBase : ISourceGenerator
+    public class JsonMergePatchSourceGenerator : ISourceGenerator
     {
         public void Execute(GeneratorExecutionContext context) => ExecuteImpl(context);
 

@@ -34,7 +34,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Abstractions.Tests
         private static Compilation CreateWrappedTypeCompilation(string source)
         {
             Compilation inputCompilation = CreateCompilation(source);
-            JsonMergePatchSourceGeneratorBase generator = new JsonMergePatchSourceGeneratorBase();
+            JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
             driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
             return outputCompilation;

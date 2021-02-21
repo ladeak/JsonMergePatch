@@ -183,7 +183,7 @@ namespace TestCode
     }
 }
 ");
-            JsonMergePatchSourceGeneratorBase generator = new JsonMergePatchSourceGeneratorBase();
+            JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
             driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
             return (inputCompilation, outputCompilation);

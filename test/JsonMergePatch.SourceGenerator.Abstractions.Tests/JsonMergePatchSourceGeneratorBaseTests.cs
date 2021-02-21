@@ -26,7 +26,7 @@ namespace TestCode1
     }
 }
 ");
-            JsonMergePatchSourceGeneratorBase generator = new JsonMergePatchSourceGeneratorBase();
+            JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
             driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
 
@@ -60,7 +60,7 @@ namespace TestCode2
     }
 }
 ");
-            JsonMergePatchSourceGeneratorBase generator = new JsonMergePatchSourceGeneratorBase();
+            JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
             driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
 
@@ -90,7 +90,7 @@ namespace TestCode3
     }
 }
 ");
-            JsonMergePatchSourceGeneratorBase generator = new JsonMergePatchSourceGeneratorBase();
+            JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
             driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
 
@@ -116,7 +116,7 @@ namespace TestCode3
     }
 }
 ");
-            JsonMergePatchSourceGeneratorBase generator = new JsonMergePatchSourceGeneratorBase();
+            JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
             driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
             return (inputCompilation, outputCompilation);

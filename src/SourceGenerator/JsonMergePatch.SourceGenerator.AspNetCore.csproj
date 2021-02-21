@@ -17,11 +17,6 @@
 
   <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(OutputPath)\JsonMergePatch.SourceGenerator.Abstractions.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SourceGenerator.Abstractions\JsonMergePatch.SourceGenerator.Abstractions.csproj" />
   </ItemGroup>
   
 </Project>
