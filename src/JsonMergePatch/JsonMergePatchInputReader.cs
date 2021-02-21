@@ -26,7 +26,7 @@ namespace LaDeak.JsonMergePatch
             SupportedEncodings.Add(Encoding.Unicode);
         }
 
-        protected override bool CanReadType(Type type) => type.GetGenericTypeDefinition() == typeof(Patch<>);
+        protected override bool CanReadType(Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Patch<>);
 
         public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
         {

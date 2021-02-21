@@ -41,7 +41,8 @@ namespace LaDeak.JsonMergePatch.Tests
         public async Task NullArguments_ReadRequestBodyAsync_ThrowsArgumentNullException()
         {
             var sut = new JsonMergePatchInputReader(new JsonOptions());
-            await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ReadRequestBodyAsync(null, null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ReadRequestBodyAsync(null, Encoding.UTF8));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ReadRequestBodyAsync(CreateInputFormatterContext(typeof(Patch<TestDto>), new DefaultHttpContext()), null));
         }
 
         [Fact]
@@ -118,6 +119,36 @@ namespace LaDeak.JsonMergePatch.Tests
             Assert.Equal(InputFormatterResult.Failure(), result);
         }
 
+        [Fact]
+        public async Task OpenPatchType_CanRead_ReturnsTrue()
+        {
+            var sut = new JsonMergePatchInputReader(new JsonOptions());
+            DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }").ConfigureAwait(false);
+            var inputContext = CreateInputFormatterContext(typeof(Patch<>), httpContext);
+
+            Assert.True(sut.CanRead(inputContext));
+        }
+
+        [Fact]
+        public async Task ClosedPatchType_CanRead_ReturnsTrue()
+        {
+            var sut = new JsonMergePatchInputReader(new JsonOptions());
+            DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }").ConfigureAwait(false);
+            var inputContext = CreateInputFormatterContext(typeof(Patch<TestDto>), httpContext);
+
+            Assert.True(sut.CanRead(inputContext));
+        }
+
+        [Fact]
+        public async Task NonPatchType_CanRead_ReturnsFalse()
+        {
+            var sut = new JsonMergePatchInputReader(new JsonOptions());
+            DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }").ConfigureAwait(false);
+            var inputContext = CreateInputFormatterContext(typeof(TestDto), httpContext);
+
+            Assert.False(sut.CanRead(inputContext));
+        }
+
         private async Task<DefaultHttpContext> CreateHttpContextAsync(string requestBody = null, Encoding encoding = null)
         {
             var httpContext = new DefaultHttpContext();
@@ -126,6 +157,7 @@ namespace LaDeak.JsonMergePatch.Tests
             typeRepository.TryGet(Arg.Is<Type>(x => x == typeof(TestDto)), out Arg.Any<Type>()).Returns(callInfo => { callInfo[1] = typeof(WrappedTestDto); return true; });
             servicesProvider.GetService(typeof(ITypeRepository)).Returns(typeRepository);
             httpContext.RequestServices = servicesProvider;
+            httpContext.Request.ContentType = "application/merge-patch+json";
             if (string.IsNullOrEmpty(requestBody))
                 return httpContext;
 
@@ -142,7 +174,8 @@ namespace LaDeak.JsonMergePatch.Tests
         private InputFormatterContext CreateInputFormatterContext(
                 Type modelType,
                 HttpContext httpContext,
-                string modelName = null)
+                string modelName = null,
+                bool emptyInputIsDefault = false)
         {
             var provider = new EmptyModelMetadataProvider();
             var metadata = provider.GetMetadataForType(modelType);
@@ -153,7 +186,8 @@ namespace LaDeak.JsonMergePatch.Tests
                 modelState: new ModelStateDictionary(),
                 metadata: metadata,
                 readerFactory: (s, e) => new HttpRequestStreamReader(s, e),
-                treatEmptyInputAsDefaultValue: false);
+                treatEmptyInputAsDefaultValue: emptyInputIsDefault);
         }
+
     }
 }
