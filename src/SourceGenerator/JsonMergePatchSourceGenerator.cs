@@ -1,26 +1,21 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
+using LaDeak.JsonMergePatch.SourceGenerator.Abstractions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator
+namespace LaDeak.JsonMergePatch.SourceGenerator.AspNetCore
 {
     [Generator]
-    public class JsonMergePatchSourceGenerator : ISourceGenerator
+    public class JsonMergePatchSourceGenerator : JsonMergePatchSourceGeneratorBase, ISourceGenerator
     {
-        public void Execute(GeneratorExecutionContext context)
+        protected override IEnumerable<GeneratedWrapper> ExecuteImpl(GeneratorExecutionContext context)
         {
-            var typeBuilder = new MultiTypeBuilder(context.Compilation.SyntaxTrees, context.Compilation, new TypeBuilder(), new PatchParametersWalker());
-            var types = typeBuilder.Generate();
-            foreach(var generatedType in types)
-                context.AddSource(generatedType.FileName, SourceText.From(generatedType.SourceCode, Encoding.UTF8));
+            var types = base.ExecuteImpl(context);
             var modelBuilderGenerator = new ModelBuilderExtensionGenerator();
-            var mvcExtension = modelBuilderGenerator.CreateModelBuilder(types.Select(x => (x.SourceTypeFullName, x.TargetTypeFullName)));
+            var mvcExtension = modelBuilderGenerator.CreateModelBuilder("LaDeak.JsonMergePatch.Generated.TypeRepositoryContainer.Instance.Repository");
             context.AddSource("LaDeakJsonMergePatchModelBuilderExtension", SourceText.From(mvcExtension, Encoding.UTF8));
-        }
-
-        public void Initialize(GeneratorInitializationContext context)
-        {
+            return types;
         }
     }
 }

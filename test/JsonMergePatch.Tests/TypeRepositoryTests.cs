@@ -1,7 +1,8 @@
 using System;
+using LaDeak.JsonMergePatch.Abstractions;
 using Xunit;
 
-namespace LaDeak.JsonMergePatch.Tests
+namespace LaDeak.JsonMergePatch.AspNetCore.Tests
 {
     public class TypeRepositoryTests
     {

@@ -4,7 +4,8 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using LaDeak.JsonMergePatch;
+using LaDeak.JsonMergePatch.Abstractions;
+using LaDeak.JsonMergePatch.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreWebApi.Controllers
@@ -35,12 +36,10 @@ namespace CoreWebApi.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
         private readonly IHttpClientFactory _clientFactory;
-        private readonly ITypeRepository _typeRepository;
 
-        public SampleController(IHttpClientFactory clientFactory, ITypeRepository typeRepository)
+        public SampleController(IHttpClientFactory clientFactory)
         {
             _clientFactory = clientFactory;
-            _typeRepository = typeRepository;
         }
 
         [HttpGet("Weather")]
@@ -76,7 +75,7 @@ namespace CoreWebApi.Controllers
         {
             var httpClient = _clientFactory.CreateClient();
             var response = await httpClient.GetAsync("https://localhost:5001/Sample/Weather", HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
-            var responseData = await response.Content.ReadJsonPatchAsync<WeatherForecast>(_typeRepository, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }).ConfigureAwait(false);
+            var responseData = await response.Content.ReadJsonPatchAsync<WeatherForecast>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }).ConfigureAwait(false);
             var original = new WeatherForecast() { Date = DateTime.UtcNow, Summary = "Sample weather forecast", TemperatureC = 24 };
             var result = responseData.ApplyPatch(original);
             return result;

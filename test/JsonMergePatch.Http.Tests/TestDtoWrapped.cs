@@ -1,10 +1,10 @@
 ﻿using LaDeak.JsonMergePatch.Abstractions;
 
-namespace LaDeak.JsonMergePatch.AspNetCore.Tests
+namespace LaDeak.JsonMergePatch.Http.Tests
 {
-    public class WrappedTestDto : Patch<TestDto>
+    public class TestDtoWrapped : Patch<TestDto>
     {
-        public WrappedTestDto()
+        public TestDtoWrapped()
         {
             Properties = new bool[1];
         }

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using LaDeak.JsonMergePatch.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using NSubstitute;
 using Xunit;
 
-namespace LaDeak.JsonMergePatch.Tests
+namespace LaDeak.JsonMergePatch.AspNetCore.Tests
 {
     public class JsonMergePatchInputReaderTests
     {

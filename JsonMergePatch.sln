@@ -3,15 +3,33 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch", "src\JsonMergePatch\JsonMergePatch.csproj", "{D539E41C-F89E-44C7-B2FD-ABE4E55942F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.AspNetCore", "src\JsonMergePatch\JsonMergePatch.AspNetCore.csproj", "{D539E41C-F89E-44C7-B2FD-ABE4E55942F1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreWebApi", "sample\CoreWebApi\CoreWebApi.csproj", "{910E8728-872B-43EF-994F-B67953874BCB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.Tests", "test\JsonMergePatch.Tests\JsonMergePatch.Tests.csproj", "{7FD5D0AB-6388-4C97-896B-E648CADD86E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.AspNetCore.Tests", "test\JsonMergePatch.Tests\JsonMergePatch.AspNetCore.Tests.csproj", "{7FD5D0AB-6388-4C97-896B-E648CADD86E8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator", "src\SourceGenerator\JsonMergePatch.SourceGenerator.csproj", "{CFE85679-E443-402A-B2D9-0FFDFAD18886}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.AspNetCore", "src\SourceGenerator\JsonMergePatch.SourceGenerator.AspNetCore.csproj", "{CFE85679-E443-402A-B2D9-0FFDFAD18886}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonMergePatch.SourceGenerator.Tests", "test\JsonMergePatch.SourceGenerator.Tests\JsonMergePatch.SourceGenerator.Tests.csproj", "{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.AspNetCore.Tests", "test\JsonMergePatch.SourceGenerator.Tests\JsonMergePatch.SourceGenerator.AspNetCore.Tests.csproj", "{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.Http", "src\JsonMergePatch.Http\JsonMergePatch.Http.csproj", "{C817634D-62FD-4958-A8BD-8661112891F6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.Abstractions", "src\JsonMergePatch.Abstractions\JsonMergePatch.Abstractions.csproj", "{09D9741D-9ED9-4115-80D3-72B4EAFBA5AE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.Http.Tests", "test\JsonMergePatch.Http.Tests\JsonMergePatch.Http.Tests.csproj", "{7A12F9DC-7326-477A-8888-169F37712BCB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.Abstractions", "src\SourceGenerator.Abstractions\JsonMergePatch.SourceGenerator.Abstractions.csproj", "{EBA8FB4C-92D5-4675-95EF-33097868643E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonMergePatch.SourceGenerator.Http", "src\SourceGenerator.Http\JsonMergePatch.SourceGenerator.Http.csproj", "{C1670191-202E-40FC-9387-19868900256D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.Http.Tests", "test\JsonMergePatch.SourceGenerator.Http.Tests\JsonMergePatch.SourceGenerator.Http.Tests.csproj", "{A5E8E7E2-6393-48E9-A409-B2462E5EBE2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonMergePatch.SourceGenerator.Abstractions.Tests", "test\JsonMergePatch.SourceGenerator.Abstractions.Tests\JsonMergePatch.SourceGenerator.Abstractions.Tests.csproj", "{02307264-F3C6-40F7-9735-044B14A9277C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadJsonPatchAsync", "sample\ReadJsonPatchAsync\ReadJsonPatchAsync.csproj", "{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{0E750D74-69C7-433C-92C7-3F026083C255}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,9 +57,45 @@ Global
 		{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C817634D-62FD-4958-A8BD-8661112891F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C817634D-62FD-4958-A8BD-8661112891F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C817634D-62FD-4958-A8BD-8661112891F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C817634D-62FD-4958-A8BD-8661112891F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09D9741D-9ED9-4115-80D3-72B4EAFBA5AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09D9741D-9ED9-4115-80D3-72B4EAFBA5AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09D9741D-9ED9-4115-80D3-72B4EAFBA5AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09D9741D-9ED9-4115-80D3-72B4EAFBA5AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A12F9DC-7326-477A-8888-169F37712BCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A12F9DC-7326-477A-8888-169F37712BCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A12F9DC-7326-477A-8888-169F37712BCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A12F9DC-7326-477A-8888-169F37712BCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBA8FB4C-92D5-4675-95EF-33097868643E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBA8FB4C-92D5-4675-95EF-33097868643E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBA8FB4C-92D5-4675-95EF-33097868643E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBA8FB4C-92D5-4675-95EF-33097868643E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1670191-202E-40FC-9387-19868900256D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1670191-202E-40FC-9387-19868900256D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1670191-202E-40FC-9387-19868900256D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1670191-202E-40FC-9387-19868900256D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5E8E7E2-6393-48E9-A409-B2462E5EBE2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5E8E7E2-6393-48E9-A409-B2462E5EBE2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5E8E7E2-6393-48E9-A409-B2462E5EBE2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5E8E7E2-6393-48E9-A409-B2462E5EBE2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02307264-F3C6-40F7-9735-044B14A9277C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02307264-F3C6-40F7-9735-044B14A9277C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02307264-F3C6-40F7-9735-044B14A9277C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02307264-F3C6-40F7-9735-044B14A9277C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{910E8728-872B-43EF-994F-B67953874BCB} = {0E750D74-69C7-433C-92C7-3F026083C255}
+		{1FE80A1A-9402-4953-9A7F-F01B1D0539B5} = {0E750D74-69C7-433C-92C7-3F026083C255}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {55007954-1D8A-4553-A15C-FE4AE17C0A4B}
