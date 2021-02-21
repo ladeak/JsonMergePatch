@@ -16,7 +16,7 @@ namespace TestCode1
     public class Dto { public int Property { get; set; }  }
     public class Program
     {
-        public void SomeMethod(LaDeak.JsonMergePatch.Patch<Dto> data)
+        public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<Dto> data)
         {
         }
     }
@@ -42,7 +42,7 @@ namespace TestCode1
         [Fact]
         public void SimpleTestCode_Generate_ReturnsWrappedDtoType()
         {
-            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.CompileMvc(SimpleTestCode);
+            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.Compile(SimpleTestCode);
             var walker = Substitute.For<IPatchParametersWalker>();
             walker.Process(Arg.Any<SyntaxNode>(), Arg.Any<SemanticModel>()).Returns(new[] { Substitute.For<ITypeSymbol>() });
             var typeBuilder = Substitute.For<ITypeBuilder>();
@@ -57,7 +57,7 @@ namespace TestCode1
         [Fact]
         public void MultipleTypesFound_Generate_ReturnsWrappedForAllTypes()
         {
-            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.CompileMvc(SimpleTestCode);
+            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.Compile(SimpleTestCode);
             var walker = Substitute.For<IPatchParametersWalker>();
             walker.Process(Arg.Any<SyntaxNode>(), Arg.Any<SemanticModel>()).Returns(new[] { Substitute.For<ITypeSymbol>(), Substitute.For<ITypeSymbol>(), Substitute.For<ITypeSymbol>() });
             var typeBuilder = Substitute.For<ITypeBuilder>();
@@ -72,7 +72,7 @@ namespace TestCode1
         [Fact]
         public void MultipleSyntaxTrees_Generate_ReturnsWrappedForAllTrees()
         {
-            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.CompileMvc(SimpleTestCode);
+            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.Compile(SimpleTestCode);
             var walker = Substitute.For<IPatchParametersWalker>();
             walker.Process(Arg.Any<SyntaxNode>(), Arg.Any<SemanticModel>()).Returns(new[] { Substitute.For<ITypeSymbol>() });
             var typeBuilder = Substitute.For<ITypeBuilder>();
@@ -87,7 +87,7 @@ namespace TestCode1
         [Fact]
         public void GeneratedTypeReturnInnerType_Generate_ReturnsWrappedTypeForInner()
         {
-            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.CompileMvc(SimpleTestCode);
+            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.Compile(SimpleTestCode);
             var walker = Substitute.For<IPatchParametersWalker>();
             walker.Process(Arg.Any<SyntaxNode>(), Arg.Any<SemanticModel>()).Returns(new[] { Substitute.For<ITypeSymbol>() });
             var typeBuilder = Substitute.For<ITypeBuilder>();
@@ -102,7 +102,7 @@ namespace TestCode1
         [Fact]
         public void MultipleInnerType_Generate_ReturnsWrappedMultipleInnerType()
         {
-            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.CompileMvc(SimpleTestCode);
+            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.Compile(SimpleTestCode);
             var walker = Substitute.For<IPatchParametersWalker>();
             walker.Process(Arg.Any<SyntaxNode>(), Arg.Any<SemanticModel>()).Returns(new[] { Substitute.For<ITypeSymbol>() });
             var typeBuilder = Substitute.For<ITypeBuilder>();
@@ -121,7 +121,7 @@ namespace TestCode1
         [Fact]
         public void NoSyntaxTree_Generate_ReturnsEmptyResults()
         {
-            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.CompileMvc(SimpleTestCode);
+            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.Compile(SimpleTestCode);
             var walker = Substitute.For<IPatchParametersWalker>();
             var typeBuilder = Substitute.For<ITypeBuilder>();
             typeBuilder.BuildWrapperType(Arg.Any<ITypeSymbol>(), Arg.Any<string>()).Returns(new GeneratedWrapper() { ToProcessTypes = new List<ITypeSymbol>() });
@@ -136,7 +136,7 @@ namespace TestCode1
         [Fact]
         public void WalkerReturnsNoFinding_Generate_ReturnsEmptyResults()
         {
-            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.CompileMvc(SimpleTestCode);
+            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.Compile(SimpleTestCode);
             var walker = Substitute.For<IPatchParametersWalker>();
             walker.Process(Arg.Any<SyntaxNode>(), Arg.Any<SemanticModel>()).Returns(Enumerable.Empty<ITypeSymbol>());
             var typeBuilder = Substitute.For<ITypeBuilder>();
@@ -151,7 +151,7 @@ namespace TestCode1
         [Fact]
         public void MultipleGenerateCalls_ReturnsEqualResults()
         {
-            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.CompileMvc(SimpleTestCode);
+            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.Compile(SimpleTestCode);
             var walker = Substitute.For<IPatchParametersWalker>();
             walker.Process(Arg.Any<SyntaxNode>(), Arg.Any<SemanticModel>()).Returns(new[] { Substitute.For<ITypeSymbol>() });
             var typeBuilder = Substitute.For<ITypeBuilder>();
@@ -167,7 +167,7 @@ namespace TestCode1
         [Fact]
         public void GeneratedWrappersSource_SameAsReturnedByTypeBuilder()
         {
-            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.CompileMvc(SimpleTestCode);
+            (Compilation inputCompilation, SyntaxTree tree) = SourceBuilder.Compile(SimpleTestCode);
             var walker = Substitute.For<IPatchParametersWalker>();
             walker.Process(Arg.Any<SyntaxNode>(), Arg.Any<SemanticModel>()).Returns(new[] { Substitute.For<ITypeSymbol>() });
             var typeBuilder = Substitute.For<ITypeBuilder>();
@@ -183,7 +183,7 @@ namespace TestCode1
             Assert.Equal(typeBuilderResult.TargetTypeFullName, result.TargetTypeFullName);
         }
 
-        private static Compilation CreateCompilation(string source) => SourceBuilder.CompileMvc(source).Compilation;
+        private static Compilation CreateCompilation(string source) => SourceBuilder.Compile(source).Compilation;
 
     }
 }

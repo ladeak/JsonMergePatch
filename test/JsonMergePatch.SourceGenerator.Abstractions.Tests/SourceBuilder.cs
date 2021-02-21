@@ -4,11 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Http.Json;
-using Microsoft.AspNetCore.Mvc.Formatters;
+using LaDeak.JsonMergePatch.Abstractions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 {
@@ -18,13 +16,6 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         {
             var compilation = Compile(code, metadataReferences);
             return EmitToAssembly(compilation.Compilation);
-        }
-
-        public static Assembly CompileMvcToAssembly(string code, IEnumerable<MetadataReference> metadataReferences = null)
-        {
-            metadataReferences ??= Enumerable.Empty<MetadataReference>();
-            List<MetadataReference> references = GetMvcMetadataReferences();
-            return CompileToAssembly(code, metadataReferences.Concat(references));
         }
 
         public static Assembly EmitToAssembly(Compilation compilation)
@@ -48,36 +39,12 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             references.Add(MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll"));
             references.Add(MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "netstandard.dll"));
             references.Add(MetadataReference.CreateFromFile(typeof(IEnumerable<>).Assembly.Location));
+            references.Add(MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location));
+            references.Add(MetadataReference.CreateFromFile(typeof(JsonPropertyNameAttribute).Assembly.Location));
             references.AddRange(metadataReferences ?? Enumerable.Empty<MetadataReference>());
             var compilation = CSharpCompilation.Create($"{Guid.NewGuid()}.dll", new[] { syntaxTree }, references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
             return (compilation, syntaxTree);
         }
-
-        public static (CSharpCompilation Compilation, SyntaxTree Tree) CompileMvc(string code)
-        {
-            return Compile(code, GetMvcMetadataReferences());
-        }
-
-        public static Func<IMvcBuilder, JsonOptions, IMvcBuilder> GetMethod(Assembly assembly, string type, string methodName)
-        {
-            var method = assembly.GetType(type).GetMethod(methodName);
-            Func<IMvcBuilder, JsonOptions, IMvcBuilder> result = method.CreateDelegate<Func<IMvcBuilder, JsonOptions, IMvcBuilder>>();
-            return result;
-        }
-
-        private static List<MetadataReference> GetMvcMetadataReferences()
-        {
-            var references = new List<MetadataReference>();
-            references.Add(MetadataReference.CreateFromFile(typeof(IServiceCollection).Assembly.Location));
-            references.Add(MetadataReference.CreateFromFile(typeof(IServiceProvider).Assembly.Location));
-            references.Add(MetadataReference.CreateFromFile(typeof(IMvcBuilder).Assembly.Location));
-            references.Add(MetadataReference.CreateFromFile(typeof(ITypeRepository).Assembly.Location));
-            references.Add(MetadataReference.CreateFromFile(typeof(JsonOptions).Assembly.Location));
-            references.Add(MetadataReference.CreateFromFile(typeof(FormatterCollection<>).Assembly.Location));
-            references.Add(MetadataReference.CreateFromFile(typeof(JsonPropertyNameAttribute).Assembly.Location));
-            return references;
-        }
-
     }
 }

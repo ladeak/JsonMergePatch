@@ -60,7 +60,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         private void BuildClassDeclaration(BuilderState state, Action<BuilderState>? addBody = null)
         {
             BuildAttributes(state, state.TypeInfo.TypeSymbol.GetAttributes());
-            state.AppendLine($"public class {state.TypeInfo.Name} : LaDeak.JsonMergePatch.Patch<{state.TypeInfo.SourceTypeName}>");
+            state.AppendLine($"public class {state.TypeInfo.Name} : LaDeak.JsonMergePatch.Abstractions.Patch<{state.TypeInfo.SourceTypeName}>");
             state.AppendLine("{");
             addBody?.Invoke(state.IncrementIdentation());
             state.AppendLine("}");

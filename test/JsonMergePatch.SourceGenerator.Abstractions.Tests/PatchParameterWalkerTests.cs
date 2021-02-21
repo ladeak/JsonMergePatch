@@ -3,6 +3,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using LaDeak.JsonMergePatch.Abstractions;
+using LaDeak.JsonMergePatch.Http;
 using Microsoft.CodeAnalysis;
 using Xunit;
 
@@ -17,7 +19,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 public class Controller
 {
     public class SomeType { }
-    public void TestMethod(LaDeak.JsonMergePatch.Patch<SomeType> input) { }
+    public void TestMethod(LaDeak.JsonMergePatch.Abstractions.Patch<SomeType> input) { }
 }";
 
             var compilation = SourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
@@ -34,8 +36,8 @@ public class Controller
 public class Controller
 {
     public class SomeType { }
-    public void TestMethod1(LaDeak.JsonMergePatch.Patch<SomeType> input) { }
-    public void TestMethod2(LaDeak.JsonMergePatch.Patch<bool> input) { }
+    public void TestMethod1(LaDeak.JsonMergePatch.Abstractions.Patch<SomeType> input) { }
+    public void TestMethod2(LaDeak.JsonMergePatch.Abstractions.Patch<bool> input) { }
 }";
 
             var compilation = SourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
@@ -54,7 +56,7 @@ public class Controller
 public class Controller
 {
     public class Patch<T> { }
-    public void TestMethod1(LaDeak.JsonMergePatch.Patch<SomeType> input) { }
+    public void TestMethod1(LaDeak.JsonMergePatch.Abstractions.Patch<SomeType> input) { }
     public void TestMethod2(Patch<bool> input) { }
 }";
 
@@ -69,7 +71,7 @@ public class Controller
         public async Task UsingNamespace_PatchedType_Returned()
         {
             string code = @"
-using LaDeak.JsonMergePatch;
+using LaDeak.JsonMergePatch.Abstractions;
 public class Controller
 {
     public class SomeType { }
@@ -104,7 +106,7 @@ public class Controller
         public async Task Returns_ReadJsonPatchAsync_Types()
         {
             string code = @"
-using LaDeak.JsonMergePatch;
+using LaDeak.JsonMergePatch.Http;
 public class Controller
 {
     public class SomeType { }
@@ -112,15 +114,16 @@ public class Controller
     {
         var client = new System.Net.Http.HttpClient();
         var response = await client.GetAsync(""https://test.com"");
-        await response.Content.ReadJsonPatchAsync<SomeType>(null);
+        await response.Content.ReadJsonPatchAsync<SomeType>();
     }
 }";
 
-            var compilation = SourceBuilder.Compile(code, new[] { 
+            var compilation = SourceBuilder.Compile(code, new[] {
                 MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(HttpClient).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(HttpContentExtensions).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(JsonSerializerOptions).Assembly.Location)});
 
             var sut = new PatchParametersWalker();

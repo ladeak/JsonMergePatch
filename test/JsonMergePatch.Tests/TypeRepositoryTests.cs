@@ -1,7 +1,8 @@
 using System;
+using LaDeak.JsonMergePatch.Abstractions;
 using Xunit;
 
-namespace LaDeak.JsonMergePatch.Tests
+namespace LaDeak.JsonMergePatch.AspNetCore.Tests
 {
     public class TypeRepositoryTests
     {
@@ -9,15 +10,15 @@ namespace LaDeak.JsonMergePatch.Tests
         public void EmptyRepository_Add_DoesNotThrow()
         {
             var sut = new TypeRepository();
-            sut.Add<TestDto, WrappedTestDto>();
+            sut.Add<TestDto, TestDtoWrapped>();
         }
 
         [Fact]
         public void EmptyRepository_AddTwiceSameType_ThrowsException()
         {
             var sut = new TypeRepository();
-            sut.Add<TestDto, WrappedTestDto>();
-            Assert.Throws<ArgumentException>(() => sut.Add<TestDto, WrappedTestDto>());
+            sut.Add<TestDto, TestDtoWrapped>();
+            Assert.Throws<ArgumentException>(() => sut.Add<TestDto, TestDtoWrapped>());
         }
 
         [Fact]
@@ -31,7 +32,7 @@ namespace LaDeak.JsonMergePatch.Tests
         public void RepositoryWitTestDto_TryGet_ReturnsTrue()
         {
             var sut = new TypeRepository();
-            sut.Add<TestDto, WrappedTestDto>();
+            sut.Add<TestDto, TestDtoWrapped>();
             Assert.True(sut.TryGet(typeof(TestDto), out _));
         }
 
@@ -39,16 +40,16 @@ namespace LaDeak.JsonMergePatch.Tests
         public void RepositoryWitTestDto_TryGet_ReturnsRegisteredType()
         {
             var sut = new TypeRepository();
-            sut.Add<TestDto, WrappedTestDto>();
+            sut.Add<TestDto, TestDtoWrapped>();
             sut.TryGet(typeof(TestDto), out var result);
-            Assert.Equal(typeof(WrappedTestDto), result);
+            Assert.Equal(typeof(TestDtoWrapped), result);
         }
 
         [Fact]
         public void RepositoryWitTestDto_TryGet_ReturnsPatchOfUserType()
         {
             var sut = new TypeRepository();
-            sut.Add<TestDto, WrappedTestDto>();
+            sut.Add<TestDto, TestDtoWrapped>();
             sut.TryGet(typeof(TestDto), out var result);
             Assert.True(typeof(Patch<TestDto>).IsAssignableFrom(result));
         }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace LaDeak.JsonMergePatch
+namespace LaDeak.JsonMergePatch.Abstractions
 {
     public interface ITypeRepository
     {

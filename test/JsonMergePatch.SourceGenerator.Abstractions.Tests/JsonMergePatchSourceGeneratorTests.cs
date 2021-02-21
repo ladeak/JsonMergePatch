@@ -20,7 +20,7 @@ namespace TestCode1
     public class Dto { public int Property { get; set; }  }
     public class Program
     {
-        public void SomeMethod(LaDeak.JsonMergePatch.Patch<Dto> data)
+        public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<Dto> data)
         {
         }
     }
@@ -50,11 +50,11 @@ namespace TestCode2
 
     public class Program
     {
-        public void SomeMethod(LaDeak.JsonMergePatch.Patch<Dto0> data)
+        public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<Dto0> data)
         {
         }
 
-        public void SomeMethod(LaDeak.JsonMergePatch.Patch<Dto1> data)
+        public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<Dto1> data)
         {
         }
     }
@@ -84,7 +84,7 @@ namespace TestCode3
 
     public class Program2
     {
-        public void SomeMethod2(LaDeak.JsonMergePatch.Patch<Dto4> data)
+        public void SomeMethod2(LaDeak.JsonMergePatch.Abstractions.Patch<Dto4> data)
         {
         }
     }
@@ -110,7 +110,7 @@ namespace TestCode3
 
     public class Program2
     {
-        public void SomeMethod2(LaDeak.JsonMergePatch.Patch<Dto4> data)
+        public void SomeMethod2(LaDeak.JsonMergePatch.Abstractions.Patch<Dto4> data)
         {
         }
     }
@@ -122,6 +122,6 @@ namespace TestCode3
             return (inputCompilation, outputCompilation);
         }
 
-        private static Compilation CreateCompilation(string source) => SourceBuilder.CompileMvc(source).Compilation;
+        private static Compilation CreateCompilation(string source) => SourceBuilder.Compile(source).Compilation;
     }
 }

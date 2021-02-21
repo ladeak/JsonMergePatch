@@ -177,7 +177,7 @@ namespace TestCode
 
     public class Program2
     {
-        public void SomeMethod2(LaDeak.JsonMergePatch.Patch<Dto2> data)
+        public void SomeMethod2(LaDeak.JsonMergePatch.Abstractions.Patch<Dto2> data)
         {
         }
     }
@@ -191,6 +191,6 @@ namespace TestCode
 
         private static Compilation CreateWrappedTypeCompilation() => CreateInputOutputCompilation().Output;
 
-        private static Compilation CreateCompilation(string source) => SourceBuilder.CompileMvc(source).Compilation;
+        private static Compilation CreateCompilation(string source) => SourceBuilder.Compile(source).Compilation;
     }
 }

@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\JsonMergePatch\JsonMergePatch.csproj" />
+    <ProjectReference Include="..\..\src\JsonMergePatch\JsonMergePatch.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

@@ -85,7 +85,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(
 @"namespace LaDeak.JsonMergePatch.Generated.S
 {
-    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
         public TestTypeWrapped()
         {
@@ -127,7 +127,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(
 @"namespace LaDeak.JsonMergePatch.Generated.S
 {
-    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
         public TestTypeWrapped()
         {
@@ -169,7 +169,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(
 @"namespace LaDeak.JsonMergePatch.Generated.S
 {
-    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
         public TestTypeWrapped()
         {
@@ -201,7 +201,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 {
     [TestAttribute]
     [Hello]
-    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
         public TestTypeWrapped()
         {
@@ -234,7 +234,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(
 @"namespace LaDeak.JsonMergePatch.Generated.S
 {
-    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
         public TestTypeWrapped()
         {
@@ -281,7 +281,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(
     @"namespace LaDeak.JsonMergePatch.Generated.S
 {
-    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
         public TestTypeWrapped()
         {
@@ -340,7 +340,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(
     @"namespace LaDeak.JsonMergePatch.Generated.S
 {
-    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
         public TestTypeWrapped()
         {
@@ -400,7 +400,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(
 @"namespace LaDeak.JsonMergePatch.Generated.S
 {
-    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
         public TestTypeWrapped()
         {
@@ -445,7 +445,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(
 @"namespace LaDeak.JsonMergePatch.Generated.S
 {
-    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
         public TestTypeWrapped()
         {
@@ -497,7 +497,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(
 @"namespace LaDeak.JsonMergePatch.Generated.S
 {
-    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
         public TestTypeWrapped()
         {
@@ -568,7 +568,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(
 @"namespace LaDeak.JsonMergePatch.Generated.S
 {
-    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
         public TestTypeWrapped()
         {
@@ -619,7 +619,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(
 @"namespace LaDeak.JsonMergePatch.Generated.S
 {
-    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
         public TestTypeWrapped()
         {
@@ -677,7 +677,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(
 @"namespace LaDeak.JsonMergePatch.Generated.S
 {
-    public class TestTypeWrapped : LaDeak.JsonMergePatch.Patch<SourceName>
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
         public TestTypeWrapped()
         {

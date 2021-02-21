@@ -40,7 +40,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             return outputCompilation;
         }
 
-        private static Compilation CreateCompilation(string source) => SourceBuilder.CompileMvc(source).Compilation;
+        private static Compilation CreateCompilation(string source) => SourceBuilder.Compile(source).Compilation;
     }
 
     public class DictionarySerializationData : IEnumerable<object[]>
@@ -64,7 +64,7 @@ namespace TestCode
 
     public class Program
     {
-        public void SomeMethod(LaDeak.JsonMergePatch.Patch<Dto> data)
+        public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<Dto> data)
         {
         }
     }
@@ -78,7 +78,7 @@ namespace TestCode
 
     public class Program
     {
-        public void SomeMethod(LaDeak.JsonMergePatch.Patch<Dto> data)
+        public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<Dto> data)
         {
         }
     }
@@ -93,7 +93,7 @@ namespace TestCode
 
     public class Program
     {
-        public void SomeMethod(LaDeak.JsonMergePatch.Patch<Dto> data)
+        public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<Dto> data)
         {
         }
     }

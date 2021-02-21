@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace LaDeak.JsonMergePatch
+namespace LaDeak.JsonMergePatch.Abstractions
 {
     public sealed class TypeRepository : ITypeRepository
     {

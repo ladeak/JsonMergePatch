@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace LaDeak.JsonMergePatch
+namespace LaDeak.JsonMergePatch.Abstractions
 {
     public abstract class Patch<T>
     {

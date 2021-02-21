@@ -78,11 +78,11 @@ namespace TestCode
 
     public class Program
     {
-        public void SomeMethod(LaDeak.JsonMergePatch.Patch<ParentDto> data)
+        public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<ParentDto> data)
         {
         }
 
-        public void SomeMethod2(LaDeak.JsonMergePatch.Patch<SomeDerived> data)
+        public void SomeMethod2(LaDeak.JsonMergePatch.Abstractions.Patch<SomeDerived> data)
         {
         }
     }
@@ -96,7 +96,7 @@ namespace TestCode
 
         private static Compilation CreateWrappedTypeCompilation() => CreateInputOutputCompilation().Output;
 
-        private static Compilation CreateCompilation(string source) => SourceBuilder.CompileMvc(source).Compilation;
+        private static Compilation CreateCompilation(string source) => SourceBuilder.Compile(source).Compilation;
     }
 
     public class BasicSerializationData : IEnumerable<object[]>

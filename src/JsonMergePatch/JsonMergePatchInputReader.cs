@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using LaDeak.JsonMergePatch.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 
-namespace LaDeak.JsonMergePatch
+namespace LaDeak.JsonMergePatch.AspNetCore
 {
     public class JsonMergePatchInputReader : TextInputFormatter
     {

@@ -1,4 +1,4 @@
-﻿namespace LaDeak.JsonMergePatch.AspNetCore.Tests
+﻿namespace LaDeak.JsonMergePatch.Http.Tests
 {
     public class TestDto
     {

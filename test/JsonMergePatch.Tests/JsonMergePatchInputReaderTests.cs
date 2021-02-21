@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using LaDeak.JsonMergePatch.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using NSubstitute;
 using Xunit;
 
-namespace LaDeak.JsonMergePatch.Tests
+namespace LaDeak.JsonMergePatch.AspNetCore.Tests
 {
     public class JsonMergePatchInputReaderTests
     {
@@ -92,7 +93,7 @@ namespace LaDeak.JsonMergePatch.Tests
 
             var result = await sut.ReadRequestBodyAsync(inputContext, Encoding.UTF8);
 
-            Assert.Equal(5, ((WrappedTestDto)result.Model).Prop1);
+            Assert.Equal(5, ((TestDtoWrapped)result.Model).Prop1);
         }
 
         [Fact]
@@ -104,7 +105,7 @@ namespace LaDeak.JsonMergePatch.Tests
 
             var result = await sut.ReadRequestBodyAsync(inputContext, Encoding.Unicode);
 
-            Assert.Equal(5, ((WrappedTestDto)result.Model).Prop1);
+            Assert.Equal(5, ((TestDtoWrapped)result.Model).Prop1);
         }
 
         [Fact]
@@ -154,7 +155,7 @@ namespace LaDeak.JsonMergePatch.Tests
             var httpContext = new DefaultHttpContext();
             var servicesProvider = Substitute.For<IServiceProvider>();
             var typeRepository = Substitute.For<ITypeRepository>();
-            typeRepository.TryGet(Arg.Is<Type>(x => x == typeof(TestDto)), out Arg.Any<Type>()).Returns(callInfo => { callInfo[1] = typeof(WrappedTestDto); return true; });
+            typeRepository.TryGet(Arg.Is<Type>(x => x == typeof(TestDto)), out Arg.Any<Type>()).Returns(callInfo => { callInfo[1] = typeof(TestDtoWrapped); return true; });
             servicesProvider.GetService(typeof(ITypeRepository)).Returns(typeRepository);
             httpContext.RequestServices = servicesProvider;
             httpContext.Request.ContentType = "application/merge-patch+json";
