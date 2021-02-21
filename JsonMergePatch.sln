@@ -21,13 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.Http.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.Abstractions", "src\SourceGenerator.Abstractions\JsonMergePatch.SourceGenerator.Abstractions.csproj", "{EBA8FB4C-92D5-4675-95EF-33097868643E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonMergePatch.SourceGenerator.Http", "src\SourceGenerator.Http\JsonMergePatch.SourceGenerator.Http.csproj", "{C1670191-202E-40FC-9387-19868900256D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.Abstractions.Tests", "test\JsonMergePatch.SourceGenerator.Abstractions.Tests\JsonMergePatch.SourceGenerator.Abstractions.Tests.csproj", "{02307264-F3C6-40F7-9735-044B14A9277C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.Http.Tests", "test\JsonMergePatch.SourceGenerator.Http.Tests\JsonMergePatch.SourceGenerator.Http.Tests.csproj", "{A5E8E7E2-6393-48E9-A409-B2462E5EBE2D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonMergePatch.SourceGenerator.Abstractions.Tests", "test\JsonMergePatch.SourceGenerator.Abstractions.Tests\JsonMergePatch.SourceGenerator.Abstractions.Tests.csproj", "{02307264-F3C6-40F7-9735-044B14A9277C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadJsonPatchAsync", "sample\ReadJsonPatchAsync\ReadJsonPatchAsync.csproj", "{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadJsonPatchAsync", "sample\ReadJsonPatchAsync\ReadJsonPatchAsync.csproj", "{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{0E750D74-69C7-433C-92C7-3F026083C255}"
 EndProject
@@ -73,14 +69,6 @@ Global
 		{EBA8FB4C-92D5-4675-95EF-33097868643E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBA8FB4C-92D5-4675-95EF-33097868643E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBA8FB4C-92D5-4675-95EF-33097868643E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C1670191-202E-40FC-9387-19868900256D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C1670191-202E-40FC-9387-19868900256D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C1670191-202E-40FC-9387-19868900256D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C1670191-202E-40FC-9387-19868900256D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A5E8E7E2-6393-48E9-A409-B2462E5EBE2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A5E8E7E2-6393-48E9-A409-B2462E5EBE2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A5E8E7E2-6393-48E9-A409-B2462E5EBE2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A5E8E7E2-6393-48E9-A409-B2462E5EBE2D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{02307264-F3C6-40F7-9735-044B14A9277C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{02307264-F3C6-40F7-9735-044B14A9277C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02307264-F3C6-40F7-9735-044B14A9277C}.Release|Any CPU.ActiveCfg = Release|Any CPU

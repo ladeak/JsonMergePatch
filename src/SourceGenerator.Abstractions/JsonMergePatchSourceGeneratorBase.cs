@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -7,6 +6,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace LaDeak.JsonMergePatch.SourceGenerator.Abstractions
 {
+    [Generator]
     public class JsonMergePatchSourceGeneratorBase : ISourceGenerator
     {
         public void Execute(GeneratorExecutionContext context) => ExecuteImpl(context);
