@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <Version>0.0.1-ladeak1</Version>
+    <Version>0.0.1-alpha1</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>ladeak</Authors>
     <Copyright>ladeak</Copyright>
@@ -10,6 +10,7 @@
     <RepositoryUrl>https://github.com/ladeak/JsonMergePatch</RepositoryUrl>
     <PackageIcon>icon.png</PackageIcon>
     <IsPackable>true</IsPackable>
+    <Description>LaDeak.JsonMergePatch libraries provide an implementation for Json Merge Patch, RFC7396. Library using C# source generators to generate the types required for serialization. The Http package provides extension methods for HTTP requests, while the AspNetCore package provides an InputReader implementation.</Description>
 
     <MicrosoftCodeAnalysisCSharpVersion>3.8.0</MicrosoftCodeAnalysisCSharpVersion>
     <MicrosoftCodeAnalysisAnalyzersVersion>3.3.2</MicrosoftCodeAnalysisAnalyzersVersion>
