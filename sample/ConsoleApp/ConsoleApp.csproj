@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!--<PackageReference Include="LaDeak.JsonMergePatch.Http" Version="0.0.1-alpha1" />
+    <PackageReference Include="LaDeak.JsonMergePatch.SourceGenerator" Version="0.0.1-alpha1" />-->
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\JsonMergePatch.Http\JsonMergePatch.Http.csproj" />
     <ProjectReference Include="..\..\src\JsonMergePatch.SourceGenerator\JsonMergePatch.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
