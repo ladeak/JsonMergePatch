@@ -16,7 +16,7 @@ namespace ReadJsonPatchAsync
 
         public static async Task Main(string[] args)
         {
-            LaDeak.JsonMergePatch.Abstractions.JsonMergePatchOptions.Repository = LaDeak.JsonMergePatch.Generated.TypeRepositoryContainer.Instance.Repository;
+            LaDeak.JsonMergePatch.Abstractions.JsonMergePatchOptions.Repository = LaDeak.JsonMergePatch.Generated.TypeRepository.Instance;
             await ReadAsJsonMergePatchAsync();
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using LaDeak.JsonMergePatch.Abstractions;
 using LaDeak.JsonMergePatch.AspNetCore;
@@ -18,7 +19,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.AspNetCore.Tests
         public void GeneratedCode_Compiles()
         {
             var sut = new ModelBuilderExtensionGenerator();
-            var code = sut.CreateModelBuilder("new LaDeak.JsonMergePatch.Abstractions.TypeRepository()");
+            var code = sut.CreateModelBuilder("new LaDeak.JsonMergePatch.SourceGenerator.AspNetCore.Tests.TypeRepositoryHook()");
             GetMethodDelegate(code);
         }
 
@@ -36,7 +37,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.AspNetCore.Tests
         public void Adds_ITypeRepository_MvcOptions_ServiceRegistrations()
         {
             var sut = new ModelBuilderExtensionGenerator();
-            var code = sut.CreateModelBuilder("new LaDeak.JsonMergePatch.Abstractions.TypeRepository()");
+            var code = sut.CreateModelBuilder("new LaDeak.JsonMergePatch.SourceGenerator.AspNetCore.Tests.TypeRepositoryHook()");
             var mvcBuilder = Substitute.For<IMvcBuilder>();
             var services = Substitute.For<IServiceCollection>();
             mvcBuilder.Services.Returns(services);
@@ -51,7 +52,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.AspNetCore.Tests
         public void AddsJsonMergePatchInputReader_ToMvcOptions()
         {
             var sut = new ModelBuilderExtensionGenerator();
-            var code = sut.CreateModelBuilder("new LaDeak.JsonMergePatch.Abstractions.TypeRepository()");
+            var code = sut.CreateModelBuilder("new LaDeak.JsonMergePatch.SourceGenerator.AspNetCore.Tests.TypeRepositoryHook()");
             var mvcBuilder = Substitute.For<IMvcBuilder>();
             var services = Substitute.For<IServiceCollection>();
             mvcBuilder.Services.Returns(services);
@@ -71,7 +72,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.AspNetCore.Tests
         public void PassesCustom_JsonOptions_JsonMergePatchInputReader()
         {
             var sut = new ModelBuilderExtensionGenerator();
-            var code = sut.CreateModelBuilder("new LaDeak.JsonMergePatch.Abstractions.TypeRepository()");
+            var code = sut.CreateModelBuilder("new LaDeak.JsonMergePatch.SourceGenerator.AspNetCore.Tests.TypeRepositoryHook()");
             var mvcBuilder = Substitute.For<IMvcBuilder>();
             var services = Substitute.For<IServiceCollection>();
             mvcBuilder.Services.Returns(services);
@@ -88,11 +89,23 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.AspNetCore.Tests
             Assert.Same(jsonOption.SerializerOptions, options.InputFormatters.OfType<JsonMergePatchInputReader>().First().SerializerOptions);
         }
 
-        private Func<IMvcBuilder, JsonOptions, IMvcBuilder> GetMethodDelegate(string code, IEnumerable<MetadataReference> metadataReferences = null)
+        private Func<IMvcBuilder, JsonOptions, IMvcBuilder> GetMethodDelegate(string code)
         {
+            IEnumerable<MetadataReference> metadataReferences = new[] { MetadataReference.CreateFromFile(typeof(TypeRepositoryHook).Assembly.Location) };
             return AspNetCoreSourceBuilder.GetMethod(AspNetCoreSourceBuilder.CompileMvcToAssembly(code, metadataReferences), "LaDeak.JsonMergePatch.Generated.MvcBuilderExtensions", "AddJsonMergePatch");
         }
+    }
 
+    public class TypeRepositoryHook : ITypeRepository
+    {
+        public void Add<TSource, TWrapper>() where TWrapper : Patch<TSource>
+        {
+        }
 
+        public bool TryGet(Type source, [NotNullWhen(true)] out Type wrapper)
+        {
+            wrapper = null;
+            return false;
+        }
     }
 }
