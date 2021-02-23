@@ -11,25 +11,39 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             StringBuilder sb = new StringBuilder(@"
 namespace LaDeak.JsonMergePatch.Generated
 {
-    public class TypeRepositoryContainer
-    {
-        public LaDeak.JsonMergePatch.Abstractions.ITypeRepository Repository { get; } = new LaDeak.JsonMergePatch.Abstractions.TypeRepository();
+    public class TypeRepository : LaDeak.JsonMergePatch.Abstractions.ITypeRepository
+    {       
+        private System.Collections.Generic.Dictionary<System.Type, System.Type> _repository = new System.Collections.Generic.Dictionary<System.Type, System.Type>();
 
-        private TypeRepositoryContainer()
+        private TypeRepository()
         {
 ");
             foreach ((var originalType, var generatedType) in typeRegistrations ?? Enumerable.Empty<(string, string)>())
-                sb.AppendLine($"            Repository.Add<{originalType}, {generatedType}>();");
+                sb.AppendLine($"            Add<{originalType}, {generatedType}>();");
 
             sb.Append(@"
         }
 
-        public static TypeRepositoryContainer Instance { get; } = new TypeRepositoryContainer();
+        public void Add<TSource, TWrapper>() where TWrapper : LaDeak.JsonMergePatch.Abstractions.Patch<TSource>
+        {
+            _repository.Add(typeof(TSource), typeof(TWrapper));
+        }
+
+        public bool TryGet(System.Type source, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out System.Type wrapper)
+        {
+            return _repository.TryGetValue(source, out wrapper);
+        }
+
+        public static LaDeak.JsonMergePatch.Abstractions.ITypeRepository Instance { get; } = new TypeRepository();
     }
 }");
             return sb.ToString();
         }
-
-
     }
 }
+
+
+
+
+
+
