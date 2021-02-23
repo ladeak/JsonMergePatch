@@ -1,0 +1,7 @@
+<Project>
+
+  <PropertyGroup>
+    <PackageId>$(RootNamespace)</PackageId>
+  </PropertyGroup>
+
+</Project>

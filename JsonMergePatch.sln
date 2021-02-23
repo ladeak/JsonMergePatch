@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.AspNetCore", "src\JsonMergePatch\JsonMergePatch.AspNetCore.csproj", "{D539E41C-F89E-44C7-B2FD-ABE4E55942F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.AspNetCore", "src\JsonMergePatch.AspNetCore\JsonMergePatch.AspNetCore.csproj", "{D539E41C-F89E-44C7-B2FD-ABE4E55942F1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreWebApi", "sample\AspNetCoreWebApi\AspNetCoreWebApi.csproj", "{910E8728-872B-43EF-994F-B67953874BCB}"
 EndProject

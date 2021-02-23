@@ -2,7 +2,21 @@
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <Authors>LaDeak</Authors>
+    <Version>0.0.1-ladeak1</Version>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>ladeak</Authors>
+    <Copyright>ladeak</Copyright>
+    <PackageTags>Json, JsonMergePatch, RFC7396, AspNetCore</PackageTags>
+    <RepositoryUrl>https://github.com/ladeak/JsonMergePatch</RepositoryUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <IsPackable>true</IsPackable>
+
+    <MicrosoftCodeAnalysisCSharpVersion>3.8.0</MicrosoftCodeAnalysisCSharpVersion>
+    <MicrosoftCodeAnalysisAnalyzersVersion>3.3.2</MicrosoftCodeAnalysisAnalyzersVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\icon.png" Pack="True" PackagePath="" />
+  </ItemGroup>
 
 </Project>

@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
-    <Nullable>enable</Nullable>
     <RootNamespace>LaDeak.JsonMergePatch.Http</RootNamespace>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
