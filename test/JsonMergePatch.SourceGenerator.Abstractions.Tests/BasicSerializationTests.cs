@@ -171,6 +171,22 @@ namespace TestCode
     }
 }
 ";
+
+        private readonly string _vanillaRecordTypesProperties = @"
+namespace TestCode
+{
+    public record SubDto(System.Int32 NumberProp, System.DateTime? NullableDateTimeProperty, System.Double CamelCaseProperty);
+
+    public record ParentDto(System.String ParentStringProperty, SubDto OtherDto, System.Collections.Generic.IEnumerable<int> Values);
+
+    public class Program
+    {
+        public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<ParentDto> data)
+        {
+        }
+    }
+}
+";
     }
 }
 

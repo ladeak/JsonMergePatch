@@ -177,11 +177,9 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             state.AppendLine($"public override {state.TypeInfo.SourceTypeName} ApplyPatch({state.TypeInfo.SourceTypeName} input)");
             state.AppendLine("{");
             var bodyState = state.IncrementIdentation();
-            if (CallConstructIfEmpty(bodyState))
-            {
-                SetInitOnlyProperties(bodyState);
-                SetReadWriteProperties(bodyState);
-            }
+            CallConstructIfEmpty(bodyState, "input ??=", leaveOpen: false);
+            SetInitOnlyProperties(bodyState);
+            SetReadWriteProperties(bodyState);
             PopulateDictionaryProperties(bodyState);
             bodyState.AppendLine("return input;");
             state.AppendLine("}");
@@ -211,7 +209,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         {
             if (!state.TypeInfo.Properties.Any(x => IsInitOnlyProperty(x.Property)))
                 return;
-            state.AppendLine($"var tmp = new {state.TypeInfo.SourceTypeName}()");
+            //state.AppendLine($"var tmp = new {state.TypeInfo.SourceTypeName}()");
+            CallConstructIfEmpty(state, "var tmp =", leaveOpen: true);
             state.AppendLine("{");
             var initializerState = state.IncrementIdentation();
             for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
@@ -258,17 +257,19 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             return typeSymbol.GetMembers().OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor).AnyOrNull(x => x.Parameters.IsEmpty);
         }
 
-        private bool CallConstructIfEmpty(BuilderState state)
+        private void CallConstructIfEmpty(BuilderState state, string toInitialize, bool leaveOpen)
         {
-            if (HasDefaultConstructor(state.TypeInfo.TypeSymbol))
+            IEnumerable<string> parameters = Enumerable.Empty<string>();
+            if (!HasDefaultConstructor(state.TypeInfo.TypeSymbol))
             {
-                state.AppendLine($"input ??= new {state.TypeInfo.SourceTypeName}();");
-                return true;
+                var typeSymbol = state.TypeInfo.TypeSymbol;
+                var ctor = typeSymbol.GetMembers().OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor).OrderByDescending(x => x.Parameters.Length).First();
+                var properties = state.TypeInfo.Properties.Select(x => x.Property).ToList();
+                parameters = Enumerable.Repeat("default", ctor.Parameters.Length);
             }
-
-
-            //return false if non-default ctr. used.
-            return false;
+            var ending = leaveOpen ? "" : ";";
+            state.AppendLine($"{toInitialize} new {state.TypeInfo.SourceTypeName}({string.Join(", ", parameters)}){ending}");
+            return;
         }
 
         private void PopulateDictionary(BuilderState state, PropertyInformation propertyInformation)
