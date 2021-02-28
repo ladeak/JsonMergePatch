@@ -177,42 +177,43 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             state.AppendLine($"public override {state.TypeInfo.SourceTypeName} ApplyPatch({state.TypeInfo.SourceTypeName} input)");
             state.AppendLine("{");
             var bodyState = state.IncrementIdentation();
-            if (CallConstructIfEmpty(state, bodyState))
+            if (CallConstructIfEmpty(bodyState))
             {
-                SetInitOnlyProperties(state, bodyState);
-                SetReadWriteProperties(state, bodyState);
+                SetInitOnlyProperties(bodyState);
+                SetReadWriteProperties(bodyState);
             }
+            PopulateDictionaryProperties(bodyState);
             bodyState.AppendLine("return input;");
             state.AppendLine("}");
         }
 
-        private void SetReadWriteProperties(BuilderState state, BuilderState bodyState)
+        private void SetReadWriteProperties(BuilderState state)
         {
             for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
             {
                 var currentProperty = state.TypeInfo.Properties[i].Property;
                 if (!IsInitOnlyProperty(currentProperty))
                 {
-                    bodyState.AppendLine($"if (Properties[{i}])");
+                    state.AppendLine($"if (Properties[{i}])");
                     if (GeneratedTypeFilter.IsGeneratableType(currentProperty.Type))
-                        bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name});");
+                        state.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name});");
                     else if (state.TypeInfo.Properties[i].IsGenericDictionary)
-                        BuildDictionaryApplyPath(bodyState.IncrementIdentation(), state.TypeInfo.Properties[i]);
+                        state.IncrementIdentation().AppendLine($"input.{currentProperty.Name} ??= new();");
                     else if (state.TypeInfo.Properties[i].IsConvertedToNullableType)
-                        bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}.HasValue ? {currentProperty.Name}.Value : default;");
+                        state.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}.HasValue ? {currentProperty.Name}.Value : default;");
                     else
-                        bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name};");
+                        state.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name};");
                 }
             }
         }
 
-        private void SetInitOnlyProperties(BuilderState state, BuilderState bodyState)
+        private void SetInitOnlyProperties(BuilderState state)
         {
             if (!state.TypeInfo.Properties.Any(x => IsInitOnlyProperty(x.Property)))
                 return;
-            bodyState.AppendLine("input = new()");
-            bodyState.AppendLine("{");
-            var initializerState = bodyState.IncrementIdentation();
+            state.AppendLine($"var tmp = new {state.TypeInfo.SourceTypeName}()");
+            state.AppendLine("{");
+            var initializerState = state.IncrementIdentation();
             for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
             {
                 var currentProperty = state.TypeInfo.Properties[i].Property;
@@ -233,16 +234,17 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                     initializerState.AppendLine($"{currentProperty.Name} = input.{currentProperty.Name},");
                 }
             }
-            bodyState.AppendLine("};");
+            state.AppendLine("};");
+            state.AppendLine("input = tmp;");
+        }
 
+        private void PopulateDictionaryProperties(BuilderState state)
+        {
             for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
             {
                 var currentProperty = state.TypeInfo.Properties[i].Property;
-                if (IsInitOnlyProperty(currentProperty))
-                {
-                    if (!GeneratedTypeFilter.IsGeneratableType(currentProperty.Type) && state.TypeInfo.Properties[i].IsGenericDictionary)
-                        PopulateDictionary(bodyState, state.TypeInfo.Properties[i]);
-                }
+                if (!GeneratedTypeFilter.IsGeneratableType(currentProperty.Type) && state.TypeInfo.Properties[i].IsGenericDictionary)
+                    PopulateDictionary(state, state.TypeInfo.Properties[i]);
             }
         }
 
@@ -251,21 +253,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             return propertySymbol.SetMethod?.OriginalDefinition.IsInitOnly ?? false;
         }
 
-        private bool CallConstructIfEmpty(BuilderState state, BuilderState bodyState)
+        private bool CallConstructIfEmpty(BuilderState state)
         {
-            bodyState.AppendLine($"input ??= new {state.TypeInfo.SourceTypeName}();");
+            state.AppendLine($"input ??= new {state.TypeInfo.SourceTypeName}();");
             //return false if non-default ctr. used.
             return true;
         }
 
-        private void BuildDictionaryApplyPath(BuilderState state, PropertyInformation propertyInformation)
-        {
-            var propertyName = propertyInformation.Property.Name;
-            state.AppendLine($"input.{propertyName} ??= new();");
-            PopulateDictionary(state, propertyInformation);
-        }
-
-        private static void PopulateDictionary(BuilderState state, PropertyInformation propertyInformation)
+        private void PopulateDictionary(BuilderState state, PropertyInformation propertyInformation)
         {
             var propertyName = propertyInformation.Property.Name;
             state.AppendLine($"foreach(var item in {propertyName})");

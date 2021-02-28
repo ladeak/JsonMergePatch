@@ -468,13 +468,13 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             input ??= new SourceName();
             if (Properties[0])
                 input.TestProp ??= new();
-                foreach(var item in TestProp)
-                {
-                    if(item.Value is null)
-                        input.TestProp.Remove(item.Key);
-                    else
-                        input.TestProp[item.Key] = item.Value.Value;
-                }
+            foreach(var item in TestProp)
+            {
+                if(item.Value is null)
+                    input.TestProp.Remove(item.Key);
+                else
+                    input.TestProp[item.Key] = item.Value.Value;
+            }
             return input;
         }
     }
@@ -531,22 +531,22 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             input ??= new SourceName();
             if (Properties[0])
                 input.TestProp0 ??= new();
-                foreach(var item in TestProp0)
-                {
-                    if(item.Value is null)
-                        input.TestProp0.Remove(item.Key);
-                    else
-                        input.TestProp0[item.Key] = item.Value.Value;
-                }
             if (Properties[1])
                 input.TestProp1 ??= new();
-                foreach(var item in TestProp1)
-                {
-                    if(item.Value is null)
-                        input.TestProp1.Remove(item.Key);
-                    else
-                        input.TestProp1[item.Key] = item.Value.Value;
-                }
+            foreach(var item in TestProp0)
+            {
+                if(item.Value is null)
+                    input.TestProp0.Remove(item.Key);
+                else
+                    input.TestProp0[item.Key] = item.Value.Value;
+            }
+            foreach(var item in TestProp1)
+            {
+                if(item.Value is null)
+                    input.TestProp1.Remove(item.Key);
+                else
+                    input.TestProp1[item.Key] = item.Value.Value;
+            }
             return input;
         }
     }
@@ -591,13 +591,13 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             input ??= new SourceName();
             if (Properties[0])
                 input.TestProp ??= new();
-                foreach(var item in TestProp)
-                {
-                    if(item.Value is null)
-                        input.TestProp.Remove(item.Key);
-                    else
-                        input.TestProp[item.Key] = item.Value;
-                }
+            foreach(var item in TestProp)
+            {
+                if(item.Value is null)
+                    input.TestProp.Remove(item.Key);
+                else
+                    input.TestProp[item.Key] = item.Value;
+            }
             return input;
         }
     }
@@ -642,13 +642,13 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             input ??= new SourceName();
             if (Properties[0])
                 input.TestProp ??= new();
-                foreach(var item in TestProp)
-                {
-                    if(item.Value is null)
-                        input.TestProp.Remove(item.Key);
-                    else
-                        input.TestProp[item.Key] = item.Value;
-                }
+            foreach(var item in TestProp)
+            {
+                if(item.Value is null)
+                    input.TestProp.Remove(item.Key);
+                else
+                    input.TestProp[item.Key] = item.Value;
+            }
             return input;
         }
     }
