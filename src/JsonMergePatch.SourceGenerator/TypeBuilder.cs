@@ -179,8 +179,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             var bodyState = state.IncrementIdentation();
             if (CallConstructIfEmpty(state, bodyState))
             {
-                SetReadWriteProperties(state, bodyState);
                 SetInitOnlyProperties(state, bodyState);
+                SetReadWriteProperties(state, bodyState);
             }
             bodyState.AppendLine("return input;");
             state.AppendLine("}");
@@ -208,15 +208,16 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
 
         private void SetInitOnlyProperties(BuilderState state, BuilderState bodyState)
         {
+            if (!state.TypeInfo.Properties.Any(x => IsInitOnlyProperty(x.Property)))
+                return;
+            bodyState.AppendLine("input = new()");
+            bodyState.AppendLine("{");
+            var initializerState = bodyState.IncrementIdentation();
             for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
             {
                 var currentProperty = state.TypeInfo.Properties[i].Property;
                 if (IsInitOnlyProperty(currentProperty))
                 {
-                    bodyState.AppendLine("input = input with");
-                    bodyState.AppendLine("{");
-                    var initializerState = bodyState.IncrementIdentation();
-
                     if (GeneratedTypeFilter.IsGeneratableType(currentProperty.Type))
                         initializerState.AppendLine($"{currentProperty.Name} = this.{currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name}),");
                     else if (state.TypeInfo.Properties[i].IsGenericDictionary)
@@ -225,10 +226,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                         initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] && {currentProperty.Name}.HasValue ? this.{currentProperty.Name}.Value : input.{currentProperty.Name},");
                     else
                         initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] ? this.{currentProperty.Name} : input.{currentProperty.Name},");
-
-                    bodyState.AppendLine("};");
+                }
+                else
+                {
+                    // Copy old property values onto the new object
+                    initializerState.AppendLine($"{currentProperty.Name} = input.{currentProperty.Name},");
                 }
             }
+            bodyState.AppendLine("};");
 
             for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
             {
