@@ -13,7 +13,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             if (typeInfo is INamedTypeSymbol namedTypeInfo)
                 generic = namedTypeInfo.IsGenericType;
             return typeInfo.SpecialType == SpecialType.None && !typeInfo.IsAnonymousType && !typeInfo.IsAbstract && !generic
-            && typeInfo.GetMembers().OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor).All(x => x.Parameters.IsEmpty);
+            && typeInfo.GetMembers().OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor).AnyOrNull(x => x.Parameters.IsEmpty);
         }
 
 

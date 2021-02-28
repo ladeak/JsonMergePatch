@@ -23,7 +23,7 @@ namespace LaDeak.JsonMergePatch.Http
                 throw new ArgumentNullException(nameof(typeRepository));
             if (!typeRepository.TryGet(typeof(TResult), out var wrapperType))
                 throw new ArgumentException($"{typeof(TResult)} is missing generated wrapper type. Check if all members of the type definition is supported.");
-            if (content.Headers.ContentType?.MediaType != "application/merge-patch+json" && content.Headers.ContentType?.MediaType != "application/json")
+            if (content.Headers.ContentType?.MediaType != "application/merge-patch+json" && content.Headers.ContentType?.MediaType != "application/json" && !string.IsNullOrWhiteSpace(content.Headers.ContentType?.MediaType))
                 return null;
 
             var contentStream = await content.ReadAsStreamAsync().ConfigureAwait(false);

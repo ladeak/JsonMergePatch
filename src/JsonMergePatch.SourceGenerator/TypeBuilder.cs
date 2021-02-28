@@ -177,28 +177,92 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             state.AppendLine($"public override {state.TypeInfo.SourceTypeName} ApplyPatch({state.TypeInfo.SourceTypeName} input)");
             state.AppendLine("{");
             var bodyState = state.IncrementIdentation();
-            bodyState.AppendLine($"input ??= new {state.TypeInfo.SourceTypeName}();");
-            for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
+            if (CallConstructIfEmpty(state, bodyState))
             {
-                bodyState.AppendLine($"if (Properties[{i}])");
-                var currentProperty = state.TypeInfo.Properties[i].Property;
-                if (GeneratedTypeFilter.IsGeneratableType(currentProperty.Type))
-                    bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name});");
-                else if (state.TypeInfo.Properties[i].IsGenericDictionary)
-                    BuildDictionaryApplyPath(bodyState.IncrementIdentation(), state.TypeInfo.Properties[i]);
-                else if (state.TypeInfo.Properties[i].IsConvertedToNullableType)
-                    bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}.HasValue ? {currentProperty.Name}.Value : default;");
-                else
-                    bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name};");
+                SetReadWriteProperties(state, bodyState);
+                SetInitOnlyProperties(state, bodyState);
             }
             bodyState.AppendLine("return input;");
             state.AppendLine("}");
+        }
+
+        private void SetReadWriteProperties(BuilderState state, BuilderState bodyState)
+        {
+            for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
+            {
+                var currentProperty = state.TypeInfo.Properties[i].Property;
+                if (!IsInitOnlyProperty(currentProperty))
+                {
+                    bodyState.AppendLine($"if (Properties[{i}])");
+                    if (GeneratedTypeFilter.IsGeneratableType(currentProperty.Type))
+                        bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name});");
+                    else if (state.TypeInfo.Properties[i].IsGenericDictionary)
+                        BuildDictionaryApplyPath(bodyState.IncrementIdentation(), state.TypeInfo.Properties[i]);
+                    else if (state.TypeInfo.Properties[i].IsConvertedToNullableType)
+                        bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}.HasValue ? {currentProperty.Name}.Value : default;");
+                    else
+                        bodyState.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name};");
+                }
+            }
+        }
+
+        private void SetInitOnlyProperties(BuilderState state, BuilderState bodyState)
+        {
+            for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
+            {
+                var currentProperty = state.TypeInfo.Properties[i].Property;
+                if (IsInitOnlyProperty(currentProperty))
+                {
+                    bodyState.AppendLine("input = input with");
+                    bodyState.AppendLine("{");
+                    var initializerState = bodyState.IncrementIdentation();
+
+                    if (GeneratedTypeFilter.IsGeneratableType(currentProperty.Type))
+                        initializerState.AppendLine($"{currentProperty.Name} = this.{currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name}),");
+                    else if (state.TypeInfo.Properties[i].IsGenericDictionary)
+                        initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] && input.{currentProperty.Name} == null ? new() : default,");
+                    else if (state.TypeInfo.Properties[i].IsConvertedToNullableType)
+                        initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] && {currentProperty.Name}.HasValue ? this.{currentProperty.Name}.Value : input.{currentProperty.Name},");
+                    else
+                        initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] ? this.{currentProperty.Name} : input.{currentProperty.Name},");
+
+                    bodyState.AppendLine("};");
+                }
+            }
+
+            for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
+            {
+                var currentProperty = state.TypeInfo.Properties[i].Property;
+                if (IsInitOnlyProperty(currentProperty))
+                {
+                    if (!GeneratedTypeFilter.IsGeneratableType(currentProperty.Type) && state.TypeInfo.Properties[i].IsGenericDictionary)
+                        PopulateDictionary(bodyState, state.TypeInfo.Properties[i]);
+                }
+            }
+        }
+
+        private bool IsInitOnlyProperty(IPropertySymbol propertySymbol)
+        {
+            return propertySymbol.SetMethod?.OriginalDefinition.IsInitOnly ?? false;
+        }
+
+        private bool CallConstructIfEmpty(BuilderState state, BuilderState bodyState)
+        {
+            bodyState.AppendLine($"input ??= new {state.TypeInfo.SourceTypeName}();");
+            //return false if non-default ctr. used.
+            return true;
         }
 
         private void BuildDictionaryApplyPath(BuilderState state, PropertyInformation propertyInformation)
         {
             var propertyName = propertyInformation.Property.Name;
             state.AppendLine($"input.{propertyName} ??= new();");
+            PopulateDictionary(state, propertyInformation);
+        }
+
+        private static void PopulateDictionary(BuilderState state, PropertyInformation propertyInformation)
+        {
+            var propertyName = propertyInformation.Property.Name;
             state.AppendLine($"foreach(var item in {propertyName})");
             state.AppendLine("{");
             var foreachBody = state.IncrementIdentation();
