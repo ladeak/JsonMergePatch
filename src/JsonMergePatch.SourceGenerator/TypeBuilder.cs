@@ -222,7 +222,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                     if (GeneratedTypeFilter.IsGeneratableType(currentProperty.Type))
                         initializerState.AppendLine($"{currentProperty.Name} = this.{currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name}),");
                     else if (state.TypeInfo.Properties[i].IsGenericDictionary)
-                        initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] && input.{currentProperty.Name} == null ? new() : default,");
+                        initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] && input.{currentProperty.Name} == null ? new() : input.Values,");
                     else if (state.TypeInfo.Properties[i].IsConvertedToNullableType)
                         initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] && {currentProperty.Name}.HasValue ? this.{currentProperty.Name}.Value : input.{currentProperty.Name},");
                     else
