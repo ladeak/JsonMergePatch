@@ -12,6 +12,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         [Theory]
         [ClassData(typeof(BasicSerializationData))]
         public void ApplyPatch_PropertyToDelete_SetsNullOnTarget(
+            string sourceCode,
             bool hasTargetParent,
             bool hasTargetSub,
             string parentStringPropertyInput,
@@ -26,7 +27,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             int[] valuesExpected,
             string jsonInput)
         {
-            var compilation = CreateWrappedTypeCompilation();
+            var compilation = CreateInputOutputCompilation(sourceCode);
             var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
 
             var parentDtoWrappedMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.ParentDtoWrapped");
@@ -61,11 +62,61 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Assert.Equal(camelCasePropertyExpected, targetSubMetadata.GetProperty("CamelCaseProperty").GetValue(patchedSub));
         }
 
-
-
-        private static (Compilation Input, Compilation Output) CreateInputOutputCompilation()
+        private static Compilation CreateInputOutputCompilation(string sourceCode)
         {
-            Compilation inputCompilation = CreateCompilation(@"
+            Compilation inputCompilation = SourceBuilder.Compile(sourceCode).Compilation;
+            JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+            driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
+            return outputCompilation;
+        }
+    }
+
+    public class BasicSerializationData : IEnumerable<object[]>
+    {
+        public BasicSerializationData()
+        {
+            _data.Add(new object[] { _classesWithReadWriteProperties, false, false, default(string), "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _classesWithReadWriteProperties, false, false, default(string), "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _classesWithReadWriteProperties, true, true, "world", "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _classesWithReadWriteProperties, true, true, "world", "hello", 10, 1, new DateTime(2021, 1, 20), new DateTime(2021, 2, 20), 100, 3.5, new int[] { 1, 2 }, new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _classesWithReadWriteProperties, true, true, "world", "world", 10, 10, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 100, new int[] { 1, 2 }, new[] { 1, 2, 3 }, @"{ ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _classesWithReadWriteProperties, true, true, "world", "world", 10, 10, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 100, new int[] { 1, 2, 3, 4 }, new[] { 1, 2, 3 }, @"{ ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _classesWithReadWriteProperties, true, true, "world", "world", 10, 1, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 3.5, new int[0], new int[0], @"{ ""OtherDto"": { ""NumberProp"": 1, ""camelCaseProperty"": 3.5 } }" });
+            _data.Add(new object[] { _classesWithReadWriteProperties, true, true, "world", default(string), 10, 1, new DateTime(2021, 1, 20), default(DateTime?), 100, 3.5, new int[] { 1, 2 }, default(int[]), @"{ ""ParentStringProperty"": null, ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":null, ""camelCaseProperty"": 3.5 }, ""Values"": null }" });
+            _data.Add(new object[] { _classesWithReadWriteProperties, true, true, "world", default(string), 10, 10, new DateTime(2021, 1, 20), default(DateTime?), 100, 3.5, new int[] { 1, 2 }, default(int[]), @"{ ""ParentStringProperty"": null, ""OtherDto"": { ""NullableDateTimeProperty"":null, ""camelCaseProperty"": 3.5 }, ""Values"": null }" });
+            _data.Add(new object[] { _classesWithReadWriteProperties, true, true, "world", "world", 5, 0, default(DateTime), default(DateTime), 10, 0, new int[0], new int[0], @"{ ""OtherDto"": { ""NumberProp"": null, ""camelCaseProperty"": null } }" });
+
+            _data.Add(new object[] { _classesWithInitOnlyProperties, false, false, default(string), "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _classesWithInitOnlyProperties, false, false, default(string), "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _classesWithInitOnlyProperties, true, true, "world", "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _classesWithInitOnlyProperties, true, true, "world", "hello", 10, 1, new DateTime(2021, 1, 20), new DateTime(2021, 2, 20), 100, 3.5, new int[] { 1, 2 }, new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _classesWithInitOnlyProperties, true, true, "world", "world", 10, 10, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 100, new int[] { 1, 2 }, new[] { 1, 2, 3 }, @"{ ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _classesWithInitOnlyProperties, true, true, "world", "world", 10, 10, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 100, new int[] { 1, 2, 3, 4 }, new[] { 1, 2, 3 }, @"{ ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _classesWithInitOnlyProperties, true, true, "world", "world", 10, 1, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 3.5, new int[0], new int[0], @"{ ""OtherDto"": { ""NumberProp"": 1, ""camelCaseProperty"": 3.5 } }" });
+            _data.Add(new object[] { _classesWithInitOnlyProperties, true, true, "world", default(string), 10, 1, new DateTime(2021, 1, 20), default(DateTime?), 100, 3.5, new int[] { 1, 2 }, default(int[]), @"{ ""ParentStringProperty"": null, ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":null, ""camelCaseProperty"": 3.5 }, ""Values"": null }" });
+            _data.Add(new object[] { _classesWithInitOnlyProperties, true, true, "world", default(string), 10, 10, new DateTime(2021, 1, 20), default(DateTime?), 100, 3.5, new int[] { 1, 2 }, default(int[]), @"{ ""ParentStringProperty"": null, ""OtherDto"": { ""NullableDateTimeProperty"":null, ""camelCaseProperty"": 3.5 }, ""Values"": null }" });
+            _data.Add(new object[] { _classesWithInitOnlyProperties, true, true, "world", "world", 5, 0, default(DateTime), default(DateTime), 10, 0, new int[0], new int[0], @"{ ""OtherDto"": { ""NumberProp"": null, ""camelCaseProperty"": null } }" });
+
+            _data.Add(new object[] { _recordsWithInitOnlyProperties, false, false, default(string), "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _recordsWithInitOnlyProperties, false, false, default(string), "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _recordsWithInitOnlyProperties, true, true, "world", "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _recordsWithInitOnlyProperties, true, true, "world", "hello", 10, 1, new DateTime(2021, 1, 20), new DateTime(2021, 2, 20), 100, 3.5, new int[] { 1, 2 }, new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _recordsWithInitOnlyProperties, true, true, "world", "world", 10, 10, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 100, new int[] { 1, 2 }, new[] { 1, 2, 3 }, @"{ ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _recordsWithInitOnlyProperties, true, true, "world", "world", 10, 10, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 100, new int[] { 1, 2, 3, 4 }, new[] { 1, 2, 3 }, @"{ ""Values"": [ 1, 2, 3 ] }" });
+            _data.Add(new object[] { _recordsWithInitOnlyProperties, true, true, "world", "world", 10, 1, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 3.5, new int[0], new int[0], @"{ ""OtherDto"": { ""NumberProp"": 1, ""camelCaseProperty"": 3.5 } }" });
+            _data.Add(new object[] { _recordsWithInitOnlyProperties, true, true, "world", default(string), 10, 1, new DateTime(2021, 1, 20), default(DateTime?), 100, 3.5, new int[] { 1, 2 }, default(int[]), @"{ ""ParentStringProperty"": null, ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":null, ""camelCaseProperty"": 3.5 }, ""Values"": null }" });
+            _data.Add(new object[] { _recordsWithInitOnlyProperties, true, true, "world", default(string), 10, 10, new DateTime(2021, 1, 20), default(DateTime?), 100, 3.5, new int[] { 1, 2 }, default(int[]), @"{ ""ParentStringProperty"": null, ""OtherDto"": { ""NullableDateTimeProperty"":null, ""camelCaseProperty"": 3.5 }, ""Values"": null }" });
+            _data.Add(new object[] { _recordsWithInitOnlyProperties, true, true, "world", "world", 5, 0, default(DateTime), default(DateTime), 10, 0, new int[0], new int[0], @"{ ""OtherDto"": { ""NumberProp"": null, ""camelCaseProperty"": null } }" });
+        }
+
+        private readonly List<object[]> _data = new List<object[]>();
+
+        public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+
+        private readonly string _classesWithReadWriteProperties = @"
 namespace TestCode
 {
     public class SubDto { public System.Int32 NumberProp { get; set; } public System.DateTime? NullableDateTimeProperty { get; set; } [System.Text.Json.Serialization.JsonPropertyNameAttribute(""camelCaseProperty"")] public System.Double CamelCaseProperty { get; set; } }
@@ -87,37 +138,39 @@ namespace TestCode
         }
     }
 }
-");
-            JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-            driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
-            return (inputCompilation, outputCompilation);
-        }
+";
 
-        private static Compilation CreateWrappedTypeCompilation() => CreateInputOutputCompilation().Output;
+        private readonly string _classesWithInitOnlyProperties = @"
+namespace TestCode
+{
+    public class SubDto { public System.Int32 NumberProp { get; init; } public System.DateTime? NullableDateTimeProperty { get; init; } [System.Text.Json.Serialization.JsonPropertyNameAttribute(""camelCaseProperty"")] public System.Double CamelCaseProperty { get; init; } }
 
-        private static Compilation CreateCompilation(string source) => SourceBuilder.Compile(source).Compilation;
-    }
+    public class ParentDto { public System.String ParentStringProperty { get; init; } public SubDto OtherDto { get; init; } public System.Collections.Generic.IEnumerable<int> Values { get; init; } }
 
-    public class BasicSerializationData : IEnumerable<object[]>
+    public class Program
     {
-        private readonly List<object[]> _data = new List<object[]>
+        public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<ParentDto> data)
         {
-            new object[] {false, false, default(string), "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }"  },
-            new object[] {false, false, default(string), "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }"  },
-            new object[] {true, true, "world", "hello", default(int), 1, default(DateTime), new DateTime(2021, 2, 20), default(double), 3.5, new int[0], new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }"  },
-            new object[] {true, true, "world", "hello", 10, 1, new DateTime(2021, 1, 20), new DateTime(2021, 2, 20), 100, 3.5, new int[] { 1, 2 }, new[] { 1, 2, 3 }, @"{ ""ParentStringProperty"": ""hello"", ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":""2021-02-20T00:00:00"", ""camelCaseProperty"": 3.5 }, ""Values"": [ 1, 2, 3 ] }"  },
-            new object[] {true, true, "world", "world", 10, 10, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 100, new int[] { 1, 2 }, new[] { 1, 2, 3 }, @"{ ""Values"": [ 1, 2, 3 ] }"  },
-            new object[] {true, true, "world", "world", 10, 10, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 100, new int[] { 1, 2, 3, 4 }, new[] { 1, 2, 3 }, @"{ ""Values"": [ 1, 2, 3 ] }"  },
-            new object[] {true, true, "world", "world", 10, 1, new DateTime(2021, 1, 20), new DateTime(2021, 1, 20), 100, 3.5, new int[0], new int[0], @"{ ""OtherDto"": { ""NumberProp"": 1, ""camelCaseProperty"": 3.5 } }"  },
-            new object[] {true, true, "world", default(string), 10, 1, new DateTime(2021, 1, 20), default(DateTime?), 100, 3.5, new int[] { 1, 2 }, default(int[]), @"{ ""ParentStringProperty"": null, ""OtherDto"": { ""NumberProp"": 1, ""NullableDateTimeProperty"":null, ""camelCaseProperty"": 3.5 }, ""Values"": null }"  },
-            new object[] {true, true, "world", default(string), 10, 10, new DateTime(2021, 1, 20), default(DateTime?), 100, 3.5, new int[] { 1, 2 }, default(int[]), @"{ ""ParentStringProperty"": null, ""OtherDto"": { ""NullableDateTimeProperty"":null, ""camelCaseProperty"": 3.5 }, ""Values"": null }"  },
-            new object[] {true, true, "world", "world", 5, 0, default(DateTime), default(DateTime), 10, 0, new int[0], new int[0], @"{ ""OtherDto"": { ""NumberProp"": null, ""camelCaseProperty"": null } }"  },
-        };
+        }
+    }
+}
+";
 
-        public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
+        private readonly string _recordsWithInitOnlyProperties = @"
+namespace TestCode
+{
+    public record SubDto { public System.Int32 NumberProp { get; init; } public System.DateTime? NullableDateTimeProperty { get; init; } [System.Text.Json.Serialization.JsonPropertyNameAttribute(""camelCaseProperty"")] public System.Double CamelCaseProperty { get; init; } }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+    public record ParentDto { public System.String ParentStringProperty { get; init; } public SubDto OtherDto { get; init; } public System.Collections.Generic.IEnumerable<int> Values { get; init; } }
+
+    public class Program
+    {
+        public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<ParentDto> data)
+        {
+        }
+    }
+}
+";
     }
 }
 

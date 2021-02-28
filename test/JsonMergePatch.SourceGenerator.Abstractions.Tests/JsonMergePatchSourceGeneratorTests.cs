@@ -343,6 +343,35 @@ namespace TestCode1
             Assert.Empty(runResult.Diagnostics);
         }
 
+        [Fact]
+        public void DefaultRecordType_ExtensionAndTypeAddedToSource()
+        {
+            // Create the 'input' compilation that the generator will act on
+            Compilation inputCompilation = CreateCompilation(@"
+namespace TestCode1
+{
+    public record Dto(int Property0, string Property1);
+    public class Program
+    {
+        public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<Dto> data)
+        {
+        }
+    }
+}
+");
+            JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+            driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
+
+            Assert.True(diagnostics.IsEmpty);
+            Assert.True(outputCompilation.SyntaxTrees.Count() == 3);
+            Assert.True(outputCompilation.GetDiagnostics().IsEmpty);
+
+            GeneratorDriverRunResult runResult = driver.GetRunResult();
+            Assert.Equal(2, runResult.GeneratedTrees.Length);
+            Assert.Empty(runResult.Diagnostics);
+        }
+
         private static Compilation CreateCompilation(string source) => SourceBuilder.Compile(source).Compilation;
     }
 }

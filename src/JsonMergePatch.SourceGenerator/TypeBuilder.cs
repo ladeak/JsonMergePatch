@@ -220,11 +220,11 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                 if (IsInitOnlyProperty(currentProperty))
                 {
                     if (GeneratedTypeFilter.IsGeneratableType(currentProperty.Type))
-                        initializerState.AppendLine($"{currentProperty.Name} = this.{currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name}),");
+                        initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] ? this.{currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name}) : input.{currentProperty.Name},");
                     else if (state.TypeInfo.Properties[i].IsGenericDictionary)
                         initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] && input.{currentProperty.Name} == null ? new() : input.Values,");
                     else if (state.TypeInfo.Properties[i].IsConvertedToNullableType)
-                        initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] && {currentProperty.Name}.HasValue ? this.{currentProperty.Name}.Value : input.{currentProperty.Name},");
+                        initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] ? ({currentProperty.Name}.HasValue ? this.{currentProperty.Name}.Value : default) : input.{currentProperty.Name},");
                     else
                         initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] ? this.{currentProperty.Name} : input.{currentProperty.Name},");
                 }
@@ -253,11 +253,22 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             return propertySymbol.SetMethod?.OriginalDefinition.IsInitOnly ?? false;
         }
 
+        private bool HasDefaultConstructor(ITypeSymbol typeSymbol)
+        {
+            return typeSymbol.GetMembers().OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor).AnyOrNull(x => x.Parameters.IsEmpty);
+        }
+
         private bool CallConstructIfEmpty(BuilderState state)
         {
-            state.AppendLine($"input ??= new {state.TypeInfo.SourceTypeName}();");
+            if (HasDefaultConstructor(state.TypeInfo.TypeSymbol))
+            {
+                state.AppendLine($"input ??= new {state.TypeInfo.SourceTypeName}();");
+                return true;
+            }
+
+
             //return false if non-default ctr. used.
-            return true;
+            return false;
         }
 
         private void PopulateDictionary(BuilderState state, PropertyInformation propertyInformation)
