@@ -150,7 +150,9 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         private void BuildAttributes(BuilderState state, IEnumerable<AttributeData> attributes)
         {
             foreach (var attribute in attributes)
-                BuildAttribute(state, attribute);
+                if (attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableContextAttribute" &&
+                    attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableAttribute")
+                    BuildAttribute(state, attribute);
         }
 
         private void BuildAttribute(BuilderState state, AttributeData attribute) => state.AppendLine($"[{attribute}]");
@@ -209,7 +211,6 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         {
             if (!state.TypeInfo.Properties.Any(x => IsInitOnlyProperty(x.Property)))
                 return;
-            //state.AppendLine($"var tmp = new {state.TypeInfo.SourceTypeName}()");
             CallConstructIfEmpty(state, "var tmp =", leaveOpen: true);
             state.AppendLine("{");
             var initializerState = state.IncrementIdentation();
