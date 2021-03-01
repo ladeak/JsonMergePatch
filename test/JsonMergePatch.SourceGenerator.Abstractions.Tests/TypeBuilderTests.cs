@@ -32,7 +32,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal("LaDeak.JsonMergePatch.Generated.STestTypeNamespace.TestTypeWrapped", result.TargetTypeFullName);
+            Assert.Equal("LaDeak.JsonMergePatch.Generated.SafeTestTypeNamespace.TestTypeWrapped", result.TargetTypeFullName);
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var attributes = ImmutableArray.Create<AttributeData>();
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal("LaDeakJsonMergePatchSTestTypeWrapped", result.FileName);
+            Assert.Equal("LaDeakJsonMergePatchSafeTestTypeWrapped", result.FileName);
         }
 
         [Fact]
@@ -83,7 +83,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.S
+@"namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -125,7 +125,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.S
+@"namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -167,7 +167,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.S
+@"namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -197,7 +197,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.S
+@"namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     [TestAttribute]
     [Hello]
@@ -232,7 +232,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.S
+@"namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -279,7 +279,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-    @"namespace LaDeak.JsonMergePatch.Generated.S
+    @"namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -338,7 +338,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-    @"namespace LaDeak.JsonMergePatch.Generated.S
+    @"namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -347,8 +347,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[2];
         }
 
-        private LaDeak.JsonMergePatch.Generated.STest.DtoWrapped _testProp0;
-        public LaDeak.JsonMergePatch.Generated.STest.DtoWrapped TestProp0
+        private LaDeak.JsonMergePatch.Generated.SafeTest.DtoWrapped _testProp0;
+        public LaDeak.JsonMergePatch.Generated.SafeTest.DtoWrapped TestProp0
         {
             get { return _testProp0; }
             init
@@ -398,7 +398,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.S
+@"namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -443,7 +443,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.S
+@"namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -495,7 +495,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.S
+@"namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -566,7 +566,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.S
+@"namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -617,7 +617,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.S
+@"namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -675,7 +675,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.S
+@"namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {

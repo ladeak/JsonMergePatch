@@ -19,7 +19,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                 context.AddSource(generatedType.FileName, SourceText.From(generatedType.SourceCode, Encoding.UTF8));
 
             var tyeRepoGenerator = new TypeRepositoryGenerator();
-            var typeRepoClass = tyeRepoGenerator.CreateTypeRepository(types.Select(x => (x.SourceTypeFullName, x.TargetTypeFullName)));
+            var typeRepoClass = tyeRepoGenerator.CreateTypeRepository(types.Select(x => (x.SourceTypeFullName, x.TargetTypeFullName)), context.Compilation.Assembly.Name);
             context.AddSource("LaDeakJsonMergePatchTypeRepo", SourceText.From(typeRepoClass, Encoding.UTF8));
             return types;
         }

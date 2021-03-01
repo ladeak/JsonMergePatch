@@ -20,7 +20,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var compilation = CreateWrappedTypeCompilation(source);
             var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
 
-            var dtoWrappedMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.DtoWrapped");
+            var dtoWrappedMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.DtoWrapped");
             var targetMetadata = outputAssembly.GetType("TestCode.Dto");
             var target = targetMetadata.GetConstructor(new Type[0]).Invoke(null);
             targetMetadata.GetProperty("Values").SetValue(target, input);

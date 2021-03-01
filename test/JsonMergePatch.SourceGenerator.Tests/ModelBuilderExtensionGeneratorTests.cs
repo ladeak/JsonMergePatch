@@ -102,6 +102,12 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.AspNetCore.Tests
         {
         }
 
+        public void Add(Type source, Type wrapper)
+        {
+        }
+
+        public IEnumerable<KeyValuePair<Type, Type>> GetAll() => Enumerable.Empty<KeyValuePair<Type, Type>>();
+
         public bool TryGet(Type source, [NotNullWhen(true)] out Type wrapper)
         {
             wrapper = null;

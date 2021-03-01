@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ConsoleAppLibrary;
+using LaDeak.JsonMergePatch.Abstractions;
 using LaDeak.JsonMergePatch.Http;
 
 namespace ReadJsonPatchAsync
@@ -16,7 +18,7 @@ namespace ReadJsonPatchAsync
 
         public static async Task Main(string[] args)
         {
-            LaDeak.JsonMergePatch.Abstractions.JsonMergePatchOptions.Repository = LaDeak.JsonMergePatch.Generated.TypeRepository.Instance;
+            LaDeak.JsonMergePatch.Abstractions.JsonMergePatchOptions.Repository = LaDeak.JsonMergePatch.Generated.SafeConsoleApp.TypeRepository.Instance.Extend(LaDeak.JsonMergePatch.Generated.SafeConsoleAppLibrary.TypeRepository.Instance);
             await ReadAsJsonMergePatchAsync();
         }
 
@@ -28,6 +30,9 @@ namespace ReadJsonPatchAsync
             var original = new WeatherForecast() { Date = DateTime.UtcNow, Summary = "Sample weather forecast", Temp = 24 };
             var result = responseData.ApplyPatch(original);
             Console.WriteLine($"Patched: Date={result.Date}, Summary={result.Summary}, Temp={result.Temp}");
+
+            var client = new Client();
+            await client.ReadAsJsonMergePatchAsync();
         }
     }
 }

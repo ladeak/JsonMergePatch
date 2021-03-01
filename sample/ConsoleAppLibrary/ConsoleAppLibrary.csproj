@@ -1,15 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\JsonMergePatch.Http\JsonMergePatch.Http.csproj" />
     <ProjectReference Include="..\..\src\JsonMergePatch.SourceGenerator\JsonMergePatch.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\ConsoleAppLibrary\ConsoleAppLibrary.csproj" />
   </ItemGroup>
 
 </Project>
