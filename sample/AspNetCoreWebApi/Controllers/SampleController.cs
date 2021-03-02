@@ -27,6 +27,12 @@ namespace CoreWebApi.Controllers
         public string Summary { get; set; }
     }
 
+    public class DeviceData
+    {
+        public double Watts { get; set; }
+        public string Name { get; set; }
+    }
+
     [ApiController]
     [Route("[controller]")]
     public class SampleController : ControllerBase
@@ -51,6 +57,16 @@ namespace CoreWebApi.Controllers
                 Date = DateTime.Now.AddDays(1),
                 TemperatureC = rng.Next(-20, 55),
                 Summary = Summaries[rng.Next(Summaries.Length)]
+            };
+        }
+
+        [HttpGet("DeviceData")]
+        public DeviceData GetDeviceData()
+        {
+            return new DeviceData
+            {
+                Name = "test device1",
+                Watts = 12
             };
         }
 

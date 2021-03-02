@@ -9,8 +9,10 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.AspNetCore
     {
         public void Execute(GeneratorExecutionContext context)
         {
+            var currentAssemblyName = context.Compilation.Assembly.Name;
+            var namespaceName = NameBuilder.GetNamespace(currentAssemblyName);
             var modelBuilderGenerator = new ModelBuilderExtensionGenerator();
-            var mvcExtension = modelBuilderGenerator.CreateModelBuilder("LaDeak.JsonMergePatch.Generated.TypeRepository.Instance");
+            var mvcExtension = modelBuilderGenerator.CreateModelBuilder($"{namespaceName}.TypeRepository.Instance");
             context.AddSource("LaDeakJsonMergePatchModelBuilderExtension", SourceText.From(mvcExtension, Encoding.UTF8));
         }
 

@@ -13,7 +13,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Compilation outputCompilation = CreateWrappedTypeCompilation();
             var assembly = SourceBuilder.EmitToAssembly(outputCompilation);
 
-            var sut = assembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.Dto2Wrapped").GetConstructor(new Type[0]).Invoke(null);
+            var sut = assembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.Dto2Wrapped").GetConstructor(new Type[0]).Invoke(null);
 
             Assert.NotNull(sut);
         }
@@ -24,7 +24,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Compilation outputCompilation = CreateWrappedTypeCompilation();
             var assembly = SourceBuilder.EmitToAssembly(outputCompilation);
 
-            var wrappedTypeMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.Dto2Wrapped");
+            var wrappedTypeMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.Dto2Wrapped");
             var sut = wrappedTypeMetadata.GetConstructor(new Type[0]).Invoke(null);
             wrappedTypeMetadata.GetProperty("Property").SetValue(sut, "test");
 
@@ -37,7 +37,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Compilation outputCompilation = CreateWrappedTypeCompilation();
             var assembly = SourceBuilder.EmitToAssembly(outputCompilation);
 
-            var wrappedTypeMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.Dto1Wrapped");
+            var wrappedTypeMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.Dto1Wrapped");
             var sut = wrappedTypeMetadata.GetConstructor(new Type[0]).Invoke(null);
             wrappedTypeMetadata.GetProperty("NumberProp").SetValue(sut, 100);
 
@@ -50,8 +50,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Compilation outputCompilation = CreateWrappedTypeCompilation();
             var assembly = SourceBuilder.EmitToAssembly(outputCompilation);
 
-            var wrappedDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.Dto2Wrapped");
-            var wrappedSubDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.Dto1Wrapped");
+            var wrappedDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.Dto2Wrapped");
+            var wrappedSubDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.Dto1Wrapped");
             var sut = wrappedDtoMetadata.GetConstructor(new Type[0]).Invoke(null);
             var subDto = wrappedSubDtoMetadata.GetConstructor(new Type[0]).Invoke(null);
             wrappedDtoMetadata.GetProperty("OtherDto").SetValue(sut, subDto);
@@ -65,7 +65,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Compilation outputCompilation = CreateWrappedTypeCompilation();
             var assembly = SourceBuilder.EmitToAssembly(outputCompilation);
 
-            var wrappedSubDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.Dto1Wrapped");
+            var wrappedSubDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.Dto1Wrapped");
             var sut = wrappedSubDtoMetadata.GetConstructor(new Type[0]).Invoke(null);
 
             var result = wrappedSubDtoMetadata.GetMethod("ApplyPatch").Invoke(sut, new object[] { null });
@@ -78,8 +78,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Compilation outputCompilation = CreateWrappedTypeCompilation();
             var assembly = SourceBuilder.EmitToAssembly(outputCompilation);
 
-            var wrappedDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.Dto2Wrapped");
-            var wrappedSubDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.Dto1Wrapped");
+            var wrappedDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.Dto2Wrapped");
+            var wrappedSubDtoMetadata = assembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.Dto1Wrapped");
             var sut = wrappedDtoMetadata.GetConstructor(new Type[0]).Invoke(null);
             var subDto = wrappedSubDtoMetadata.GetConstructor(new Type[0]).Invoke(null);
             wrappedDtoMetadata.GetProperty("OtherDto").SetValue(sut, subDto);
@@ -99,7 +99,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var compilation = CreateWrappedTypeCompilation();
             var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
 
-            var wrappedTypeMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.Dto1Wrapped");
+            var wrappedTypeMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.Dto1Wrapped");
             var sut = wrappedTypeMetadata.GetConstructor(new Type[0]).Invoke(null);
             wrappedTypeMetadata.GetProperty("NumberProp").SetValue(sut, 100);
 
@@ -117,7 +117,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var compilation = CreateWrappedTypeCompilation();
             var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
 
-            var wrappedTypeMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.Dto1Wrapped");
+            var wrappedTypeMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.Dto1Wrapped");
             var sut = wrappedTypeMetadata.GetConstructor(new Type[0]).Invoke(null);
 
             var targetTypeMetadata = outputAssembly.GetType("TestCode.Dto1");
@@ -135,7 +135,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var compilation = CreateWrappedTypeCompilation();
             var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
 
-            var wrappedTypeMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.Dto2Wrapped");
+            var wrappedTypeMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.Dto2Wrapped");
             var sut = wrappedTypeMetadata.GetConstructor(new Type[0]).Invoke(null);
 
             var targetTypeMetadata = outputAssembly.GetType("TestCode.Dto2");
@@ -153,7 +153,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             var compilation = CreateWrappedTypeCompilation();
             var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
 
-            var wrappedTypeMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.STestCode.Dto2Wrapped");
+            var wrappedTypeMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.Dto2Wrapped");
             var sut = wrappedTypeMetadata.GetConstructor(new Type[0]).Invoke(null);
             wrappedTypeMetadata.GetProperty("Property").SetValue(sut, null);
 

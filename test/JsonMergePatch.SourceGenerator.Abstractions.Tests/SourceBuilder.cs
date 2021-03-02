@@ -42,7 +42,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             references.Add(MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location));
             references.Add(MetadataReference.CreateFromFile(typeof(JsonPropertyNameAttribute).Assembly.Location));
             references.AddRange(metadataReferences ?? Enumerable.Empty<MetadataReference>());
-            var compilation = CSharpCompilation.Create($"{Guid.NewGuid()}.dll", new[] { syntaxTree }, references,
+            var compilation = CSharpCompilation.Create($"Test{Guid.NewGuid().ToString().Replace("-", "")}", new[] { syntaxTree }, references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
             return (compilation, syntaxTree);
         }
