@@ -40,10 +40,10 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.AspNetCore.Tests
             return references;
         }
 
-        public static Func<IMvcBuilder, JsonOptions, IMvcBuilder> GetMethod(Assembly assembly, string type, string methodName)
+        public static Func<IMvcBuilder, JsonOptions, ITypeRepository, IMvcBuilder> GetMethod(Assembly assembly, string type, string methodName)
         {
             var method = assembly.GetType(type).GetMethod(methodName);
-            Func<IMvcBuilder, JsonOptions, IMvcBuilder> result = method.CreateDelegate<Func<IMvcBuilder, JsonOptions, IMvcBuilder>>();
+            Func<IMvcBuilder, JsonOptions, ITypeRepository, IMvcBuilder> result = method.CreateDelegate<Func<IMvcBuilder, JsonOptions, ITypeRepository, IMvcBuilder>>();
             return result;
         }
 

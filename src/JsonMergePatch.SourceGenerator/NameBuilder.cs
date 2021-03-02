@@ -14,6 +14,6 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
 
         public static string GetNamespace(ITypeSymbol typeInfo) => $"{Namespace}.{GetNamespaceExtension(typeInfo)}";
 
-        public static string GetNamespaceExtension(string extension) => $"{Namespace}.Safe{extension}";
+        public static string GetNamespace(string extension) => $"{Namespace}.Safe{extension}";
     }
 }

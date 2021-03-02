@@ -9,7 +9,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         public string CreateTypeRepository(IEnumerable<(string, string)> typeRegistrations, string assemblyName)
         {
             StringBuilder sb = new StringBuilder(@$"
-namespace {NameBuilder.GetNamespaceExtension(assemblyName.Replace("-", ""))}");
+namespace {NameBuilder.GetNamespace(assemblyName)}");
             sb.Append(@"
 {
     public class TypeRepository : LaDeak.JsonMergePatch.Abstractions.ITypeRepository
