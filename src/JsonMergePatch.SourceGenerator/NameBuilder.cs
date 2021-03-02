@@ -4,7 +4,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public static class NameBuilder
     {
-        internal const string Namespace = "LaDeak.JsonMergePatch.Generated";
+        private const string Namespace = "LaDeak.JsonMergePatch.Generated";
 
         public static string GetName(ITypeSymbol typeInfo) => $"{typeInfo.Name}Wrapped";
 
