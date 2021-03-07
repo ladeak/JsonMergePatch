@@ -18,8 +18,8 @@ namespace ConsoleAppLibrary
             var httpClient = new HttpClient();
             var response = await httpClient.GetAsync("https://localhost:5001/Sample/DeviceData", HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
             var responseData = await response.Content.ReadJsonPatchAsync<DeviceData>().ConfigureAwait(false);
-            var original = new DeviceData() { Watts = 5, Name = "phone" };
-            var result = responseData.ApplyPatch(original);
+            var target = new DeviceData() { Watts = 5, Name = "phone" };
+            var result = responseData.ApplyPatch(target);
             Console.WriteLine($"Patched: Name={result.Name}, Watts={result.Watts}");
         }
     }
