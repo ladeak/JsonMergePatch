@@ -73,27 +73,27 @@ namespace CoreWebApi.Controllers
         [HttpPatch("PatchWeather")]
         public WeatherForecast PatchForecast(Patch<WeatherForecast> input)
         {
-            var original = new WeatherForecast() { Date = DateTime.UtcNow, Summary = "Sample weather forecast", TemperatureC = 24 };
-            var result = input.ApplyPatch(original);
+            var target = new WeatherForecast() { Date = DateTime.UtcNow, Summary = "Sample weather forecast", TemperatureC = 24 };
+            var result = input.ApplyPatch(target);
             return result;
         }
 
         [HttpPatch("PatchCities")]
         public CitiesData PatchCities(Patch<CitiesData> input)
         {
-            var original = new CitiesData() { Cities = new Dictionary<string, string>() { { "Frankfurt", "Germany" }, { "New York", "US" }, { "London", "UK" } } };
-            var result = input.ApplyPatch(original);
+            var target = new CitiesData() { Cities = new Dictionary<string, string>() { { "Frankfurt", "Germany" }, { "New York", "US" }, { "London", "UK" } } };
+            var result = input.ApplyPatch(target);
             return result;
         }
 
         [HttpGet("ReadJsonPatchAsync")]
         public async Task<WeatherForecast> GetReadJsonPatchAsync()
         {
+            var target = new WeatherForecast() { Date = DateTime.UtcNow, Summary = "Sample weather forecast", TemperatureC = 24 };
             var httpClient = _clientFactory.CreateClient();
             var response = await httpClient.GetAsync("https://localhost:5001/Sample/Weather", HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
             var responseData = await response.Content.ReadJsonPatchAsync<WeatherForecast>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }).ConfigureAwait(false);
-            var original = new WeatherForecast() { Date = DateTime.UtcNow, Summary = "Sample weather forecast", TemperatureC = 24 };
-            var result = responseData.ApplyPatch(original);
+            var result = responseData.ApplyPatch(target);
             return result;
         }
     }
