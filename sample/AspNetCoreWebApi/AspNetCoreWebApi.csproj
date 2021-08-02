@@ -9,7 +9,7 @@
   <ItemGroup>
     <!--<PackageReference Include="LaDeak.JsonMergePatch.AspNetCore" Version="0.0.1-alpha1" />
     <PackageReference Include="LaDeak.JsonMergePatch.SourceGenerator.AspNetCore" Version="0.0.1-alpha1" />-->
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.5" />
   </ItemGroup>
 
   <ItemGroup>
