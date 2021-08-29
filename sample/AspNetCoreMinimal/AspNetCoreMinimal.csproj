@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -6,12 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
-    <PackageReference Include="System.Text.Json" Version="6.0.0-rc.2.21427.5" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.5" />
+    <PackageReference Include="System.Text.Json" Version="6.0.0-rc.2.21428.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\JsonMergePatch.AspNetCore\JsonMergePatch.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\JsonMergePatch.SourceGenerator.AspNetCore\JsonMergePatch.SourceGenerator.AspNetCore.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\AspNetCoreMinimal.Entities\AspNetCoreMinimal.Entities.csproj" />
   </ItemGroup>
 

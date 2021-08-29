@@ -1,11 +1,9 @@
 using System.Text.Json.Serialization;
+using LaDeak.JsonMergePatch.Generated;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-var mvcBuilder = builder.Services.AddControllers();
-AddJsonMergePatch(mvcBuilder);
+var mvcBuilder = builder.Services.AddControllers();//.AddJsonMergePatch<SampleJsonContext>();
 builder.Services.AddHttpClient();
 builder.Services.AddSwaggerGen(c =>
 {
