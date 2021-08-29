@@ -12,11 +12,11 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1.8.1
       with:
-        dotnet-version: '5.0.x'
+        dotnet-version: '6.0.x'
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore --source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json
     - name: Test
       run: dotnet test --collect:"XPlat Code Coverage" --settings ./.github/codecoverage.runsettings
     - name: Upload Test Coverage
