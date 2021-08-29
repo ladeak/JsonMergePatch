@@ -21,11 +21,3 @@ public class WeatherForecast
 
     public string Summary { get; set; }
 }
-
-[Patchable]
-public class DeviceData
-{
-    public double Watts { get; set; }
-    public string Name { get; set; }
-}
-

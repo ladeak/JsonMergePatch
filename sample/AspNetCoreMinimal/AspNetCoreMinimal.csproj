@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\JsonMergePatch.AspNetCore\JsonMergePatch.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\JsonMergePatch.SourceGenerator\JsonMergePatch.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\AspNetCoreMinimal.Entities\AspNetCoreMinimal.Entities.csproj" />
   </ItemGroup>
 

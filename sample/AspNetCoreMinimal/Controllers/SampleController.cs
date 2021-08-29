@@ -10,8 +10,6 @@ namespace AspNetCoreMinimal.Controllers;
 [Route("[controller]")]
 public class SampleController : ControllerBase
 {
-    private static readonly string[] Summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-
     private readonly IHttpClientFactory _clientFactory;
 
     public SampleController(IHttpClientFactory clientFactory)
@@ -22,35 +20,12 @@ public class SampleController : ControllerBase
     [HttpGet("Weather")]
     public WeatherForecast GetWeather()
     {
-        var rng = new Random();
         return new WeatherForecast
         {
             Date = DateTime.Now.AddDays(1),
-            TemperatureC = rng.Next(-20, 55),
-            Summary = Summaries[rng.Next(Summaries.Length)]
+            TemperatureC = Random.Shared.Next(-20, 55),
+            Summary = "Sample weather forecast"
         };
-    }
-
-    [HttpGet("DeviceData")]
-    public DeviceData GetDeviceData()
-    {
-        return new DeviceData
-        {
-            Name = "test device1",
-            Watts = 12
-        };
-    }
-
-    [HttpPatch("PatchDevice")]
-    public DeviceData PatchForecast(Patch<DeviceData> input)
-    {
-        var target = new DeviceData
-        {
-            Name = "test device1",
-            Watts = 12
-        };
-        var result = input.ApplyPatch(target);
-        return result;
     }
 
     [HttpPatch("PatchWeather")]
