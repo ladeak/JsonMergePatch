@@ -9,6 +9,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
 {
     public class PatchParametersWalker : CSharpSyntaxWalker, IPatchParametersWalker
     {
+        private const string PatchableAttributeFullName = "LaDeak.JsonMergePatch.Abstractions.PatchableAttribute";
         private SemanticModel? _semantics;
         private List<ITypeSymbol>? _typeNames;
 
@@ -45,6 +46,36 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                     _typeNames?.Add(methodSymbol.TypeArguments.First());
             }
             base.VisitInvocationExpression(node);
+        }
+
+        public override void VisitStructDeclaration(StructDeclarationSyntax node)
+        {
+            if (_semantics.GetDeclaredSymbol(node) is ITypeSymbol typeSymbol
+                && typeSymbol.GetAttributes().Any(x => x.AttributeClass?.ToDisplayString() == PatchableAttributeFullName))
+            {
+                _typeNames?.Add(typeSymbol);
+            }
+            base.VisitStructDeclaration(node);
+        }
+
+        public override void VisitRecordDeclaration(RecordDeclarationSyntax node)
+        {
+            if (_semantics.GetDeclaredSymbol(node) is ITypeSymbol typeSymbol
+                && typeSymbol.GetAttributes().Any(x => x.AttributeClass?.ToDisplayString() == PatchableAttributeFullName))
+            {
+                _typeNames?.Add(typeSymbol);
+            }
+            base.VisitRecordDeclaration(node);
+        }
+
+        public override void VisitClassDeclaration(ClassDeclarationSyntax node)
+        {
+            if (_semantics.GetDeclaredSymbol(node) is ITypeSymbol typeSymbol
+                && typeSymbol.GetAttributes().Any(x => x.AttributeClass?.ToDisplayString() == PatchableAttributeFullName))
+            {
+                _typeNames?.Add(typeSymbol);
+            }
+            base.VisitClassDeclaration(node);
         }
     }
 }

@@ -3,11 +3,13 @@ using LaDeak.JsonMergePatch.Abstractions;
 
 namespace AspNetCoreWebApi2.Entities;
 
+[Patchable]
 public class CitiesData
 {
     public Dictionary<string, string> Cities { get; set; }
 }
 
+[Patchable]
 public class WeatherForecast
 {
     public DateTime Date { get; set; }
@@ -20,17 +22,10 @@ public class WeatherForecast
     public string Summary { get; set; }
 }
 
+[Patchable]
 public class DeviceData
 {
     public double Watts { get; set; }
     public string Name { get; set; }
 }
 
-public class PatchContext
-{
-    public void Generate(Patch<CitiesData> data) { }
-
-    public void Generate(Patch<WeatherForecast> data) { }
-
-    public void Generate(Patch<DeviceData> data) { }
-}

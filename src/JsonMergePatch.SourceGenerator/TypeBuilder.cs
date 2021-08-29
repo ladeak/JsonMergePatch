@@ -153,8 +153,9 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         private void BuildAttributes(BuilderState state, IEnumerable<AttributeData> attributes)
         {
             foreach (var attribute in attributes)
-                if (attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableContextAttribute" &&
-                    attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableAttribute")
+                if (attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableContextAttribute"
+                    && attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableAttribute"
+                    && attribute.AttributeClass?.ToDisplayString() != "LaDeak.JsonMergePatch.Abstractions.PatchableAttribute")
                     BuildAttribute(state, attribute);
         }
 
