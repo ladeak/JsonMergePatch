@@ -4,12 +4,12 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:53040",
-      "sslPort": 44379
+      "applicationUrl": "http://localhost:42816",
+      "sslPort": 44364
     }
   },
   "profiles": {
-    "AspNetCoreWebApi2": {
+    "AspNetCoreMinimal": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

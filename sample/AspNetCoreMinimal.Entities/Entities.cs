@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using LaDeak.JsonMergePatch.Abstractions;
 
-namespace AspNetCoreWebApi2.Entities;
+namespace AspNetCoreMinimal.Entities;
 
 [Patchable]
 public class CitiesData
