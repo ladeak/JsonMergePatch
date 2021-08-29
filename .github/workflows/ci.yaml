@@ -20,6 +20,6 @@ jobs:
     - name: Test
       run: dotnet test --collect:"XPlat Code Coverage" --settings ./.github/codecoverage.runsettings
     - name: Upload Test Coverage
-      uses: codecov/codecov-action@v2.0.2
+      uses: codecov/codecov-action@v2.0.3
       with:
         flags: dotnet
