@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using LaDeak.JsonMergePatch.Abstractions;
 using LaDeak.JsonMergePatch.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,20 +23,10 @@ namespace CoreWebApi.Controllers
         public string Summary { get; set; }
     }
 
-    public class DeviceData
-    {
-        public double Watts { get; set; }
-        public string Name { get; set; }
-    }
-
     [ApiController]
     [Route("[controller]")]
     public class SampleController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
         private readonly IHttpClientFactory _clientFactory;
 
         public SampleController(IHttpClientFactory clientFactory)
@@ -56,17 +42,7 @@ namespace CoreWebApi.Controllers
             {
                 Date = DateTime.Now.AddDays(1),
                 TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            };
-        }
-
-        [HttpGet("DeviceData")]
-        public DeviceData GetDeviceData()
-        {
-            return new DeviceData
-            {
-                Name = "test device1",
-                Watts = 12
+                Summary = "Sample weather forecast"
             };
         }
 

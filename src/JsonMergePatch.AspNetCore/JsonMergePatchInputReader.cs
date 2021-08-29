@@ -8,18 +8,20 @@ using LaDeak.JsonMergePatch.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 
 namespace LaDeak.JsonMergePatch.AspNetCore
 {
     public class JsonMergePatchInputReader : TextInputFormatter
     {
+        private readonly ITypeRepository _typeRepository;
+
         public JsonSerializerOptions SerializerOptions { get; }
 
-        public JsonMergePatchInputReader(JsonOptions options)
+        public JsonMergePatchInputReader(JsonOptions options, ITypeRepository typeRepository = null)
         {
             SerializerOptions = options.SerializerOptions;
+            _typeRepository = typeRepository ?? JsonMergePatchOptions.Repository ?? throw new ArgumentNullException(nameof(typeRepository));
 
             SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/merge-patch+json"));
 
@@ -39,9 +41,8 @@ namespace LaDeak.JsonMergePatch.AspNetCore
 
             object? model;
             var httpContext = context.HttpContext;
-            var typeRepository = httpContext.RequestServices.GetRequiredService<ITypeRepository>();
             var registeredType = context.ModelType.GenericTypeArguments.FirstOrDefault();
-            if (registeredType == null || !typeRepository.TryGet(registeredType, out var targetType))
+            if (registeredType == null || !_typeRepository.TryGet(registeredType, out var targetType))
             {
                 return InputFormatterResult.Failure();
             }
