@@ -135,7 +135,7 @@ namespace TestCode1
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode1
 {
-    public record Dto { public int Property { get; init; }  }
+    public record Dto { public int Property { get; set; }  }
     public class Program
     {
         public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<Dto> data)
@@ -163,8 +163,8 @@ namespace TestCode1
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode2
 {
-    public record Dto0 { public double Property { get; init; }  }
-    public record Dto1 { public Dto0 Property { get; init; } }
+    public record Dto0 { public double Property { get; set; }  }
+    public record Dto1 { public Dto0 Property { get; set; } }
 
     public class Program
     {
@@ -199,7 +199,7 @@ namespace TestCode2
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode1
 {
-    public record Dto { public string Property { get; init; }  }
+    public record Dto { public string Property { get; set; }  }
     public class Program
     {
         public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<Dto> data)
@@ -228,7 +228,7 @@ namespace TestCode1
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode1
 {
-    public class Dto { public int Property { get; init; }  }
+    public class Dto { public int Property { get; set; }  }
     public class Program
     {
         public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<Dto> data)
@@ -256,8 +256,8 @@ namespace TestCode1
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode2
 {
-    public class Dto0 { public double Property { get; init; }  }
-    public class Dto1 { public Dto0 Property { get; init; } }
+    public class Dto0 { public double Property { get; set; }  }
+    public class Dto1 { public Dto0 Property { get; set; } }
 
     public class Program
     {
@@ -292,7 +292,7 @@ namespace TestCode2
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode1
 {
-    public class Dto { public string Property { get; init; }  }
+    public class Dto { public string Property { get; set; }  }
     public class Program
     {
         public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<Dto> data)
@@ -321,7 +321,7 @@ namespace TestCode1
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode1
 {
-    public class Dto { public string Property { get; init; }  public string Property1 { get; set; }  }
+    public class Dto { public string Property { get; set; }  public string Property1 { get; set; }  }
     public class Program
     {
         public void SomeMethod(LaDeak.JsonMergePatch.Abstractions.Patch<Dto> data)

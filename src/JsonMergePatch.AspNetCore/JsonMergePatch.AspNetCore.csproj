@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="6.0.0-preview.6.21352.12" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\JsonMergePatch.Abstractions\JsonMergePatch.Abstractions.csproj" />
     <ProjectReference Include="..\JsonMergePatch.Http\JsonMergePatch.Http.csproj" />
   </ItemGroup>
