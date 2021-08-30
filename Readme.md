@@ -8,25 +8,24 @@ JsonMergePatch library provides an implementation for json merge patch operation
 
 JsonMergePatch library helps to deserialize http requests' and responses' json body content for merge patch operation. Merge patch operation is detailed by [RFC7396](https://tools.ietf.org/html/rfc7396). If the merge patch request contains members that appear as null on the target object, those members are added. If the target object contains the member, the value is replaced. Members with null values in the merge patch requests, are removed from the target object (set to null or default).
 
-JsonMergePatch library is based on C# source generators. For http body content to be deserialized into a type, the SourceGenerator library generates a helper class. Helper classes are called Wrappers, capturing all the features of the type intended to be used for the deserialization. Once the request is deserialized into a Wrapper object, it can be used to apply the patch on an object typed as the source class. The JsonMergePatch library is designed to be used with POCO classes and record types.
+JsonMergePatch library is based on C# source generators. For the http body content to be deserialized into a type, the SourceGenerator library generates helper classes. Helper classes are called Wrappers, capturing all the features of the type intended to be used for the deserialization. Once the request is deserialized into a Wrapper object, the object can be used to apply the patch on the user defined target object. The JsonMergePatch library is designed to be used with POCO classes and record types.
 
 Source Generations requires Visual Studio 16.9 or later.
 
 Based on the given application type different packages may be installed from NuGet by running one or more of the following commands:
 
 ```
-dotnet add package LaDeak.JsonMergePatch.Http
 dotnet add package LaDeak.JsonMergePatch.SourceGenerator
+dotnet add package LaDeak.JsonMergePatch.Http
 dotnet add package LaDeak.JsonMergePatch.AspNetCore
-dotnet add package LaDeak.JsonMergePatch.SourceGenerator.AspNetCore
 ```
 
 ## JsonMergePatch with AspNetCore
 
-1. Install AspNetCore packages via NuGet
+1. Install AspNetCore package via NuGet
 1. Add the required usings
-1. Add a new controller with a parameter types ```Patch<T>``` where ```T``` is a custom type chosen by the user
-1. Extend application startup with ```AddJsonMergePatch()``` extension method
+1. Add a new controller with a parameter types ```Patch<T>``` where ```T``` is a custom target type chosen by the user
+1. Extend application startup
 
 ### Install AspNetCore packages via NuGet
 
@@ -34,12 +33,12 @@ To use the JsonMergePatch library with AspNetCore install the following packages
 
 ```
 dotnet add package LaDeak.JsonMergePatch.AspNetCore
-dotnet add package LaDeak.JsonMergePatch.SourceGenerator.AspNetCore
+dotnet add package LaDeak.JsonMergePatch.SourceGenerator
 ```
 
 ### Add the required usings
 
-Add the following using to controller class:
+Add the following using to the controller class:
 
 ```csharp
 using LaDeak.JsonMergePatch.Abstractions;
@@ -63,32 +62,83 @@ During build, the source generator scans for methods with type parameters of ```
 
 ### Extend application startup
 
-In **Startup.cs** file add the following using:
+In **Program.cs** or **Startup.cs** file add the following using:
 
 ```csharp
-using LaDeak.JsonMergePatch.Generated;
+using LaDeak.JsonMergePatch.AspNetCore;
 ```
 
-Extend ```ConfigureServices``` method:
+Extend ```AddMvcOptions``` method:
 
 ```csharp
- public void ConfigureServices(IServiceCollection services)
+.AddControllers().AddMvcOptions(options =>
 {
-    // ...
-    services.AddControllers().AddJsonMergePatch();
-    // ...
-}
+    LaDeak.JsonMergePatch.Abstractions.JsonMergePatchOptions.Repository = LaDeak.JsonMergePatch.Generated.SafeAspNetCoreMinimal.TypeRepository.Instance;
+    options.InputFormatters.Insert(0, new JsonMergePatchInputReader());
+});
 ```
 
-> Note, that ```AddJsonMergePatch()``` is a generated method. The current Visual Studio's intellisense and editor will not recognize it, and shows as an error. At the same time builds operation shall succeed, which will be indicated on the status bar and the output window. The current suggestion with source generators is to restart Visual Studio after build so intellisense and editor window swallow the errors.
+> Note, that ```TypeRepository.Instance``` is a generated type's property. The current Visual Studio's intellisense and editor might not recognize it, and might show it as an error. At the same time builds operation shall succeed, which will be indicated on the status bar and the output window.
 
-```AddJsonMergePatch()``` has two optional parameters to set a ```Microsoft.AspNetCore.Http.Json.JsonOptions``` and an ```ITypeRepository``` parameter. The method returns ```IMvcBuilder```.
+```JsonMergePatchInputReader```'s constructor has two parameters, one to set a ```Microsoft.AspNetCore.Http.Json.JsonOptions``` and an ```ITypeRepository``` parameter.
 
 The AspNetCore input reader supports requests with ```application/merge-patch+json``` media type and UTF8 and Unicode encodings.
 
+### Patchable
+
+Certain use-cases require to generate wrapper types with the source generation for assemblies that do not directly use `Patch<T>` (where T is the wrapped source type). This could be a reason for having separate assemblies for entity types, or because of the need of stacking multiple source generators on top of each other.
+In thie case types may be attributed with `[Patchable]` attribute:
+
+```csharp
+[Patchable]
+public class WeatherForecast
+{
+  //...
+}
+```
+
+`[Patchable]` makes sure to generate wrapper types for source types not used in HTTP requests or method arguments of `Patch<T>`.
+
+### Using it with System.Text.Json source generation
+
+In order to use multiple source generators, we need to *stack* them. Today the only way to do it is by enforcing a build order between two projects, while adding the first source generator to the first project built, and the second one to the second project built. To make sure JsonMergePatch source generator works with System.Text.Json's source generator create two projects:
+
+1. Entities class library
+1. Application executable
+
+Make sure `Application` references the `Entities` project. Add entity/POCO/Patchable types to the `Entities` project. Mark these types with `[Patchable]` attribute.
+Add the following nuget packages to the `Entities` project:
+
+1. LaDeak.JsonMergePatch.SourceGenerator
+1. LaDeak.JsonMergePatch.Abstractions
+
+This will generate the wrapper types in the `Entities` project.
+
+In the `Application` project add a `JsonSerializerContext` as detailed by System.Text.Json library. In the `[JsonSerializable]` attributes list the generated wrapper types from the `Entities` project using `LaDeak.JsonMergePatch.Generated.Safe{TypeName}` naming pattern.
+
+```csharp
+[JsonSerializable(typeof(LaDeak.JsonMergePatch.Generated.SafeAspNetCoreMinimal.Entities.WeatherForecastWrapped))]
+[JsonSerializable(typeof(LaDeak.JsonMergePatch.Generated.SafeAspNetCoreMinimal.Entities.CitiesDataWrapped))]
+public partial class SampleJsonContext : JsonSerializerContext
+{
+}
+```
+
+For Asp.Net Core applications, create a new `JsonOptions` object and extend the serialization options with the derived `JsonSerializerContext` type. Pass the `JsonOptions` object to the constructor of `JsonMergePatchInputReader`.
+
+```csharp
+var mvcBuilder = builder.Services.AddControllers().AddMvcOptions(options =>
+{
+    LaDeak.JsonMergePatch.Abstractions.JsonMergePatchOptions.Repository = LaDeak.JsonMergePatch.Generated.SafeAspNetCoreMinimal.TypeRepository.Instance;
+    var jsonOptions = new Microsoft.AspNetCore.Http.Json.JsonOptions();
+    jsonOptions.SerializerOptions.AddContext<SampleJsonContext>();
+    options.InputFormatters.Insert(0, new JsonMergePatchInputReader(jsonOptions));
+});
+```
+
 ### Samples
 
-Sample web application can be found in the [sample folder](https://github.com/ladeak/JsonMergePatch/tree/master/sample)
+Sample web applications can be found in the [sample folder](https://github.com/ladeak/JsonMergePatch/tree/master/sample)
 
 ## Using with Http Content
 

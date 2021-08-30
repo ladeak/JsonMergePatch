@@ -14,8 +14,9 @@ public class JsonMergePatchInputReader : TextInputFormatter
 
     public JsonSerializerOptions SerializerOptions { get; }
 
-    public JsonMergePatchInputReader(JsonOptions options, ITypeRepository typeRepository = null)
+    public JsonMergePatchInputReader(JsonOptions? options = null, ITypeRepository? typeRepository = null)
     {
+        options ??= new JsonOptions();
         SerializerOptions = options.SerializerOptions;
         _typeRepository = typeRepository ?? JsonMergePatchOptions.Repository ?? throw new ArgumentNullException(nameof(typeRepository));
 
@@ -29,11 +30,8 @@ public class JsonMergePatchInputReader : TextInputFormatter
 
     public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
     {
-        if (context == null)
-            throw new ArgumentNullException(nameof(context));
-
-        if (encoding == null)
-            throw new ArgumentNullException(nameof(encoding));
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(encoding);
 
         object? model;
         var httpContext = context.HttpContext;

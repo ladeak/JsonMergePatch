@@ -19,7 +19,7 @@ namespace CoreWebApi
                 .AddMvcOptions(options =>
                 {
                     LaDeak.JsonMergePatch.Abstractions.JsonMergePatchOptions.Repository = LaDeak.JsonMergePatch.Generated.SafeAspNetCoreWebApi.TypeRepository.Instance;
-                    options.InputFormatters.Insert(0, new JsonMergePatchInputReader(new Microsoft.AspNetCore.Http.Json.JsonOptions()));
+                    options.InputFormatters.Insert(0, new JsonMergePatchInputReader());
                 });
             services.AddSwaggerGen(c =>
             {
