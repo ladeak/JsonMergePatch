@@ -12,10 +12,11 @@ jobs:
     - uses: actions/setup-dotnet@v1.8.1
       with:
         dotnet-version: '6.0.x'
+        include-prerelease: true
     - name: Set VERSION variable from tag
       run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore --source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json --source https://api.nuget.org/v3/index.json
     - name: Build
       run: dotnet build --configuration Release --no-restore -p:Version=${VERSION}
     - name: Test
