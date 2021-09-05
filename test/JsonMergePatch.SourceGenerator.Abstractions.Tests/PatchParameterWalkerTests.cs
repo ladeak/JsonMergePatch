@@ -130,5 +130,62 @@ public class Controller
             var result = sut.Process(await compilation.Tree.GetRootAsync(), compilation.Compilation.GetSemanticModel(compilation.Tree));
             Assert.Equal("SomeType", result.First().Name);
         }
+
+        [Fact]
+        public async Task ClassTypeWithPatchableArgument_Patch_ReturnsType()
+        {
+            string code = @"
+public class Controller
+{
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
+    public class SomeType { }
+
+    public class SomeOtherType { }
+}";
+
+            var compilation = SourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
+
+            var sut = new PatchParametersWalker();
+            var result = sut.Process(await compilation.Tree.GetRootAsync(), compilation.Compilation.GetSemanticModel(compilation.Tree));
+            Assert.Equal("SomeType", result.Single().Name);
+        }
+
+        [Fact]
+        public async Task StructTypeWithPatchableArgument_Patch_ReturnsType()
+        {
+            string code = @"
+public class Controller
+{
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
+    public struct SomeType { }
+
+    public struct SomeOtherType { }
+}";
+
+            var compilation = SourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
+
+            var sut = new PatchParametersWalker();
+            var result = sut.Process(await compilation.Tree.GetRootAsync(), compilation.Compilation.GetSemanticModel(compilation.Tree));
+            Assert.Equal("SomeType", result.Single().Name);
+        }
+
+        [Fact]
+        public async Task RecordTypeWithPatchableArgument_Patch_ReturnsType()
+        {
+            string code = @"
+public class Controller
+{
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
+    public record SomeType(int Param);
+
+    public record SomeOtherType(int Param);
+}";
+
+            var compilation = SourceBuilder.Compile(code, new[] { MetadataReference.CreateFromFile(typeof(PatchParameterWalkerTests).Assembly.Location), MetadataReference.CreateFromFile(typeof(Patch<>).Assembly.Location) });
+
+            var sut = new PatchParametersWalker();
+            var result = sut.Process(await compilation.Tree.GetRootAsync(), compilation.Compilation.GetSemanticModel(compilation.Tree));
+            Assert.Equal("SomeType", result.Single().Name);
+        }
     }
 }

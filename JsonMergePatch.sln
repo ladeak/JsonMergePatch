@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30907.101
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31521.260
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.AspNetCore", "src\JsonMergePatch.AspNetCore\JsonMergePatch.AspNetCore.csproj", "{D539E41C-F89E-44C7-B2FD-ABE4E55942F1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreWebApi", "sample\AspNetCoreWebApi\AspNetCoreWebApi.csproj", "{910E8728-872B-43EF-994F-B67953874BCB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.AspNetCore.Tests", "test\JsonMergePatch.Tests\JsonMergePatch.AspNetCore.Tests.csproj", "{7FD5D0AB-6388-4C97-896B-E648CADD86E8}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.AspNetCore.Tests", "test\JsonMergePatch.SourceGenerator.Tests\JsonMergePatch.SourceGenerator.AspNetCore.Tests.csproj", "{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.Http", "src\JsonMergePatch.Http\JsonMergePatch.Http.csproj", "{C817634D-62FD-4958-A8BD-8661112891F6}"
 EndProject
@@ -23,11 +21,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "sample\Consol
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{0E750D74-69C7-433C-92C7-3F026083C255}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator.AspNetCore", "src\JsonMergePatch.SourceGenerator.AspNetCore\JsonMergePatch.SourceGenerator.AspNetCore.csproj", "{CE0B30FD-75D5-4D1A-83A0-9C3305FE2599}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SourceGenerator", "src\JsonMergePatch.SourceGenerator\JsonMergePatch.SourceGenerator.csproj", "{CEB6F7B7-15A4-485E-8372-7687852EB929}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppLibrary", "sample\ConsoleAppLibrary\ConsoleAppLibrary.csproj", "{3592FF83-D9D6-473A-97CE-94FF0D7FE5F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleAppLibrary", "sample\ConsoleAppLibrary\ConsoleAppLibrary.csproj", "{3592FF83-D9D6-473A-97CE-94FF0D7FE5F1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreMinimal", "sample\AspNetCoreMinimal\AspNetCoreMinimal.csproj", "{882E1027-9F66-4779-B85C-BC10C38E6816}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreMinimal.Entities", "sample\AspNetCoreMinimal.Entities\AspNetCoreMinimal.Entities.csproj", "{D9F5C75F-DD5F-4B0A-A7C2-BD928EDC4838}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +47,6 @@ Global
 		{7FD5D0AB-6388-4C97-896B-E648CADD86E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FD5D0AB-6388-4C97-896B-E648CADD86E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FD5D0AB-6388-4C97-896B-E648CADD86E8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4390FB7F-8B49-4D55-9D3C-63EE2DA975CD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C817634D-62FD-4958-A8BD-8661112891F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C817634D-62FD-4958-A8BD-8661112891F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C817634D-62FD-4958-A8BD-8661112891F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -71,10 +67,6 @@ Global
 		{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1FE80A1A-9402-4953-9A7F-F01B1D0539B5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CE0B30FD-75D5-4D1A-83A0-9C3305FE2599}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CE0B30FD-75D5-4D1A-83A0-9C3305FE2599}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE0B30FD-75D5-4D1A-83A0-9C3305FE2599}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CE0B30FD-75D5-4D1A-83A0-9C3305FE2599}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CEB6F7B7-15A4-485E-8372-7687852EB929}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CEB6F7B7-15A4-485E-8372-7687852EB929}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEB6F7B7-15A4-485E-8372-7687852EB929}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -83,6 +75,14 @@ Global
 		{3592FF83-D9D6-473A-97CE-94FF0D7FE5F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3592FF83-D9D6-473A-97CE-94FF0D7FE5F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3592FF83-D9D6-473A-97CE-94FF0D7FE5F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{882E1027-9F66-4779-B85C-BC10C38E6816}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{882E1027-9F66-4779-B85C-BC10C38E6816}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{882E1027-9F66-4779-B85C-BC10C38E6816}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{882E1027-9F66-4779-B85C-BC10C38E6816}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9F5C75F-DD5F-4B0A-A7C2-BD928EDC4838}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9F5C75F-DD5F-4B0A-A7C2-BD928EDC4838}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9F5C75F-DD5F-4B0A-A7C2-BD928EDC4838}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9F5C75F-DD5F-4B0A-A7C2-BD928EDC4838}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,6 +91,8 @@ Global
 		{910E8728-872B-43EF-994F-B67953874BCB} = {0E750D74-69C7-433C-92C7-3F026083C255}
 		{1FE80A1A-9402-4953-9A7F-F01B1D0539B5} = {0E750D74-69C7-433C-92C7-3F026083C255}
 		{3592FF83-D9D6-473A-97CE-94FF0D7FE5F1} = {0E750D74-69C7-433C-92C7-3F026083C255}
+		{882E1027-9F66-4779-B85C-BC10C38E6816} = {0E750D74-69C7-433C-92C7-3F026083C255}
+		{D9F5C75F-DD5F-4B0A-A7C2-BD928EDC4838} = {0E750D74-69C7-433C-92C7-3F026083C255}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {55007954-1D8A-4553-A15C-FE4AE17C0A4B}

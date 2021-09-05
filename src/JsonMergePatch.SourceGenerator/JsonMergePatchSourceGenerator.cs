@@ -4,28 +4,28 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator
+namespace LaDeak.JsonMergePatch.SourceGenerator;
+
+[Generator]
+public class JsonMergePatchSourceGenerator : ISourceGenerator
 {
-    [Generator]
-    public class JsonMergePatchSourceGenerator : ISourceGenerator
+    public void Execute(GeneratorExecutionContext context) => ExecuteImpl(context);
+
+    protected virtual IEnumerable<GeneratedWrapper> ExecuteImpl(GeneratorExecutionContext context)
     {
-        public void Execute(GeneratorExecutionContext context) => ExecuteImpl(context);
+        var typeBuilder = new MultiTypeBuilder(context.Compilation.SyntaxTrees, context.Compilation, new TypeBuilder(), new PatchParametersWalker());
+        var types = typeBuilder.Generate();
+        foreach (var generatedType in types)
+            context.AddSource(generatedType.FileName, SourceText.From(generatedType.SourceCode, Encoding.UTF8));
 
-        protected virtual IEnumerable<GeneratedWrapper> ExecuteImpl(GeneratorExecutionContext context)
-        {
-            var typeBuilder = new MultiTypeBuilder(context.Compilation.SyntaxTrees, context.Compilation, new TypeBuilder(), new PatchParametersWalker());
-            var types = typeBuilder.Generate();
-            foreach (var generatedType in types)
-                context.AddSource(generatedType.FileName, SourceText.From(generatedType.SourceCode, Encoding.UTF8));
+        var tyeRepoGenerator = new TypeRepositoryGenerator();
+        var typeRepoClass = tyeRepoGenerator.CreateTypeRepository(types.Select(x => (x.SourceTypeFullName, x.TargetTypeFullName)), context.Compilation.Assembly.Name);
+        context.AddSource("LaDeakJsonMergePatchTypeRepo", SourceText.From(typeRepoClass, Encoding.UTF8));
+        return types;
+    }
 
-            var tyeRepoGenerator = new TypeRepositoryGenerator();
-            var typeRepoClass = tyeRepoGenerator.CreateTypeRepository(types.Select(x => (x.SourceTypeFullName, x.TargetTypeFullName)), context.Compilation.Assembly.Name);
-            context.AddSource("LaDeakJsonMergePatchTypeRepo", SourceText.From(typeRepoClass, Encoding.UTF8));
-            return types;
-        }
-
-        public void Initialize(GeneratorInitializationContext context)
-        {
-        }
+    public void Initialize(GeneratorInitializationContext context)
+    {
     }
 }
+

@@ -2,18 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <!--<PackageReference Include="LaDeak.JsonMergePatch.AspNetCore" Version="0.0.1-alpha1" />
-    <PackageReference Include="LaDeak.JsonMergePatch.SourceGenerator" Version="0.0.1-alpha1" />-->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.5" />
+    <PackageReference Include="System.Text.Json" Version="6.0.0-rc.2.21428.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\JsonMergePatch.AspNetCore\JsonMergePatch.AspNetCore.csproj" />
     <ProjectReference Include="..\..\src\JsonMergePatch.SourceGenerator\JsonMergePatch.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\AspNetCoreMinimal.Entities\AspNetCoreMinimal.Entities.csproj" />
   </ItemGroup>
 
 </Project>

@@ -43,10 +43,12 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
 
         private void BuildNamespace(BuilderState state, Action<BuilderState>? addBody = null)
         {
+            state.AppendLine($"#nullable enable");
             state.AppendLine($"namespace {NameBuilder.GetNamespace(state.TypeInfo.TypeSymbol)}");
             state.AppendLine("{");
             addBody?.Invoke(state.IncrementIdentation());
             state.AppendLine("}");
+            state.AppendLine($"#nullable disable");
         }
 
         private void BuildClassDeclaration(BuilderState state, Action<BuilderState>? addBody = null)
@@ -79,7 +81,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             state.AppendLine("{");
             var getterSetter = state.IncrementIdentation();
             getterSetter.AppendLine($"get {{ return {fieldName}; }}");
-            getterSetter.AppendLine("init");
+            getterSetter.AppendLine("set");
             getterSetter.AppendLine("{");
             var setterBody = getterSetter.IncrementIdentation();
             setterBody.AppendLine($"Properties[{propertyId}] = true;");
@@ -102,6 +104,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             if (propertyInfo?.Property?.Type is not INamedTypeSymbol namedType || !namedType.IsGenericType)
                 throw new InvalidOperationException("Parameter is not generic type parameter.");
 
+            // TODO type arguments nullable annotations
             var firstUnderlyingType = GetPropertyTypeName(namedType.TypeArguments.First()).TypeName;
             var withoutUnderlyingType = namedType.ToDisplayString(new SymbolDisplayFormat(SymbolDisplayGlobalNamespaceStyle.Omitted, SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, SymbolDisplayGenericsOptions.None, SymbolDisplayMemberOptions.None, SymbolDisplayDelegateStyle.NameOnly, SymbolDisplayExtensionMethodStyle.Default, SymbolDisplayParameterOptions.IncludeType, SymbolDisplayPropertyStyle.NameOnly, SymbolDisplayLocalOptions.IncludeType, SymbolDisplayKindOptions.None, SymbolDisplayMiscellaneousOptions.ExpandNullable));
 
@@ -112,6 +115,10 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                 genericResult += $", {genericTypeParam}";
             }
             genericResult += ">";
+            if (namedType.SpecialType != SpecialType.System_Nullable_T && namedType.NullableAnnotation != NullableAnnotation.Annotated)
+            {
+                genericResult += "?";
+            }
             if (namedType.Name.Contains("Dictionary") && namedType.ContainingNamespace.ToDisplayString() == "System.Collections.Generic")
                 propertyInfo.IsGenericDictionary = true;
 
@@ -121,10 +128,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         private string ConvertToNullableIfRequired(PropertyInformation propertyInfo, ITypeSymbol typeSymbol)
         {
             string genericTypeParam = GetPropertyTypeName(typeSymbol).TypeName;
-            if (typeSymbol.IsValueType && typeSymbol.SpecialType != SpecialType.System_Nullable_T && typeSymbol.NullableAnnotation == NullableAnnotation.NotAnnotated)
+            if (typeSymbol.IsValueType && typeSymbol.SpecialType != SpecialType.System_Nullable_T && typeSymbol.NullableAnnotation != NullableAnnotation.Annotated)
             {
                 propertyInfo.IsConvertedToNullableType = true;
                 genericTypeParam = $"System.Nullable<{genericTypeParam}>";
+            }
+            if (!typeSymbol.IsValueType && typeSymbol.SpecialType != SpecialType.System_Nullable_T)
+            {
+                genericTypeParam = $"{genericTypeParam}?";
             }
 
             return genericTypeParam;
@@ -142,8 +153,9 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         private void BuildAttributes(BuilderState state, IEnumerable<AttributeData> attributes)
         {
             foreach (var attribute in attributes)
-                if (attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableContextAttribute" &&
-                    attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableAttribute")
+                if (attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableContextAttribute"
+                    && attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableAttribute"
+                    && attribute.AttributeClass?.ToDisplayString() != "LaDeak.JsonMergePatch.Abstractions.PatchableAttribute")
                     BuildAttribute(state, attribute);
         }
 
@@ -168,7 +180,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
 
         private void BuildApplyPath(BuilderState state)
         {
-            state.AppendLine($"public override {state.TypeInfo.SourceTypeName} ApplyPatch({state.TypeInfo.SourceTypeName} input)");
+            state.AppendLine($"public override {state.TypeInfo.SourceTypeName} ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] {state.TypeInfo.SourceTypeName} input)");
             state.AppendLine("{");
             var bodyState = state.IncrementIdentation();
             CallConstructIfEmpty(bodyState, "input ??=", leaveOpen: false);
@@ -268,9 +280,12 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         private void PopulateDictionary(BuilderState state, PropertyInformation propertyInformation)
         {
             var propertyName = propertyInformation.Property.Name;
-            state.AppendLine($"foreach(var item in {propertyName})");
+            state.AppendLine($"if({propertyName} != null)");
             state.AppendLine("{");
-            var foreachBody = state.IncrementIdentation();
+            var ifBody = state.IncrementIdentation();
+            ifBody.AppendLine($"foreach(var item in {propertyName})");
+            ifBody.AppendLine("{");
+            var foreachBody = ifBody.IncrementIdentation();
             foreachBody.AppendLine("if(item.Value is null)");
             foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}.Remove(item.Key);");
             foreachBody.AppendLine("else");
@@ -278,6 +293,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                 foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}[item.Key] = item.Value.Value;");
             else
                 foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}[item.Key] = item.Value;");
+            ifBody.AppendLine("}");
             state.AppendLine("}");
         }
     }

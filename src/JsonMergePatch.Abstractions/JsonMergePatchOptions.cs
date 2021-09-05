@@ -1,7 +1,7 @@
-﻿namespace LaDeak.JsonMergePatch.Abstractions
+﻿namespace LaDeak.JsonMergePatch.Abstractions;
+
+public static class JsonMergePatchOptions
 {
-    public static class JsonMergePatchOptions
-    {
-        public static ITypeRepository Repository { get; set; }
-    }
+    public static ITypeRepository Repository { get; set; }
 }
+

@@ -12,9 +12,10 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1.8.1
       with:
-        dotnet-version: '5.0.x'
+        dotnet-version: '6.0.x'
+        include-prerelease: true
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore --source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json --source https://api.nuget.org/v3/index.json
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Test

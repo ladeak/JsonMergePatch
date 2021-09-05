@@ -83,7 +83,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.Safe
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -92,13 +93,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[0];
         }
 
-        public override SourceName ApplyPatch(SourceName input)
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
         {
             input ??= new SourceName();
             return input;
         }
     }
 }
+#nullable disable
 ", result.SourceCode);
         }
 
@@ -125,7 +127,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.Safe
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -134,13 +137,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[0];
         }
 
-        public override SourceName ApplyPatch(SourceName input)
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
         {
             input ??= new SourceName();
             return input;
         }
     }
 }
+#nullable disable
 ", result.SourceCode);
         }
 
@@ -167,7 +171,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.Safe
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -176,13 +181,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[0];
         }
 
-        public override SourceName ApplyPatch(SourceName input)
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
         {
             input ??= new SourceName();
             return input;
         }
     }
 }
+#nullable disable
 ", result.SourceCode);
         }
 
@@ -197,7 +203,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.Safe
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     [TestAttribute]
     [Hello]
@@ -208,13 +215,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[0];
         }
 
-        public override SourceName ApplyPatch(SourceName input)
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
         {
             input ??= new SourceName();
             return input;
         }
     }
 }
+#nullable disable
 ", result.SourceCode);
         }
 
@@ -232,7 +240,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.Safe
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -241,18 +250,18 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[1];
         }
 
-        private System.String _testProp;
-        public System.String TestProp
+        private System.String? _testProp;
+        public System.String? TestProp
         {
             get { return _testProp; }
-            init
+            set
             {
                 Properties[0] = true;
                 _testProp = value;
             }
         }
 
-        public override SourceName ApplyPatch(SourceName input)
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
         {
             input ??= new SourceName();
             if (Properties[0])
@@ -261,6 +270,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         }
     }
 }
+#nullable disable
 ", result.SourceCode);
             Assert.Contains(result.ToProcessTypes, x => x.ToDisplayString() == "System.String");
         }
@@ -279,7 +289,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-    @"namespace LaDeak.JsonMergePatch.Generated.Safe
+    @"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -288,11 +299,11 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[2];
         }
 
-        private System.String _testProp0;
-        public System.String TestProp0
+        private System.String? _testProp0;
+        public System.String? TestProp0
         {
             get { return _testProp0; }
-            init
+            set
             {
                 Properties[0] = true;
                 _testProp0 = value;
@@ -303,14 +314,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         public System.Nullable<System.Int32> TestProp1
         {
             get { return _testProp1; }
-            init
+            set
             {
                 Properties[1] = true;
                 _testProp1 = value;
             }
         }
 
-        public override SourceName ApplyPatch(SourceName input)
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
         {
             input ??= new SourceName();
             if (Properties[0])
@@ -321,6 +332,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         }
     }
 }
+#nullable disable
 ", result.SourceCode);
         }
 
@@ -338,7 +350,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-    @"namespace LaDeak.JsonMergePatch.Generated.Safe
+    @"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -347,11 +360,11 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[2];
         }
 
-        private LaDeak.JsonMergePatch.Generated.SafeTest.DtoWrapped _testProp0;
-        public LaDeak.JsonMergePatch.Generated.SafeTest.DtoWrapped TestProp0
+        private LaDeak.JsonMergePatch.Generated.SafeTest.DtoWrapped? _testProp0;
+        public LaDeak.JsonMergePatch.Generated.SafeTest.DtoWrapped? TestProp0
         {
             get { return _testProp0; }
-            init
+            set
             {
                 Properties[0] = true;
                 _testProp0 = value;
@@ -362,14 +375,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         public System.Nullable<System.Int32> TestProp1
         {
             get { return _testProp1; }
-            init
+            set
             {
                 Properties[1] = true;
                 _testProp1 = value;
             }
         }
 
-        public override SourceName ApplyPatch(SourceName input)
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
         {
             input ??= new SourceName();
             if (Properties[0])
@@ -380,6 +393,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         }
     }
 }
+#nullable disable
 ", result.SourceCode);
             Assert.Contains(result.ToProcessTypes, x => x.ToDisplayString() == "Test.Dto");
             Assert.Contains(result.ToProcessTypes, x => x.ToDisplayString() == "System.Int32");
@@ -398,7 +412,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.Safe
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -407,19 +422,19 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[1];
         }
 
-        private System.String _testProp;
+        private System.String? _testProp;
         [JsonPropertyName(""temp"")]
-        public System.String TestProp
+        public System.String? TestProp
         {
             get { return _testProp; }
-            init
+            set
             {
                 Properties[0] = true;
                 _testProp = value;
             }
         }
 
-        public override SourceName ApplyPatch(SourceName input)
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
         {
             input ??= new SourceName();
             if (Properties[0])
@@ -428,6 +443,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         }
     }
 }
+#nullable disable
 ", result.SourceCode);
         }
 
@@ -443,7 +459,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.Safe
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -452,33 +469,37 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[1];
         }
 
-        private System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> _testProp;
-        public System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> TestProp
+        private System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>>? _testProp;
+        public System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>>? TestProp
         {
             get { return _testProp; }
-            init
+            set
             {
                 Properties[0] = true;
                 _testProp = value;
             }
         }
 
-        public override SourceName ApplyPatch(SourceName input)
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
         {
             input ??= new SourceName();
             if (Properties[0])
                 input.TestProp ??= new();
-            foreach(var item in TestProp)
+            if(TestProp != null)
             {
-                if(item.Value is null)
-                    input.TestProp.Remove(item.Key);
-                else
-                    input.TestProp[item.Key] = item.Value.Value;
+                foreach(var item in TestProp)
+                {
+                    if(item.Value is null)
+                        input.TestProp.Remove(item.Key);
+                    else
+                        input.TestProp[item.Key] = item.Value.Value;
+                }
             }
             return input;
         }
     }
 }
+#nullable disable
 ", result.SourceCode);
         }
 
@@ -495,7 +516,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.Safe
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -504,53 +526,60 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[2];
         }
 
-        private System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> _testProp0;
-        public System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> TestProp0
+        private System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>>? _testProp0;
+        public System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>>? TestProp0
         {
             get { return _testProp0; }
-            init
+            set
             {
                 Properties[0] = true;
                 _testProp0 = value;
             }
         }
 
-        private System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> _testProp1;
-        public System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> TestProp1
+        private System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>>? _testProp1;
+        public System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>>? TestProp1
         {
             get { return _testProp1; }
-            init
+            set
             {
                 Properties[1] = true;
                 _testProp1 = value;
             }
         }
 
-        public override SourceName ApplyPatch(SourceName input)
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
         {
             input ??= new SourceName();
             if (Properties[0])
                 input.TestProp0 ??= new();
             if (Properties[1])
                 input.TestProp1 ??= new();
-            foreach(var item in TestProp0)
+            if(TestProp0 != null)
             {
-                if(item.Value is null)
-                    input.TestProp0.Remove(item.Key);
-                else
-                    input.TestProp0[item.Key] = item.Value.Value;
+                foreach(var item in TestProp0)
+                {
+                    if(item.Value is null)
+                        input.TestProp0.Remove(item.Key);
+                    else
+                        input.TestProp0[item.Key] = item.Value.Value;
+                }
             }
-            foreach(var item in TestProp1)
+            if(TestProp1 != null)
             {
-                if(item.Value is null)
-                    input.TestProp1.Remove(item.Key);
-                else
-                    input.TestProp1[item.Key] = item.Value.Value;
+                foreach(var item in TestProp1)
+                {
+                    if(item.Value is null)
+                        input.TestProp1.Remove(item.Key);
+                    else
+                        input.TestProp1[item.Key] = item.Value.Value;
+                }
             }
             return input;
         }
     }
 }
+#nullable disable
 ", result.SourceCode);
         }
 
@@ -566,7 +595,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.Safe
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -575,33 +605,37 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[1];
         }
 
-        private System.Collections.Generic.Dictionary<System.String, System.String> _testProp;
-        public System.Collections.Generic.Dictionary<System.String, System.String> TestProp
+        private System.Collections.Generic.Dictionary<System.String, System.String?>? _testProp;
+        public System.Collections.Generic.Dictionary<System.String, System.String?>? TestProp
         {
             get { return _testProp; }
-            init
+            set
             {
                 Properties[0] = true;
                 _testProp = value;
             }
         }
 
-        public override SourceName ApplyPatch(SourceName input)
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
         {
             input ??= new SourceName();
             if (Properties[0])
                 input.TestProp ??= new();
-            foreach(var item in TestProp)
+            if(TestProp != null)
             {
-                if(item.Value is null)
-                    input.TestProp.Remove(item.Key);
-                else
-                    input.TestProp[item.Key] = item.Value;
+                foreach(var item in TestProp)
+                {
+                    if(item.Value is null)
+                        input.TestProp.Remove(item.Key);
+                    else
+                        input.TestProp[item.Key] = item.Value;
+                }
             }
             return input;
         }
     }
 }
+#nullable disable
 ", result.SourceCode);
         }
 
@@ -617,7 +651,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.Safe
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -626,33 +661,93 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[1];
         }
 
-        private System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> _testProp;
-        public System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>> TestProp
+        private System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>>? _testProp;
+        public System.Collections.Generic.Dictionary<System.String, System.Nullable<System.Int32>>? TestProp
         {
             get { return _testProp; }
-            init
+            set
             {
                 Properties[0] = true;
                 _testProp = value;
             }
         }
 
-        public override SourceName ApplyPatch(SourceName input)
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
         {
             input ??= new SourceName();
             if (Properties[0])
                 input.TestProp ??= new();
-            foreach(var item in TestProp)
+            if(TestProp != null)
             {
-                if(item.Value is null)
-                    input.TestProp.Remove(item.Key);
-                else
-                    input.TestProp[item.Key] = item.Value;
+                foreach(var item in TestProp)
+                {
+                    if(item.Value is null)
+                        input.TestProp.Remove(item.Key);
+                    else
+                        input.TestProp[item.Key] = item.Value;
+                }
             }
             return input;
         }
     }
 }
+#nullable disable
+", result.SourceCode);
+        }
+
+        [Fact]
+        public void DictionaryWithNullableReferenceProperty_CreatesPatchToPatchEachValue()
+        {
+            var sut = new TypeBuilder();
+            var typeSymbol = Substitute.For<INamedTypeSymbol>();
+            typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+            var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetType("System", "String"), GetNullableReferenceType(GetType("System", "String")));
+            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
+            Assert.Equal(
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
+{
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
+    {
+        public TestTypeWrapped()
+        {
+            Properties = new bool[1];
+        }
+
+        private System.Collections.Generic.Dictionary<System.String, System.String?>? _testProp;
+        public System.Collections.Generic.Dictionary<System.String, System.String?>? TestProp
+        {
+            get { return _testProp; }
+            set
+            {
+                Properties[0] = true;
+                _testProp = value;
+            }
+        }
+
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
+        {
+            input ??= new SourceName();
+            if (Properties[0])
+                input.TestProp ??= new();
+            if(TestProp != null)
+            {
+                foreach(var item in TestProp)
+                {
+                    if(item.Value is null)
+                        input.TestProp.Remove(item.Key);
+                    else
+                        input.TestProp[item.Key] = item.Value;
+                }
+            }
+            return input;
+        }
+    }
+}
+#nullable disable
 ", result.SourceCode);
         }
 
@@ -675,7 +770,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             typeSymbol.GetAttributes().Returns(attributes);
             var result = sut.BuildWrapperType(typeSymbol, "SourceName");
             Assert.Equal(
-@"namespace LaDeak.JsonMergePatch.Generated.Safe
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
     {
@@ -684,11 +780,11 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Properties = new bool[2];
         }
 
-        private System.String _testProp;
-        public System.String TestProp
+        private System.String? _testProp;
+        public System.String? TestProp
         {
             get { return _testProp; }
-            init
+            set
             {
                 Properties[0] = true;
                 _testProp = value;
@@ -699,14 +795,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         public System.Nullable<System.Int32> TestPropBase
         {
             get { return _testPropBase; }
-            init
+            set
             {
                 Properties[1] = true;
                 _testPropBase = value;
             }
         }
 
-        public override SourceName ApplyPatch(SourceName input)
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
         {
             input ??= new SourceName();
             if (Properties[0])
@@ -717,6 +813,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         }
     }
 }
+#nullable disable
 ", result.SourceCode);
             Assert.Contains(result.ToProcessTypes, x => x.ToDisplayString() == "System.String");
         }
@@ -748,6 +845,12 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             type.ToDisplayString(GeneratedTypeFilter.SymbolFormat).ReturnsForAnyArgs(name);
             type.NullableAnnotation.Returns(NullableAnnotation.Annotated);
             return type;
+        }
+
+        private ITypeSymbol GetNullableReferenceType(ITypeSymbol typeParameter)
+        {
+            typeParameter.NullableAnnotation.Returns(NullableAnnotation.Annotated);
+            return typeParameter;
         }
 
         private IPropertySymbol GetProperty(string namespaceName, string typeName, string name, AttributeData attribute = null)
