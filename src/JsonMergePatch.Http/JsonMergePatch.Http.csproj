@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="6.0.0-rc.2.21428.1" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
+    <PackageReference Include="System.Text.Json" Version="6.0.0-rc.1.21451.13" />
   </ItemGroup>
 
   <ItemGroup>
