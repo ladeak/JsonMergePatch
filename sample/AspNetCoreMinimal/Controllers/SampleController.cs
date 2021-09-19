@@ -1,4 +1,8 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
 using AspNetCoreMinimal.Entities;
 using LaDeak.JsonMergePatch.Abstractions;
 using LaDeak.JsonMergePatch.Http;
@@ -11,6 +15,8 @@ namespace AspNetCoreMinimal.Controllers;
 public class SampleController : ControllerBase
 {
     private readonly IHttpClientFactory _clientFactory;
+    private static WeatherForecast _targetWeather = new WeatherForecast() { Date = DateTime.UtcNow, Summary = "Sample weather forecast", TemperatureC = 24 };
+    private static CitiesData _targetCities = new CitiesData() { Cities = new Dictionary<string, string>() { { "Frankfurt", "Germany" }, { "New York", "US" }, { "London", "UK" } } };
 
     public SampleController(IHttpClientFactory clientFactory)
     {
@@ -18,29 +24,19 @@ public class SampleController : ControllerBase
     }
 
     [HttpGet("Weather")]
-    public WeatherForecast GetWeather()
-    {
-        return new WeatherForecast
-        {
-            Date = DateTime.Now.AddDays(1),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = "Sample weather forecast"
-        };
-    }
+    public WeatherForecast GetWeather() => _targetWeather;
 
     [HttpPatch("PatchWeather")]
     public WeatherForecast PatchForecast(Patch<WeatherForecast> input)
     {
-        var target = new WeatherForecast() { Date = DateTime.UtcNow, Summary = "Sample weather forecast", TemperatureC = 24 };
-        var result = input.ApplyPatch(target);
+        var result = input.ApplyPatch(_targetWeather);
         return result;
     }
 
     [HttpPatch("PatchCities")]
     public CitiesData PatchCities(Patch<CitiesData> input)
     {
-        var target = new CitiesData() { Cities = new Dictionary<string, string>() { { "Frankfurt", "Germany" }, { "New York", "US" }, { "London", "UK" } } };
-        var result = input.ApplyPatch(target);
+        var result = input.ApplyPatch(_targetCities);
         return result;
     }
 
