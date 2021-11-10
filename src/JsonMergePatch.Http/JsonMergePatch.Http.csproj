@@ -1,14 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;netstandard2.1</TargetFrameworks>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>LaDeak.JsonMergePatch.Http</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-    <PackageReference Include="System.Text.Json" Version="6.0.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\JsonMergePatch.Abstractions\JsonMergePatch.Abstractions.csproj" />
