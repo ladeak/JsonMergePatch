@@ -5,7 +5,7 @@ namespace LaDeak.JsonMergePatch.Abstractions;
 public abstract class Patch<T>
 {
     /// <summary>
-    /// List of properites used by the request.
+    /// List of properties used by the request.
     /// </summary>
     protected bool[] Properties;
 
