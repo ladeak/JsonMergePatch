@@ -29,6 +29,6 @@ public interface ITypeRepository
     /// <summary>
     /// Returns all registrations.
     /// </summary>
-    /// <returns>Az enumeration of registered types and corresponding wrapper types.</returns>
+    /// <returns>An enumeration of registered types and corresponding wrapper types.</returns>
     public IEnumerable<KeyValuePair<Type, Type>> GetAll();
 }
