@@ -12,7 +12,17 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             bool generic = false;
             if (typeInfo is INamedTypeSymbol namedTypeInfo)
                 generic = namedTypeInfo.IsGenericType;
-            return typeInfo.SpecialType == SpecialType.None && !typeInfo.IsAnonymousType && !typeInfo.IsAbstract && !generic && !typeInfo.IsStatic && typeInfo.TypeKind != TypeKind.Enum;
+
+            // Check for System types that have SpecialType.None.
+            string typeName = typeInfo.ToDisplayString();
+            bool isNonSpecialSystemType = typeName == "System.Guid" || typeName == "System.DateOnly" || typeName == "System.TimeOnly";
+
+            return typeInfo.SpecialType == SpecialType.None
+                && !isNonSpecialSystemType
+                && !typeInfo.IsAnonymousType
+                && !typeInfo.IsAbstract
+                && !generic && !typeInfo.IsStatic
+                && typeInfo.TypeKind != TypeKind.Enum;
         }
 
 
