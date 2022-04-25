@@ -122,6 +122,14 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             if (namedType.Name.Contains("Dictionary") && namedType.ContainingNamespace.ToDisplayString() == "System.Collections.Generic")
                 propertyInfo.IsGenericDictionary = true;
 
+            if (namedType.Name.Contains("List")
+                && namedType.ContainingNamespace.ToDisplayString() == "System.Collections.Generic"
+                && GeneratedTypeFilter.IsGeneratableType(namedType.TypeArguments.First()))
+            {
+                propertyInfo.IsGenericList = true;
+                propertyInfo.FirstGenericType = namedType.TypeArguments.First();
+            }
+
             return genericResult;
         }
 
@@ -187,6 +195,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             SetInitOnlyProperties(bodyState);
             SetReadWriteProperties(bodyState);
             PopulateDictionaryProperties(bodyState);
+            PopulateGeneratableListProperties(bodyState);
             bodyState.AppendLine("return input;");
             state.AppendLine("}");
         }
@@ -203,6 +212,8 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                         state.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name});");
                     else if (state.TypeInfo.Properties[i].IsGenericDictionary)
                         state.IncrementIdentation().AppendLine($"input.{currentProperty.Name} ??= new();");
+                    else if (state.TypeInfo.Properties[i].IsGenericList)
+                        state.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = new();");
                     else if (state.TypeInfo.Properties[i].IsConvertedToNullableType)
                         state.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}.HasValue ? {currentProperty.Name}.Value : default;");
                     else
@@ -246,9 +257,21 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
         {
             for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
             {
-                var currentProperty = state.TypeInfo.Properties[i].Property;
-                if (!GeneratedTypeFilter.IsGeneratableType(currentProperty.Type) && state.TypeInfo.Properties[i].IsGenericDictionary)
-                    PopulateDictionary(state, state.TypeInfo.Properties[i]);
+                var currentProperty = state.TypeInfo.Properties[i];
+                if (!GeneratedTypeFilter.IsGeneratableType(currentProperty.Property.Type) && currentProperty.IsGenericDictionary)
+                    PopulateDictionary(state, currentProperty);
+            }
+        }
+
+        private void PopulateGeneratableListProperties(BuilderState state)
+        {
+            for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
+            {
+                var currentProperty = state.TypeInfo.Properties[i];
+                if (currentProperty?.FirstGenericType != null
+                    && GeneratedTypeFilter.IsGeneratableType(currentProperty.FirstGenericType)
+                    && currentProperty.IsGenericList)
+                    PopulateGeneratableListProperties(state, state.TypeInfo.Properties[i]);
             }
         }
 
@@ -293,6 +316,19 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                 foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}[item.Key] = item.Value.Value;");
             else
                 foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}[item.Key] = item.Value;");
+            ifBody.AppendLine("}");
+            state.AppendLine("}");
+        }
+
+        private void PopulateGeneratableListProperties(BuilderState state, PropertyInformation propertyInformation)
+        {
+            var propertyName = propertyInformation.Property.Name;
+            state.AppendLine($"if({propertyName} != null)");
+            state.AppendLine("{");
+            var ifBody = state.IncrementIdentation();
+            ifBody.AppendLine($"foreach(var item in {propertyName})");
+            ifBody.AppendLine("{");
+            ifBody.IncrementIdentation().AppendLine($"input.{propertyName}.Add(item?.ApplyPatch(null));");
             ifBody.AppendLine("}");
             state.AppendLine("}");
         }

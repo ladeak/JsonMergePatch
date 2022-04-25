@@ -818,6 +818,105 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
             Assert.Contains(result.ToProcessTypes, x => x.ToDisplayString() == "System.String");
         }
 
+        [Fact]
+        public void ListOfComplexType_CreatesPatchToPatchEachValue()
+        {
+            var sut = new TypeBuilder();
+            var typeSymbol = Substitute.For<INamedTypeSymbol>();
+            typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+            var property = GetGenericProperty("System.Collections.Generic", "List", "TestProp", GetType("Test", "Dto"));
+            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
+            Assert.Equal(
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
+{
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
+    {
+        public TestTypeWrapped()
+        {
+            Properties = new bool[1];
+        }
+
+        private System.Collections.Generic.List<LaDeak.JsonMergePatch.Generated.SafeTest.DtoWrapped>? _testProp;
+        public System.Collections.Generic.List<LaDeak.JsonMergePatch.Generated.SafeTest.DtoWrapped>? TestProp
+        {
+            get { return _testProp; }
+            set
+            {
+                Properties[0] = true;
+                _testProp = value;
+            }
+        }
+
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
+        {
+            input ??= new SourceName();
+            if (Properties[0])
+                input.TestProp = new();
+            if(TestProp != null)
+            {
+                foreach(var item in TestProp)
+                {
+                    input.TestProp.Add(item?.ApplyPatch(null));
+                }
+            }
+            return input;
+        }
+    }
+}
+#nullable disable
+", result.SourceCode);
+        }
+
+        [Fact]
+        public void ListOfKnownType_CreatesPatchToPatchEachValue()
+        {
+            var sut = new TypeBuilder();
+            var typeSymbol = Substitute.For<INamedTypeSymbol>();
+            typeSymbol.Name.Returns("TestType");
+            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+            var property = GetGenericProperty("System.Collections.Generic", "List", "TestProp", GetType("System", "String"));
+            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
+            Assert.Equal(
+@"#nullable enable
+namespace LaDeak.JsonMergePatch.Generated.Safe
+{
+    public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
+    {
+        public TestTypeWrapped()
+        {
+            Properties = new bool[1];
+        }
+
+        private System.Collections.Generic.List<System.String>? _testProp;
+        public System.Collections.Generic.List<System.String>? TestProp
+        {
+            get { return _testProp; }
+            set
+            {
+                Properties[0] = true;
+                _testProp = value;
+            }
+        }
+
+        public override SourceName ApplyPatch([System.Diagnostics.CodeAnalysis.AllowNull] SourceName input)
+        {
+            input ??= new SourceName();
+            if (Properties[0])
+                input.TestProp = TestProp;
+            return input;
+        }
+    }
+}
+#nullable disable
+", result.SourceCode);
+        }
+
         private ITypeSymbol GetType(string namespaceName, string typeName)
         {
             var propertyTypeSymbol = Substitute.For<INamedTypeSymbol>();
@@ -865,6 +964,16 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 
         private IPropertySymbol GetGenericProperty(string namespaceName, string typeName, string name, ITypeSymbol propertyTypeSymbol0, ITypeSymbol propertyTypeSymbol1)
         {
+            return GetGenericProperty(namespaceName, typeName, name, new[] { propertyTypeSymbol0, propertyTypeSymbol1 });
+        }
+
+        private IPropertySymbol GetGenericProperty(string namespaceName, string typeName, string name, ITypeSymbol propertyTypeSymbol0)
+        {
+            return GetGenericProperty(namespaceName, typeName, name, new[] { propertyTypeSymbol0 });
+        }
+
+        private IPropertySymbol GetGenericProperty(string namespaceName, string typeName, string name, ITypeSymbol[] genericTypes)
+        {
             var propertyTypeSymbol = Substitute.For<INamedTypeSymbol>();
             propertyTypeSymbol.Name.Returns(typeName);
             SpecialType specialType = GetSpecialTypeFlag(typeName);
@@ -875,7 +984,7 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
             propertyTypeSymbol.ContainingNamespace.Returns(namespaceSymbol);
             propertyTypeSymbol.IsValueType.Returns(GetIsValueTypeFlag(typeName));
             propertyTypeSymbol.IsGenericType.Returns(true);
-            propertyTypeSymbol.TypeArguments.Returns(ImmutableArray.Create<ITypeSymbol>(propertyTypeSymbol0, propertyTypeSymbol1));
+            propertyTypeSymbol.TypeArguments.Returns(ImmutableArray.Create<ITypeSymbol>(genericTypes, 0, genericTypes.Length));
             var property = Substitute.For<IPropertySymbol>();
             property.Name.Returns(name);
             property.Type.Returns(propertyTypeSymbol);
