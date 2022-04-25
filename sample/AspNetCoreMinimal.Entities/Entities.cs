@@ -22,4 +22,14 @@ public class WeatherForecast
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 
     public string Summary { get; set; }
+
+    public List<Tag> Tags { get; set; }
+}
+
+[Patchable]
+public class Tag
+{
+    public int Id { get; set; }
+
+    public string? Name { get; set; }
 }
