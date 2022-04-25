@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using LaDeak.JsonMergePatch.SourceGenerator.ApplyPatchBuilders;
 using Microsoft.CodeAnalysis;
 
 namespace LaDeak.JsonMergePatch.SourceGenerator
@@ -15,8 +16,10 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
     {
         public IPropertySymbol? Property { get; set; }
         public bool IsConvertedToNullableType { get; set; }
-        public bool IsGenericDictionary { get; set; }
-        public bool IsGenericList { get; set; }
-        public ITypeSymbol? FirstGenericType { get; set; }
+        //public bool IsGenericDictionary { get; set; }
+        //public bool IsGenericList { get; set; }
+        //public ITypeSymbol? FirstGenericType { get; set; }
+
+        public ApplyPatchBuilder? Builder { get; set; }
     }
 }

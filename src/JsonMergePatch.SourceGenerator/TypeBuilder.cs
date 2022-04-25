@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LaDeak.JsonMergePatch.SourceGenerator.ApplyPatchBuilders;
 using Microsoft.CodeAnalysis;
 
 namespace LaDeak.JsonMergePatch.SourceGenerator
@@ -104,7 +105,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             if (propertyInfo?.Property?.Type is not INamedTypeSymbol namedType || !namedType.IsGenericType)
                 throw new InvalidOperationException("Parameter is not generic type parameter.");
 
-            // TODO type arguments nullable annotations
+            propertyInfo.Builder = new SimpleNonGeneratableBuilder(propertyInfo.Property, false);
             var firstUnderlyingType = GetPropertyTypeName(namedType.TypeArguments.First()).TypeName;
             var withoutUnderlyingType = namedType.ToDisplayString(new SymbolDisplayFormat(SymbolDisplayGlobalNamespaceStyle.Omitted, SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, SymbolDisplayGenericsOptions.None, SymbolDisplayMemberOptions.None, SymbolDisplayDelegateStyle.NameOnly, SymbolDisplayExtensionMethodStyle.Default, SymbolDisplayParameterOptions.IncludeType, SymbolDisplayPropertyStyle.NameOnly, SymbolDisplayLocalOptions.IncludeType, SymbolDisplayKindOptions.None, SymbolDisplayMiscellaneousOptions.ExpandNullable));
 
@@ -120,22 +121,20 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
                 genericResult += "?";
             }
             if (namedType.Name.Contains("Dictionary") && namedType.ContainingNamespace.ToDisplayString() == "System.Collections.Generic")
-                propertyInfo.IsGenericDictionary = true;
+                propertyInfo.Builder = new NonGeneratableDictionaryPatchBuilder(namedType, propertyInfo.Property, propertyInfo.IsConvertedToNullableType);
 
             if (namedType.Name.Contains("List")
                 && namedType.ContainingNamespace.ToDisplayString() == "System.Collections.Generic"
+                && !IsInitOnlyProperty(propertyInfo.Property)
                 && GeneratedTypeFilter.IsGeneratableType(namedType.TypeArguments.First()))
-            {
-                propertyInfo.IsGenericList = true;
-                propertyInfo.FirstGenericType = namedType.TypeArguments.First();
-            }
+                propertyInfo.Builder = new GeneratableListBuilder(namedType, propertyInfo.Property);
 
             return genericResult;
         }
 
         private string ConvertToNullableIfRequired(PropertyInformation propertyInfo, ITypeSymbol typeSymbol)
         {
-            string genericTypeParam = GetPropertyTypeName(typeSymbol).TypeName;
+            (bool isGeneratable, string genericTypeParam) = GetPropertyTypeName(typeSymbol);
             if (typeSymbol.IsValueType && typeSymbol.SpecialType != SpecialType.System_Nullable_T && typeSymbol.NullableAnnotation != NullableAnnotation.Annotated)
             {
                 propertyInfo.IsConvertedToNullableType = true;
@@ -145,6 +144,11 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             {
                 genericTypeParam = $"{genericTypeParam}?";
             }
+
+            if (isGeneratable)
+                propertyInfo.Builder = new SimpleGeneratableBuilder(propertyInfo.Property);
+            else
+                propertyInfo.Builder = new SimpleNonGeneratableBuilder(propertyInfo.Property, propertyInfo.IsConvertedToNullableType);
 
             return genericTypeParam;
         }
@@ -194,32 +198,9 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             CallConstructIfEmpty(bodyState, "input ??=", leaveOpen: false);
             SetInitOnlyProperties(bodyState);
             SetReadWriteProperties(bodyState);
-            PopulateDictionaryProperties(bodyState);
-            PopulateGeneratableListProperties(bodyState);
+            BuildApplyPatchEnumerations(bodyState);
             bodyState.AppendLine("return input;");
             state.AppendLine("}");
-        }
-
-        private void SetReadWriteProperties(BuilderState state)
-        {
-            for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
-            {
-                var currentProperty = state.TypeInfo.Properties[i].Property;
-                if (!IsInitOnlyProperty(currentProperty))
-                {
-                    state.AppendLine($"if (Properties[{i}])");
-                    if (GeneratedTypeFilter.IsGeneratableType(currentProperty.Type))
-                        state.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name});");
-                    else if (state.TypeInfo.Properties[i].IsGenericDictionary)
-                        state.IncrementIdentation().AppendLine($"input.{currentProperty.Name} ??= new();");
-                    else if (state.TypeInfo.Properties[i].IsGenericList)
-                        state.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = new();");
-                    else if (state.TypeInfo.Properties[i].IsConvertedToNullableType)
-                        state.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name}.HasValue ? {currentProperty.Name}.Value : default;");
-                    else
-                        state.IncrementIdentation().AppendLine($"input.{currentProperty.Name} = {currentProperty.Name};");
-                }
-            }
         }
 
         private void SetInitOnlyProperties(BuilderState state)
@@ -231,47 +212,37 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             var initializerState = state.IncrementIdentation();
             for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
             {
-                var currentProperty = state.TypeInfo.Properties[i].Property;
-                if (IsInitOnlyProperty(currentProperty))
+                var currentProperty = state.TypeInfo.Properties[i];
+                if (IsInitOnlyProperty(currentProperty.Property))
                 {
-                    if (GeneratedTypeFilter.IsGeneratableType(currentProperty.Type))
-                        initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] ? this.{currentProperty.Name}?.ApplyPatch(input.{currentProperty.Name}) : input.{currentProperty.Name},");
-                    else if (state.TypeInfo.Properties[i].IsGenericDictionary)
-                        initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] && input.{currentProperty.Name} == null ? new() : input.Values,");
-                    else if (state.TypeInfo.Properties[i].IsConvertedToNullableType)
-                        initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] ? ({currentProperty.Name}.HasValue ? this.{currentProperty.Name}.Value : default) : input.{currentProperty.Name},");
-                    else
-                        initializerState.AppendLine($"{currentProperty.Name} = Properties[{i}] ? this.{currentProperty.Name} : input.{currentProperty.Name},");
+                    currentProperty.Builder?.BuildInitOnly(state, i);
                 }
                 else
                 {
                     // Copy old property values onto the new object
-                    initializerState.AppendLine($"{currentProperty.Name} = input.{currentProperty.Name},");
+                    initializerState.AppendLine($"{currentProperty.Property.Name} = input.{currentProperty.Property.Name},");
                 }
             }
             state.AppendLine("};");
             state.AppendLine("input = tmp;");
         }
 
-        private void PopulateDictionaryProperties(BuilderState state)
+        private void SetReadWriteProperties(BuilderState state)
         {
             for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
             {
                 var currentProperty = state.TypeInfo.Properties[i];
-                if (!GeneratedTypeFilter.IsGeneratableType(currentProperty.Property.Type) && currentProperty.IsGenericDictionary)
-                    PopulateDictionary(state, currentProperty);
+                if (!IsInitOnlyProperty(currentProperty.Property))
+                    currentProperty.Builder?.BuildInstantiation(state, i);
             }
         }
 
-        private void PopulateGeneratableListProperties(BuilderState state)
+        private static void BuildApplyPatchEnumerations(BuilderState state)
         {
             for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
             {
                 var currentProperty = state.TypeInfo.Properties[i];
-                if (currentProperty?.FirstGenericType != null
-                    && GeneratedTypeFilter.IsGeneratableType(currentProperty.FirstGenericType)
-                    && currentProperty.IsGenericList)
-                    PopulateGeneratableListProperties(state, state.TypeInfo.Properties[i]);
+                currentProperty.Builder?.BuildPatch(state);
             }
         }
 
@@ -298,39 +269,6 @@ namespace LaDeak.JsonMergePatch.SourceGenerator
             var ending = leaveOpen ? "" : ";";
             state.AppendLine($"{toInitialize} new {state.TypeInfo.SourceTypeName}({string.Join(", ", parameters)}){ending}");
             return;
-        }
-
-        private void PopulateDictionary(BuilderState state, PropertyInformation propertyInformation)
-        {
-            var propertyName = propertyInformation.Property.Name;
-            state.AppendLine($"if({propertyName} != null)");
-            state.AppendLine("{");
-            var ifBody = state.IncrementIdentation();
-            ifBody.AppendLine($"foreach(var item in {propertyName})");
-            ifBody.AppendLine("{");
-            var foreachBody = ifBody.IncrementIdentation();
-            foreachBody.AppendLine("if(item.Value is null)");
-            foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}.Remove(item.Key);");
-            foreachBody.AppendLine("else");
-            if (propertyInformation.IsConvertedToNullableType)
-                foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}[item.Key] = item.Value.Value;");
-            else
-                foreachBody.IncrementIdentation().AppendLine($"input.{propertyName}[item.Key] = item.Value;");
-            ifBody.AppendLine("}");
-            state.AppendLine("}");
-        }
-
-        private void PopulateGeneratableListProperties(BuilderState state, PropertyInformation propertyInformation)
-        {
-            var propertyName = propertyInformation.Property.Name;
-            state.AppendLine($"if({propertyName} != null)");
-            state.AppendLine("{");
-            var ifBody = state.IncrementIdentation();
-            ifBody.AppendLine($"foreach(var item in {propertyName})");
-            ifBody.AppendLine("{");
-            ifBody.IncrementIdentation().AppendLine($"input.{propertyName}.Add(item?.ApplyPatch(null));");
-            ifBody.AppendLine("}");
-            state.AppendLine("}");
         }
     }
 }
