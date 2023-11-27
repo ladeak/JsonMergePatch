@@ -7,83 +7,61 @@ using Xunit;
 
 namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
 {
-	public class DictionarySerializationTests
-	{
-		[Theory]
-		[ClassData(typeof(DictionarySerializationData))]
-		public void ApplyPatch_PropertyToDelete_SetsNullOnTarget(
-			string source,
-			object input,
-			object expected,
-			string jsonInput)
-		{
-			var compilation = CreateWrappedTypeCompilation(source);
-			var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
+    public class DictionarySerializationTests
+    {
+        [Theory]
+        [ClassData(typeof(DictionarySerializationData))]
+        public void ApplyPatch_PropertyToDelete_SetsNullOnTarget(
+            string source,
+            object input,
+            object expected,
+            string jsonInput)
+        {
+            var compilation = CreateWrappedTypeCompilation(source);
+            var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
 
-			var dtoWrappedMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.DtoWrapped");
-			var targetMetadata = outputAssembly.GetType("TestCode.Dto");
-			var target = targetMetadata.GetConstructor(new Type[0]).Invoke(null);
-			targetMetadata.GetProperty("Values").SetValue(target, input);
+            var dtoWrappedMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.DtoWrapped");
+            var targetMetadata = outputAssembly.GetType("TestCode.Dto");
+            var target = targetMetadata.GetConstructor(new Type[0]).Invoke(null);
+            targetMetadata.GetProperty("Values").SetValue(target, input);
 
-			var sut = JsonSerializer.Deserialize(jsonInput, dtoWrappedMetadata);
-			var patchedParent = dtoWrappedMetadata.GetMethod("ApplyPatch").Invoke(sut, new[] { target });
+            var sut = JsonSerializer.Deserialize(jsonInput, dtoWrappedMetadata);
+            var patchedParent = dtoWrappedMetadata.GetMethod("ApplyPatch").Invoke(sut, new[] { target });
 
-			var result = targetMetadata.GetProperty("Values").GetValue(patchedParent);
+            Assert.Equal(expected, targetMetadata.GetProperty("Values").GetValue(patchedParent));
+        }
 
-			Assert.Equal(result, expected);
+        private static Compilation CreateWrappedTypeCompilation(string source)
+        {
+            Compilation inputCompilation = CreateCompilation(source);
+            JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+            driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
+            return outputCompilation;
+        }
 
-		}
+        private static Compilation CreateCompilation(string source) => SourceBuilder.Compile(source).Compilation;
+    }
 
-		[Fact]
-		public void NullableType_ApplyPatch_PropertyToDelete_SetsNullOnTarget()
-		{
-			var compilation = CreateWrappedTypeCompilation(DictionarySerializationData.NullableType);
-			var outputAssembly = SourceBuilder.EmitToAssembly(compilation);
+    public class DictionarySerializationData : IEnumerable<object[]>
+    {
+        private readonly List<object[]> _data = new List<object[]>
+        {
+            new object[] { ValueType, new Dictionary<string, int> { { "one", 1 }, { "two", 2 }, { "three", 3 } }, new Dictionary<string, int> { { "one", 1 }, { "three", 33 }, { "four", 4 } }, @"{ ""Values"": { ""two"" : null, ""three"" : 33, ""four"" : 4 } }"  },
+            new object[] { ReferenceType, new Dictionary<string, string> { { "one", "1" }, { "two", "2" }, { "three", "3" } }, new Dictionary<string, string> { { "one", "1" }, { "three", "33" }, { "four", "4" } }, @"{ ""Values"": { ""two"" : null, ""three"" : ""33"", ""four"" : ""4"" } }"  },
+            new object[] { NullableReferenceType, new Dictionary<string, string?> { { "one", "1" }, { "two", "2" }, { "three", null } }, new Dictionary<string, string?> { { "one", "1" }, { "three", "33" }, { "four", "4" } }, @"{ ""Values"": { ""two"" : null, ""three"" : ""33"", ""four"" : ""4"" } }"  },
+            new object[] { NullableType, new Dictionary<string, int?> { { "one", 1 }, { "two", 2 }, { "three", null } }, new Dictionary<string, int?> { { "one", 1 }, { "three", 33 }, { "four", 4 } }, @"{ ""Values"": { ""two"" : null, ""three"" : 33, ""four"" : 4 } }"  },
+            new object[] { NullableType, new Dictionary<string, int?> { { "two", null }, { "three", null } }, new Dictionary<string, int?> { { "two", null } }, @"{ ""Values"": { ""three"" : null } }"  },
+            new object[] { RecordWithDictionaryType, new Dictionary<string, string> { { "one", "1" }, { "two", "2" }, { "three", "3" } }, new Dictionary<string, string> { { "one", "1" }, { "three", "33" }, { "four", "4" } }, @"{ ""Values"": { ""two"" : null, ""three"" : ""33"", ""four"" : ""4"" } }"  },
+            new object[] { InitOnlyDictionaryOnRecordType, new Dictionary<string, string> { { "one", "1" }, { "two", "2" }, { "three", "3" } }, new Dictionary<string, string> { { "one", "1" }, { "three", "33" }, { "four", "4" } }, @"{ ""Values"": { ""two"" : null, ""three"" : ""33"", ""four"" : ""4"" } }"  },
+            new object[] { InitOnlyDictionaryOnClassType, new Dictionary<string, string> { { "one", "1" }, { "two", "2" }, { "three", "3" } }, new Dictionary<string, string> { { "one", "1" }, { "three", "33" }, { "four", "4" } }, @"{ ""Values"": { ""two"" : null, ""three"" : ""33"", ""four"" : ""4"" } }"  },
+        };
 
-			var dtoWrappedMetadata = outputAssembly.GetType("LaDeak.JsonMergePatch.Generated.SafeTestCode.DtoWrapped");
-			var targetMetadata = outputAssembly.GetType("TestCode.Dto");
-			var target = targetMetadata.GetConstructor(new Type[0]).Invoke(null);
-			targetMetadata.GetProperty("Values").SetValue(target, new Dictionary<string, int?> { { "two", null }, { "three", null } });
+        public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
 
-			var sut = JsonSerializer.Deserialize(@"{ ""Values"": { ""three"" : null } }", dtoWrappedMetadata);
-			var patchedParent = dtoWrappedMetadata.GetMethod("ApplyPatch").Invoke(sut, new[] { target });
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 
-			var result = (Dictionary<string, int?>)targetMetadata.GetProperty("Values").GetValue(patchedParent);
-
-			Assert.Equal(result.Keys, new[] { "two" });
-			Assert.Equal(result.Values, new int?[] { null });
-		}
-
-		private static Compilation CreateWrappedTypeCompilation(string source)
-		{
-			Compilation inputCompilation = CreateCompilation(source);
-			JsonMergePatchSourceGenerator generator = new JsonMergePatchSourceGenerator();
-			GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-			driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
-			return outputCompilation;
-		}
-
-		private static Compilation CreateCompilation(string source) => SourceBuilder.Compile(source).Compilation;
-	}
-
-	public class DictionarySerializationData : IEnumerable<object[]>
-	{
-		private readonly List<object[]> _data = new List<object[]>
-		{
-			new object[] { ValueType, new Dictionary<string, int> { { "one", 1 }, { "two", 2 }, { "three", 3 } }, new Dictionary<string, int> { { "one", 1 }, { "three", 33 }, { "four", 4 } }, @"{ ""Values"": { ""two"" : null, ""three"" : 33, ""four"" : 4 } }"  },
-			new object[] { ReferenceType, new Dictionary<string, string> { { "one", "1" }, { "two", "2" }, { "three", "3" } }, new Dictionary<string, string> { { "one", "1" }, { "three", "33" }, { "four", "4" } }, @"{ ""Values"": { ""two"" : null, ""three"" : ""33"", ""four"" : ""4"" } }"  },
-			new object[] { NullableReferenceType, new Dictionary<string, string?> { { "one", "1" }, { "two", "2" }, { "three", null } }, new Dictionary<string, string?> { { "one", "1" }, { "three", "33" }, { "four", "4" } }, @"{ ""Values"": { ""two"" : null, ""three"" : ""33"", ""four"" : ""4"" } }"  },
-			new object[] { NullableType, new Dictionary<string, int?> { { "one", 1 }, { "two", 2 }, { "three", null } }, new Dictionary<string, int?> { { "one", 1 }, { "three", 33 }, { "four", 4 } }, @"{ ""Values"": { ""two"" : null, ""three"" : 33, ""four"" : 4 } }"  },
-			new object[] { RecordWithDictionaryType, new Dictionary<string, string> { { "one", "1" }, { "two", "2" }, { "three", "3" } }, new Dictionary<string, string> { { "one", "1" }, { "three", "33" }, { "four", "4" } }, @"{ ""Values"": { ""two"" : null, ""three"" : ""33"", ""four"" : ""4"" } }"  },
-			new object[] { InitOnlyDictionaryOnRecordType, new Dictionary<string, string> { { "one", "1" }, { "two", "2" }, { "three", "3" } }, new Dictionary<string, string> { { "one", "1" }, { "three", "33" }, { "four", "4" } }, @"{ ""Values"": { ""two"" : null, ""three"" : ""33"", ""four"" : ""4"" } }"  },
-			new object[] { InitOnlyDictionaryOnClassType, new Dictionary<string, string> { { "one", "1" }, { "two", "2" }, { "three", "3" } }, new Dictionary<string, string> { { "one", "1" }, { "three", "33" }, { "four", "4" } }, @"{ ""Values"": { ""two"" : null, ""three"" : ""33"", ""four"" : ""4"" } }"  },
-		};
-
-		public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
-
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
-
-		internal const string NullableType = @"
+        private const string NullableType = @"
 namespace TestCode
 {
     public class Dto { public System.Collections.Generic.Dictionary<string, int?> Values { get; set; } }
@@ -97,7 +75,7 @@ namespace TestCode
 }
 ";
 
-		internal const string ValueType = @"
+        private const string ValueType = @"
 namespace TestCode
 {
     public class Dto { public System.Collections.Generic.Dictionary<string, int> Values { get; set; } }
@@ -111,7 +89,8 @@ namespace TestCode
 }
 ";
 
-		internal const string ReferenceType = @"
+
+        private const string ReferenceType = @"
 namespace TestCode
 {
     public class Dto { public System.Collections.Generic.Dictionary<string, string> Values { get; set; } }
@@ -125,7 +104,7 @@ namespace TestCode
 }
 ";
 
-		internal const string NullableReferenceType = @"
+        private const string NullableReferenceType = @"
 namespace TestCode
 {
     public class Dto { public System.Collections.Generic.Dictionary<string, string?> Values { get; set; } }
@@ -139,7 +118,7 @@ namespace TestCode
 }
 ";
 
-		internal const string RecordWithDictionaryType = @"
+        private const string RecordWithDictionaryType = @"
 namespace TestCode
 {
     public record Dto { public System.Collections.Generic.Dictionary<string, string> Values { get; set; } }
@@ -153,7 +132,7 @@ namespace TestCode
 }
 ";
 
-		internal const string InitOnlyDictionaryOnRecordType = @"
+        private const string InitOnlyDictionaryOnRecordType = @"
 namespace TestCode
 {
     public record Dto { public System.Collections.Generic.Dictionary<string, string> Values { get; init; } }
@@ -167,7 +146,7 @@ namespace TestCode
 }
 ";
 
-		internal const string InitOnlyDictionaryOnClassType = @"
+        private const string InitOnlyDictionaryOnClassType = @"
 namespace TestCode
 {
     public class Dto { public System.Collections.Generic.Dictionary<string, string> Values { get; init; } }
@@ -181,6 +160,6 @@ namespace TestCode
 }
 ";
 
-	}
+    }
 }
 
