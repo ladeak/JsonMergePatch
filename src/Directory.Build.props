@@ -12,7 +12,7 @@
     <IsPackable>true</IsPackable>
     <Description>LaDeak.JsonMergePatch libraries provide an implementation for Json Merge Patch, RFC7396. Library using C# source generators to generate the types required for serialization. The Http package provides extension methods for HTTP requests, while the AspNetCore package provides an InputReader implementation.</Description>
 
-    <MicrosoftCodeAnalysisCSharpVersion>3.11.0</MicrosoftCodeAnalysisCSharpVersion>
+    <MicrosoftCodeAnalysisCSharpVersion>4.8.0</MicrosoftCodeAnalysisCSharpVersion>
     <MicrosoftCodeAnalysisAnalyzersVersion>3.3.4</MicrosoftCodeAnalysisAnalyzersVersion>
   </PropertyGroup>
 

@@ -14,19 +14,9 @@ var mvcBuilder = builder.Services.AddControllers().AddMvcOptions(options =>
     options.InputFormatters.Insert(0, new JsonMergePatchInputReader(jsonOptions));
 });
 builder.Services.AddHttpClient();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new() { Title = "AspNetCoreMinimal", Version = "v1" });
-});
+
 
 var app = builder.Build();
-
-if (builder.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AspNetCoreMinimal v1"));
-}
 
 app.UseHttpsRedirection();
 
