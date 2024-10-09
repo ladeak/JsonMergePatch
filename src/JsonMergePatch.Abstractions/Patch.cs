@@ -7,7 +7,7 @@ public abstract class Patch<T>
     /// <summary>
     /// List of properties used by the request.
     /// </summary>
-    protected bool[] Properties;
+    protected bool[] Properties = [];
 
     /// <summary>
     /// Applies updates on input type using Json Merge Patch rules.

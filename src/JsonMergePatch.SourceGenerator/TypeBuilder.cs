@@ -1,25 +1,207 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Reflection;
 using LaDeak.JsonMergePatch.SourceGenerator.ApplyPatchBuilders;
 using Microsoft.CodeAnalysis;
 
 namespace LaDeak.JsonMergePatch.SourceGenerator;
 
+public record PropertyInfo
+{
+    public PropertyInfo(IPropertySymbol symbol)
+    {
+        Name = symbol.Name;
+        Attributes = ReadAttributes(symbol).ToList();
+        IsInitOnly = GetIsInitOnly(symbol);
+        HasGeneratableType = GeneratedTypeFilter.IsGeneratableType(symbol.Type);
+        PropertyTypeName = GetPropertyTypeName(symbol);
+    }
+
+    private static bool GetIsInitOnly(IPropertySymbol symbol)
+    {
+        return symbol.SetMethod?.OriginalDefinition.IsInitOnly ?? false;
+    }
+
+    public string Name { get; }
+
+    public List<AttributeData> Attributes { get; }
+
+    public bool HasGeneratableType { get; }
+
+    public bool IsInitOnly { get; }
+
+    public string PropertyTypeName { get; }
+
+    public ApplyPatchBuilder? Builder { get; private set; }
+
+    private IEnumerable<AttributeData> ReadAttributes(IPropertySymbol symbol)
+    {
+        return symbol.GetAttributes().Where(attribute =>
+            attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableContextAttribute"
+                && attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableAttribute"
+                && attribute.AttributeClass?.ToDisplayString() != "LaDeak.JsonMergePatch.Abstractions.PatchableAttribute");
+    }
+
+    private string GetPropertyTypeName(IPropertySymbol symbol)
+    {
+        if (symbol.Type is INamedTypeSymbol namedType && namedType.IsGenericType)
+            return CreateGenericTypeWithParameters(symbol);
+
+        return ConvertToNullableIfRequired(symbol.Type).Item1;
+    }
+
+    private string CreateGenericTypeWithParameters(IPropertySymbol propertySymbol)
+    {
+        if (propertySymbol?.Type is not INamedTypeSymbol namedType || !namedType.IsGenericType)
+            throw new InvalidOperationException("Parameter is not generic type parameter.");
+
+        Builder = new SimpleNonGeneratableBuilder(Name, false);
+        var firstUnderlyingType = GetPropertyTypeName(namedType.TypeArguments.First()).TypeName;
+        var withoutUnderlyingType = namedType.ToDisplayString(new SymbolDisplayFormat(SymbolDisplayGlobalNamespaceStyle.Omitted, SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, SymbolDisplayGenericsOptions.None, SymbolDisplayMemberOptions.None, SymbolDisplayDelegateStyle.NameOnly, SymbolDisplayExtensionMethodStyle.Default, SymbolDisplayParameterOptions.IncludeType, SymbolDisplayPropertyStyle.NameOnly, SymbolDisplayLocalOptions.IncludeType, SymbolDisplayKindOptions.None, SymbolDisplayMiscellaneousOptions.ExpandNullable));
+
+        var genericResult = $"{withoutUnderlyingType}<{firstUnderlyingType}";
+        bool isConvertedToNullableType = false;
+        foreach (var underlyingType in namedType.TypeArguments.Skip(1).OfType<INamedTypeSymbol>())
+        {
+            (string genericTypeParam, bool isConvertedToNullable) = ConvertToNullableIfRequired(underlyingType);
+            isConvertedToNullableType |= isConvertedToNullable;
+            genericResult += $", {genericTypeParam}";
+        }
+        genericResult += ">";
+        if (namedType.SpecialType != SpecialType.System_Nullable_T && namedType.NullableAnnotation != NullableAnnotation.Annotated)
+        {
+            genericResult += "?";
+        }
+        if (namedType.Name.Contains("Dictionary") && namedType.ContainingNamespace.ToDisplayString() == "System.Collections.Generic")
+            Builder = new NonGeneratableDictionaryPatchBuilder(namedType, Name, HasGeneratableType, isConvertedToNullableType);
+
+        if (namedType.Name.Contains("List")
+            && namedType.ContainingNamespace.ToDisplayString() == "System.Collections.Generic"
+            && !GetIsInitOnly(propertySymbol)
+            && GeneratedTypeFilter.IsGeneratableType(namedType.TypeArguments.First()))
+            Builder = new GeneratableListBuilder(namedType, Name);
+
+        return genericResult;
+    }
+
+    private (string, bool) ConvertToNullableIfRequired(ITypeSymbol typeSymbol)
+    {
+        (bool isGeneratable, string genericTypeParam) = GetPropertyTypeName(typeSymbol);
+        bool isConvertedToNullableType = false;
+        if (typeSymbol.IsValueType && typeSymbol.SpecialType != SpecialType.System_Nullable_T && typeSymbol.NullableAnnotation != NullableAnnotation.Annotated)
+        {
+            isConvertedToNullableType = true;
+            genericTypeParam = $"System.Nullable<{genericTypeParam}>";
+        }
+        if (!typeSymbol.IsValueType && typeSymbol.SpecialType != SpecialType.System_Nullable_T)
+        {
+            genericTypeParam = $"{genericTypeParam}?";
+        }
+
+        if (isGeneratable)
+            Builder = new SimpleGeneratableBuilder(Name);
+        else
+            Builder = new SimpleNonGeneratableBuilder(Name, isConvertedToNullableType);
+
+        return (genericTypeParam, isConvertedToNullableType);
+    }
+
+    private (bool IsGeneratedType, string TypeName) GetPropertyTypeName(ITypeSymbol propertyTypeSymbol)
+    {
+        if (GeneratedTypeFilter.IsGeneratableType(propertyTypeSymbol))
+        {
+            return (true, NameBuilder.GetFullTypeName(propertyTypeSymbol));
+        }
+        return (false, propertyTypeSymbol.ToDisplayString(GeneratedTypeFilter.SymbolFormat));
+    }
+}
+
+public record GeneratorClassInfo
+{
+    public static GeneratorClassInfo Default => new GeneratorClassInfo();
+
+    private GeneratorClassInfo()
+    {
+        Name = string.Empty;
+        FullTypeName = string.Empty;
+        NamespaceExtension = string.Empty;
+        SourceTypeName = string.Empty;
+        Namespace = string.Empty;
+        AssemblyName = string.Empty;
+        Properties = [];
+        Attributes = [];
+    }
+
+    public GeneratorClassInfo(ITypeSymbol typeSymbol, string sourceTypeName, string assemblyName = "")
+    {
+        Name = NameBuilder.GetName(typeSymbol);
+        FullTypeName = NameBuilder.GetFullTypeName(typeSymbol);
+        NamespaceExtension = NameBuilder.GetNamespaceExtension(typeSymbol);
+        HasDefaultCtor = HasDefaultConstructor(typeSymbol);
+        SourceTypeName = sourceTypeName;
+        AssemblyName = assemblyName;
+        Properties = ReadProperties(typeSymbol);
+        Attributes = ReadAttributes(typeSymbol).ToList();
+        Namespace = NameBuilder.GetNamespace(typeSymbol);
+        CtorParameterLength = typeSymbol.GetMembers()
+            .OfType<IMethodSymbol>()
+            .Where(x => x.MethodKind == MethodKind.Constructor)
+            .OrderByDescending(x => x.Parameters.Length).FirstOrDefault()?.Parameters.Count() ?? 0;
+    }
+
+    public string Name { get; }
+
+    public string FullTypeName { get; }
+
+    public string NamespaceExtension { get; }
+
+    public string Namespace { get; }
+
+    public bool HasDefaultCtor { get; }
+
+    public string SourceTypeName { get; }
+    public string AssemblyName { get; }
+    public int CtorParameterLength { get; }
+
+    public List<PropertyInfo> Properties { get; }
+
+    public List<AttributeData> Attributes { get; }
+
+    private bool HasDefaultConstructor(ITypeSymbol typeSymbol) =>
+        typeSymbol.GetMembers().OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor).AnyOrNull(x => x.Parameters.IsEmpty);
+
+    private List<PropertyInfo> ReadProperties(ITypeSymbol typeSymbol)
+    {
+        var properties = new List<PropertyInfo>();
+        var currentType = typeSymbol;
+        while (currentType != null && currentType.Name != "Object")
+        {
+            properties.AddRange(currentType.GetMembers().OfType<IPropertySymbol>()
+                       .Where(x => !x.IsReadOnly && !x.IsWriteOnly && !x.IsIndexer && !x.IsStatic && !x.IsAbstract && !x.IsVirtual)
+                       .Select(x => new PropertyInfo(x)));
+            currentType = currentType.BaseType;
+        }
+        return properties;
+    }
+
+    private IEnumerable<AttributeData> ReadAttributes(ITypeSymbol typeSymbol)
+    {
+        return typeSymbol.GetAttributes().Where(attribute =>
+            attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableContextAttribute"
+                && attribute.AttributeClass?.ToDisplayString() != "System.Runtime.CompilerServices.NullableAttribute"
+                && attribute.AttributeClass?.ToDisplayString() != "LaDeak.JsonMergePatch.Abstractions.PatchableAttribute");
+    }
+}
+
 public class TypeBuilder : ITypeBuilder
 {
-    public GeneratedWrapper BuildWrapperType(ITypeSymbol typeInfo, string sourceTypeName)
+    public GeneratedWrapper BuildWrapperType(GeneratorClassInfo typeInfo)
     {
-        var name = NameBuilder.GetName(typeInfo);
-        var state = InitializeState(typeInfo, name, sourceTypeName);
+        var name = typeInfo.Name;
+        var state = new BuilderState(typeInfo);
         BuildFile(state);
         return new GeneratedWrapper()
         {
-            FileName = $"LaDeakJsonMergePatch{NameBuilder.GetNamespaceExtension(typeInfo)}{name}",
+            FileName = $"LaDeakJsonMergePatch{typeInfo.NamespaceExtension}{name}",
             SourceCode = state.Builder.ToString(),
-            SourceTypeFullName = sourceTypeName,
-            TargetTypeFullName = NameBuilder.GetFullTypeName(typeInfo),
-            ToProcessTypes = state.ToProcessTypeSymbols
         };
     }
 
@@ -27,25 +209,10 @@ public class TypeBuilder : ITypeBuilder
 
     private void BuildClass(BuilderState state) => BuildClassDeclaration(state, s => BuildClassBody(s));
 
-    private BuilderState InitializeState(ITypeSymbol typeInfo, string name, string sourceTypeName)
-    {
-        var typeInformation = new TypeInformation() { Name = name, SourceTypeName = sourceTypeName, TypeSymbol = typeInfo };
-
-        var currentType = typeInfo;
-        while (currentType != null && currentType.Name != "Object")
-        {
-            typeInformation.Properties.AddRange(currentType.GetMembers().OfType<IPropertySymbol>()
-                .Where(x => !x.IsReadOnly && !x.IsWriteOnly && !x.IsIndexer && !x.IsStatic && !x.IsAbstract && !x.IsVirtual).Select(x => new PropertyInformation() { Property = x, IsConvertedToNullableType = false }));
-            currentType = currentType.BaseType;
-        }
-
-        return new BuilderState(typeInformation);
-    }
-
     private void BuildNamespace(BuilderState state, Action<BuilderState>? addBody = null)
     {
         state.AppendLine($"#nullable enable");
-        state.AppendLine($"namespace {NameBuilder.GetNamespace(state.TypeInfo.TypeSymbol)}");
+        state.AppendLine($"namespace {state.TypeInfo.Namespace}");
         state.AppendLine("{");
         addBody?.Invoke(state.IncrementIdentation());
         state.AppendLine("}");
@@ -54,7 +221,7 @@ public class TypeBuilder : ITypeBuilder
 
     private void BuildClassDeclaration(BuilderState state, Action<BuilderState>? addBody = null)
     {
-        BuildAttributes(state, state.TypeInfo.TypeSymbol.GetAttributes());
+        BuildAttributes(state, state.TypeInfo.Attributes);
         state.AppendLine($"public class {state.TypeInfo.Name} : LaDeak.JsonMergePatch.Abstractions.Patch<{state.TypeInfo.SourceTypeName}>");
         state.AppendLine("{");
         addBody?.Invoke(state.IncrementIdentation());
@@ -71,14 +238,13 @@ public class TypeBuilder : ITypeBuilder
         state.AppendLine("}");
     }
 
-    private void BuildPropery(BuilderState state, PropertyInformation propertyInfo, int propertyId)
+    private void BuildPropery(BuilderState state, PropertyInfo propertyInfo, int propertyId)
     {
-        state.ToProcessTypeSymbols.Add(propertyInfo.Property.Type);
-        string fieldName = Casing.PrefixUnderscoreCamelCase(propertyInfo.Property.Name);
-        string propertyTypeName = GetPropertyTypeName(propertyInfo);
+        string fieldName = Casing.PrefixUnderscoreCamelCase(propertyInfo.Name);
+        string propertyTypeName = propertyInfo.PropertyTypeName;
         state.AppendLine($"private {propertyTypeName} {fieldName};");
-        BuildAttributes(state, propertyInfo.Property.GetAttributes());
-        state.AppendLine($"public {propertyTypeName} {propertyInfo.Property.Name}");
+        BuildAttributes(state, propertyInfo.Attributes);
+        state.AppendLine($"public {propertyTypeName} {propertyInfo.Name}");
         state.AppendLine("{");
         var getterSetter = state.IncrementIdentation();
         getterSetter.AppendLine($"get {{ return {fieldName}; }}");
@@ -89,77 +255,6 @@ public class TypeBuilder : ITypeBuilder
         setterBody.AppendLine($"{fieldName} = value;");
         getterSetter.AppendLine("}");
         state.AppendLine("}");
-    }
-
-    private string GetPropertyTypeName(PropertyInformation propertyInfo)
-    {
-        var propertyTypeSymbol = propertyInfo.Property.Type;
-        if (propertyTypeSymbol is INamedTypeSymbol namedType && namedType.IsGenericType)
-            return CreateGenericTypeWithParameters(propertyInfo);
-
-        return ConvertToNullableIfRequired(propertyInfo, propertyTypeSymbol);
-    }
-
-    private string CreateGenericTypeWithParameters(PropertyInformation propertyInfo)
-    {
-        if (propertyInfo?.Property?.Type is not INamedTypeSymbol namedType || !namedType.IsGenericType)
-            throw new InvalidOperationException("Parameter is not generic type parameter.");
-
-        propertyInfo.Builder = new SimpleNonGeneratableBuilder(propertyInfo.Property, false);
-        var firstUnderlyingType = GetPropertyTypeName(namedType.TypeArguments.First()).TypeName;
-        var withoutUnderlyingType = namedType.ToDisplayString(new SymbolDisplayFormat(SymbolDisplayGlobalNamespaceStyle.Omitted, SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, SymbolDisplayGenericsOptions.None, SymbolDisplayMemberOptions.None, SymbolDisplayDelegateStyle.NameOnly, SymbolDisplayExtensionMethodStyle.Default, SymbolDisplayParameterOptions.IncludeType, SymbolDisplayPropertyStyle.NameOnly, SymbolDisplayLocalOptions.IncludeType, SymbolDisplayKindOptions.None, SymbolDisplayMiscellaneousOptions.ExpandNullable));
-
-        var genericResult = $"{withoutUnderlyingType}<{firstUnderlyingType}";
-        foreach (var underlyingType in namedType.TypeArguments.Skip(1).OfType<INamedTypeSymbol>())
-        {
-            string genericTypeParam = ConvertToNullableIfRequired(propertyInfo, underlyingType);
-            genericResult += $", {genericTypeParam}";
-        }
-        genericResult += ">";
-        if (namedType.SpecialType != SpecialType.System_Nullable_T && namedType.NullableAnnotation != NullableAnnotation.Annotated)
-        {
-            genericResult += "?";
-        }
-        if (namedType.Name.Contains("Dictionary") && namedType.ContainingNamespace.ToDisplayString() == "System.Collections.Generic")
-            propertyInfo.Builder = new NonGeneratableDictionaryPatchBuilder(namedType, propertyInfo.Property, propertyInfo.IsConvertedToNullableType);
-
-        if (namedType.Name.Contains("List")
-            && namedType.ContainingNamespace.ToDisplayString() == "System.Collections.Generic"
-            && !IsInitOnlyProperty(propertyInfo.Property)
-            && GeneratedTypeFilter.IsGeneratableType(namedType.TypeArguments.First()))
-            propertyInfo.Builder = new GeneratableListBuilder(namedType, propertyInfo.Property);
-
-        return genericResult;
-    }
-
-    private string ConvertToNullableIfRequired(PropertyInformation propertyInfo, ITypeSymbol typeSymbol)
-    {
-        (bool isGeneratable, string genericTypeParam) = GetPropertyTypeName(typeSymbol);
-        if (typeSymbol.IsValueType && typeSymbol.SpecialType != SpecialType.System_Nullable_T && typeSymbol.NullableAnnotation != NullableAnnotation.Annotated)
-        {
-            propertyInfo.IsConvertedToNullableType = true;
-            genericTypeParam = $"System.Nullable<{genericTypeParam}>";
-        }
-        if (!typeSymbol.IsValueType && typeSymbol.SpecialType != SpecialType.System_Nullable_T)
-        {
-            genericTypeParam = $"{genericTypeParam}?";
-        }
-
-        if (isGeneratable)
-            propertyInfo.Builder = new SimpleGeneratableBuilder(propertyInfo.Property);
-        else
-            propertyInfo.Builder = new SimpleNonGeneratableBuilder(propertyInfo.Property, propertyInfo.IsConvertedToNullableType);
-
-        return genericTypeParam;
-    }
-
-    private (bool IsGeneratedType, string TypeName) GetPropertyTypeName(ITypeSymbol propertyTypeSymbol)
-    {
-        if (GeneratedTypeFilter.IsGeneratableType(propertyTypeSymbol))
-        {
-            return (true, NameBuilder.GetFullTypeName(propertyTypeSymbol));
-        }
-        return (false, propertyTypeSymbol.ToDisplayString(GeneratedTypeFilter.SymbolFormat));
     }
 
     private void BuildAttributes(BuilderState state, IEnumerable<AttributeData> attributes)
@@ -205,7 +300,7 @@ public class TypeBuilder : ITypeBuilder
 
     private void SetInitOnlyProperties(BuilderState state)
     {
-        if (!state.TypeInfo.Properties.Any(x => IsInitOnlyProperty(x.Property)))
+        if (!state.TypeInfo.Properties.Any(x => x.IsInitOnly))
             return;
         CallConstructIfEmpty(state, "var tmp =", leaveOpen: true);
         state.AppendLine("{");
@@ -213,14 +308,14 @@ public class TypeBuilder : ITypeBuilder
         for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
         {
             var currentProperty = state.TypeInfo.Properties[i];
-            if (IsInitOnlyProperty(currentProperty.Property))
+            if (currentProperty.IsInitOnly)
             {
                 currentProperty.Builder?.BuildInitOnly(state, i);
             }
             else
             {
                 // Copy old property values onto the new object
-                initializerState.AppendLine($"{currentProperty.Property.Name} = input.{currentProperty.Property.Name},");
+                initializerState.AppendLine($"{currentProperty.Name} = input.{currentProperty.Name},");
             }
         }
         state.AppendLine("};");
@@ -232,7 +327,7 @@ public class TypeBuilder : ITypeBuilder
         for (int i = 0; i < state.TypeInfo.Properties.Count; i++)
         {
             var currentProperty = state.TypeInfo.Properties[i];
-            if (!IsInitOnlyProperty(currentProperty.Property))
+            if (!currentProperty.IsInitOnly)
                 currentProperty.Builder?.BuildInstantiation(state, i);
         }
     }
@@ -246,25 +341,12 @@ public class TypeBuilder : ITypeBuilder
         }
     }
 
-    private bool IsInitOnlyProperty(IPropertySymbol propertySymbol)
-    {
-        return propertySymbol.SetMethod?.OriginalDefinition.IsInitOnly ?? false;
-    }
-
-    private bool HasDefaultConstructor(ITypeSymbol typeSymbol)
-    {
-        return typeSymbol.GetMembers().OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor).AnyOrNull(x => x.Parameters.IsEmpty);
-    }
-
     private void CallConstructIfEmpty(BuilderState state, string toInitialize, bool leaveOpen)
     {
         IEnumerable<string> parameters = Enumerable.Empty<string>();
-        if (!HasDefaultConstructor(state.TypeInfo.TypeSymbol))
+        if (!state.TypeInfo.HasDefaultCtor)
         {
-            var typeSymbol = state.TypeInfo.TypeSymbol;
-            var ctor = typeSymbol.GetMembers().OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor).OrderByDescending(x => x.Parameters.Length).First();
-            var properties = state.TypeInfo.Properties.Select(x => x.Property).ToList();
-            parameters = Enumerable.Repeat("default", ctor.Parameters.Length);
+            parameters = Enumerable.Repeat("default", state.TypeInfo.CtorParameterLength);
         }
         var ending = leaveOpen ? "" : ";";
         state.AppendLine($"{toInitialize} new {state.TypeInfo.SourceTypeName}({string.Join(", ", parameters)}){ending}");

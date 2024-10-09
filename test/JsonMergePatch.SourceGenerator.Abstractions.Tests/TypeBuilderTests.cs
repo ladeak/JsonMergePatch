@@ -1,88 +1,48 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
+﻿using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using NSubstitute;
 using Xunit;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
+namespace LaDeak.JsonMergePatch.SourceGenerator.Tests;
+
+public class TypeBuilderTests
 {
-    public class TypeBuilderTests
+    [Fact]
+    public void BuildWrapperType_SourceCode_NotNull()
     {
-        [Fact]
-        public void BuildWrapperType_SourceTypeName_ReturnedInResultsSourceTypeName()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<ITypeSymbol>();
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var attributes = ImmutableArray.Create<AttributeData>();
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal("SourceName", result.SourceTypeFullName);
-        }
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<ITypeSymbol>();
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var attributes = ImmutableArray.Create<AttributeData>();
+        typeSymbol.GetAttributes().Returns(attributes);
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.NotNull(result.SourceCode);
+    }
 
-        [Fact]
-        public void BuildWrapperType_TargetTypeName_ReturnedTypeNameAndWrapped()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<ITypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            typeSymbol.ContainingNamespace.ToDisplayString().Returns("TestTypeNamespace");
-            var attributes = ImmutableArray.Create<AttributeData>();
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal("LaDeak.JsonMergePatch.Generated.SafeTestTypeNamespace.TestTypeWrapped", result.TargetTypeFullName);
-        }
+    [Fact]
+    public void BuildWrapperType_FileName_UsesTypeName()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<ITypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var attributes = ImmutableArray.Create<AttributeData>();
+        typeSymbol.GetAttributes().Returns(attributes);
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal("LaDeakJsonMergePatchSafeTestTypeWrapped", result.FileName);
+    }
 
-        [Fact]
-        public void BuildWrapperType_ToProcessTypes_NotNull()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<ITypeSymbol>();
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var attributes = ImmutableArray.Create<AttributeData>();
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.NotNull(result.ToProcessTypes);
-        }
-
-        [Fact]
-        public void BuildWrapperType_SourceCode_NotNull()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<ITypeSymbol>();
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var attributes = ImmutableArray.Create<AttributeData>();
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.NotNull(result.SourceCode);
-        }
-
-        [Fact]
-        public void BuildWrapperType_FileName_UsesTypeName()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<ITypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var attributes = ImmutableArray.Create<AttributeData>();
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal("LaDeakJsonMergePatchSafeTestTypeWrapped", result.FileName);
-        }
-
-        [Fact]
-        public void EmptyType_Returns_EmptyTypeAndNamespace()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<ITypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var attributes = ImmutableArray.Create<AttributeData>();
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+    [Fact]
+    public void EmptyType_Returns_EmptyTypeAndNamespace()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<ITypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var attributes = ImmutableArray.Create<AttributeData>();
+        typeSymbol.GetAttributes().Returns(attributes);
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -102,31 +62,31 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-        }
+    }
 
-        [Fact]
-        public void TypeWithField_Returns_EmptyTypeAndNamespace()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var members = ImmutableArray.Create<ISymbol>(
-                Substitute.For<IFieldSymbol>(),
-                Substitute.For<IEventSymbol>(),
-                Substitute.For<ITypeParameterSymbol>(),
-                Substitute.For<ITypeSymbol>(),
-                Substitute.For<IParameterSymbol>(),
-                Substitute.For<INamespaceSymbol>(),
-                Substitute.For<IMethodSymbol>(),
-                Substitute.For<IFunctionPointerTypeSymbol>(),
-                Substitute.For<IAliasSymbol>(),
-                Substitute.For<IArrayTypeSymbol>());
-            typeSymbol.GetMembers().Returns(members);
-            var attributes = ImmutableArray.Create<AttributeData>();
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+    [Fact]
+    public void TypeWithField_Returns_EmptyTypeAndNamespace()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var members = ImmutableArray.Create<ISymbol>(
+            Substitute.For<IFieldSymbol>(),
+            Substitute.For<IEventSymbol>(),
+            Substitute.For<ITypeParameterSymbol>(),
+            Substitute.For<ITypeSymbol>(),
+            Substitute.For<IParameterSymbol>(),
+            Substitute.For<INamespaceSymbol>(),
+            Substitute.For<IMethodSymbol>(),
+            Substitute.For<IFunctionPointerTypeSymbol>(),
+            Substitute.For<IAliasSymbol>(),
+            Substitute.For<IArrayTypeSymbol>());
+        typeSymbol.GetMembers().Returns(members);
+        var attributes = ImmutableArray.Create<AttributeData>();
+        typeSymbol.GetAttributes().Returns(attributes);
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -146,31 +106,31 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-        }
+    }
 
-        [Fact]
-        public void ReadonlyWriteonlyStaticIndexerAbstract_Property_Ignored()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var readonlyProperty = Substitute.For<IPropertySymbol>();
-            readonlyProperty.IsReadOnly.Returns(true);
-            var abstractProperty = Substitute.For<IPropertySymbol>();
-            abstractProperty.IsAbstract.Returns(true);
-            var writeonlyProperty = Substitute.For<IPropertySymbol>();
-            writeonlyProperty.IsWriteOnly.Returns(true);
-            var staticProperty = Substitute.For<IPropertySymbol>();
-            staticProperty.IsStatic.Returns(true);
-            var indexerProperty = Substitute.For<IPropertySymbol>();
-            indexerProperty.IsIndexer.Returns(true);
-            var members = ImmutableArray.Create<ISymbol>(readonlyProperty, writeonlyProperty, staticProperty, indexerProperty, abstractProperty);
-            typeSymbol.GetMembers().Returns(members);
-            var attributes = ImmutableArray.Create<AttributeData>();
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+    [Fact]
+    public void ReadonlyWriteonlyStaticIndexerAbstract_Property_Ignored()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var readonlyProperty = Substitute.For<IPropertySymbol>();
+        readonlyProperty.IsReadOnly.Returns(true);
+        var abstractProperty = Substitute.For<IPropertySymbol>();
+        abstractProperty.IsAbstract.Returns(true);
+        var writeonlyProperty = Substitute.For<IPropertySymbol>();
+        writeonlyProperty.IsWriteOnly.Returns(true);
+        var staticProperty = Substitute.For<IPropertySymbol>();
+        staticProperty.IsStatic.Returns(true);
+        var indexerProperty = Substitute.For<IPropertySymbol>();
+        indexerProperty.IsIndexer.Returns(true);
+        var members = ImmutableArray.Create<ISymbol>(readonlyProperty, writeonlyProperty, staticProperty, indexerProperty, abstractProperty);
+        typeSymbol.GetMembers().Returns(members);
+        var attributes = ImmutableArray.Create<AttributeData>();
+        typeSymbol.GetAttributes().Returns(attributes);
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -190,19 +150,19 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-        }
+    }
 
-        [Fact]
-        public void ClassAttribute_Added_ToGeneratedClass()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<ITypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var attributes = ImmutableArray.Create<AttributeData>(new TestAttribute(), new TestAttribute("Hello"));
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+    [Fact]
+    public void ClassAttribute_Added_ToGeneratedClass()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<ITypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var attributes = ImmutableArray.Create<AttributeData>(new TestAttribute(), new TestAttribute("Hello"));
+        typeSymbol.GetAttributes().Returns(attributes);
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -224,22 +184,22 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-        }
+    }
 
-        [Fact]
-        public void ReadWriteProperty_Added_BackingFieldAndProperty()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var property = GetProperty("System", "String", "TestProp");
-            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
-            var attributes = ImmutableArray.Create<AttributeData>();
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+    [Fact]
+    public void ReadWriteProperty_Added_BackingFieldAndProperty()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var property = GetProperty("System", "String", "TestProp");
+        typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+        var attributes = ImmutableArray.Create<AttributeData>();
+        typeSymbol.GetAttributes().Returns(attributes);
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -272,24 +232,23 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-            Assert.Contains(result.ToProcessTypes, x => x.ToDisplayString() == "System.String");
-        }
+    }
 
-        [Fact]
-        public void MultipleReadWriteProperty_Added_BackingFieldsAndProperties()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var prop0 = GetProperty("System", "String", "TestProp0");
-            var prop1 = GetProperty("System", "Int32", "TestProp1");
-            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(prop0, prop1));
-            var attributes = ImmutableArray.Create<AttributeData>();
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
-    @"#nullable enable
+    [Fact]
+    public void MultipleReadWriteProperty_Added_BackingFieldsAndProperties()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var prop0 = GetProperty("System", "String", "TestProp0");
+        var prop1 = GetProperty("System", "Int32", "TestProp1");
+        typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(prop0, prop1));
+        var attributes = ImmutableArray.Create<AttributeData>();
+        typeSymbol.GetAttributes().Returns(attributes);
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
+@"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
@@ -334,23 +293,23 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-        }
+    }
 
-        [Fact]
-        public void MultipleReadWriteProperty_AddsTypeDataToProcessSymbols()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var prop0 = GetProperty("Test", "Dto", "TestProp0");
-            var prop1 = GetProperty("System", "Int32", "TestProp1");
-            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(prop0, prop1));
-            var attributes = ImmutableArray.Create<AttributeData>();
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
-    @"#nullable enable
+    [Fact]
+    public void MultipleReadWriteProperty_AddsTypeDataToProcessSymbols()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var prop0 = GetProperty("Test", "Dto", "TestProp0");
+        var prop1 = GetProperty("System", "Int32", "TestProp1");
+        typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(prop0, prop1));
+        var attributes = ImmutableArray.Create<AttributeData>();
+        typeSymbol.GetAttributes().Returns(attributes);
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
+@"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
     public class TestTypeWrapped : LaDeak.JsonMergePatch.Abstractions.Patch<SourceName>
@@ -395,23 +354,21 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-            Assert.Contains(result.ToProcessTypes, x => x.ToDisplayString() == "Test.Dto");
-            Assert.Contains(result.ToProcessTypes, x => x.ToDisplayString() == "System.Int32");
-        }
+    }
 
-        [Fact]
-        public void PropertyWitAttribute_Adds_AttributeOnProperty()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var property = GetProperty("System", "String", "TestProp", new TestAttribute("JsonPropertyName(\"temp\")"));
-            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
-            var attributes = ImmutableArray.Create<AttributeData>();
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+    [Fact]
+    public void PropertyWitAttribute_Adds_AttributeOnProperty()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var property = GetProperty("System", "String", "TestProp", new TestAttribute("JsonPropertyName(\"temp\")"));
+        typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+        var attributes = ImmutableArray.Create<AttributeData>();
+        typeSymbol.GetAttributes().Returns(attributes);
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -445,20 +402,20 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-        }
+    }
 
-        [Fact]
-        public void DictionaryWithValueProperty_CreatesPatchToPatchEachValue()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetType("System", "String"), GetType("System", "Int32"));
-            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
-            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+    [Fact]
+    public void DictionaryWithValueProperty_CreatesPatchToPatchEachValue()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetType("System", "String"), GetType("System", "Int32"));
+        typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+        typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -501,21 +458,21 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-        }
+    }
 
-        [Fact]
-        public void MultipleDictionaryProperty_CreatesPatchToPatchEachValue()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var property0 = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp0", GetType("System", "String"), GetType("System", "Int32"));
-            var property1 = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp1", GetType("System", "String"), GetType("System", "Int32"));
-            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property0, property1));
-            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+    [Fact]
+    public void MultipleDictionaryProperty_CreatesPatchToPatchEachValue()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var property0 = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp0", GetType("System", "String"), GetType("System", "Int32"));
+        var property1 = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp1", GetType("System", "String"), GetType("System", "Int32"));
+        typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property0, property1));
+        typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -581,20 +538,20 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-        }
+    }
 
-        [Fact]
-        public void DictionaryWithReferenceProperty_CreatesPatchToPatchEachValue()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetType("System", "String"), GetType("System", "String"));
-            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
-            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+    [Fact]
+    public void DictionaryWithReferenceProperty_CreatesPatchToPatchEachValue()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetType("System", "String"), GetType("System", "String"));
+        typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+        typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -637,20 +594,20 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-        }
+    }
 
-        [Fact]
-        public void DictionaryWithNullableValueProperty_CreatesPatchToPatchEachValue()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetType("System", "String"), GetNullableType(GetType("System", "Int32")));
-            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
-            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+    [Fact]
+    public void DictionaryWithNullableValueProperty_CreatesPatchToPatchEachValue()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetType("System", "String"), GetNullableType(GetType("System", "Int32")));
+        typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+        typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -693,20 +650,20 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-        }
+    }
 
-        [Fact]
-        public void DictionaryWithNullableReferenceProperty_CreatesPatchToPatchEachValue()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetType("System", "String"), GetNullableReferenceType(GetType("System", "String")));
-            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
-            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+    [Fact]
+    public void DictionaryWithNullableReferenceProperty_CreatesPatchToPatchEachValue()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var property = GetGenericProperty("System.Collections.Generic", "Dictionary", "TestProp", GetType("System", "String"), GetNullableReferenceType(GetType("System", "String")));
+        typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+        typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -749,27 +706,27 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-        }
+    }
 
-        [Fact]
-        public void PropertiesInBaseTypeIncluded()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            var property = GetProperty("System", "String", "TestProp");
+    [Fact]
+    public void PropertiesInBaseTypeIncluded()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        var property = GetProperty("System", "String", "TestProp");
 
-            var baseTypeSymbol = Substitute.For<INamedTypeSymbol>();
-            baseTypeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var propertyBase = GetProperty("System", "Int32", "TestPropBase");
-            baseTypeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(propertyBase));
-            typeSymbol.BaseType.Returns(baseTypeSymbol);
+        var baseTypeSymbol = Substitute.For<INamedTypeSymbol>();
+        baseTypeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var propertyBase = GetProperty("System", "Int32", "TestPropBase");
+        baseTypeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(propertyBase));
+        typeSymbol.BaseType.Returns(baseTypeSymbol);
 
-            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
-            var attributes = ImmutableArray.Create<AttributeData>();
-            typeSymbol.GetAttributes().Returns(attributes);
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+        typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+        var attributes = ImmutableArray.Create<AttributeData>();
+        typeSymbol.GetAttributes().Returns(attributes);
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -815,21 +772,20 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-            Assert.Contains(result.ToProcessTypes, x => x.ToDisplayString() == "System.String");
-        }
+    }
 
-        [Fact]
-        public void ListOfComplexType_CreatesPatchToPatchEachValue()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var property = GetGenericProperty("System.Collections.Generic", "List", "TestProp", GetType("Test", "Dto"));
-            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
-            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+    [Fact]
+    public void ListOfComplexType_CreatesPatchToPatchEachValue()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var property = GetGenericProperty("System.Collections.Generic", "List", "TestProp", GetType("Test", "Dto"));
+        typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+        typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -869,20 +825,20 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-        }
+    }
 
-        [Fact]
-        public void ListOfKnownType_CreatesPatchToPatchEachValue()
-        {
-            var sut = new TypeBuilder();
-            var typeSymbol = Substitute.For<INamedTypeSymbol>();
-            typeSymbol.Name.Returns("TestType");
-            typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
-            var property = GetGenericProperty("System.Collections.Generic", "List", "TestProp", GetType("System", "String"));
-            typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
-            typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
-            var result = sut.BuildWrapperType(typeSymbol, "SourceName");
-            Assert.Equal(
+    [Fact]
+    public void ListOfKnownType_CreatesPatchToPatchEachValue()
+    {
+        var sut = new TypeBuilder();
+        var typeSymbol = Substitute.For<INamedTypeSymbol>();
+        typeSymbol.Name.Returns("TestType");
+        typeSymbol.BaseType.Returns((INamedTypeSymbol)null);
+        var property = GetGenericProperty("System.Collections.Generic", "List", "TestProp", GetType("System", "String"));
+        typeSymbol.GetMembers().Returns(ImmutableArray.Create<ISymbol>(property));
+        typeSymbol.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+        var result = sut.BuildWrapperType(new GeneratorClassInfo(typeSymbol, "SourceName"));
+        Assert.Equal(
 @"#nullable enable
 namespace LaDeak.JsonMergePatch.Generated.Safe
 {
@@ -915,98 +871,97 @@ namespace LaDeak.JsonMergePatch.Generated.Safe
 }
 #nullable disable
 ", result.SourceCode);
-        }
-
-        private ITypeSymbol GetType(string namespaceName, string typeName)
-        {
-            var propertyTypeSymbol = Substitute.For<INamedTypeSymbol>();
-            propertyTypeSymbol.Name.Returns(typeName);
-            SpecialType specialType = GetSpecialTypeFlag(typeName);
-            propertyTypeSymbol.SpecialType.Returns(specialType);
-            propertyTypeSymbol.ToDisplayString().ReturnsForAnyArgs($"{namespaceName}.{typeName}");
-            var namespaceSymbol = Substitute.For<INamespaceSymbol>();
-            namespaceSymbol.ToDisplayString().Returns(namespaceName);
-            propertyTypeSymbol.ContainingNamespace.Returns(namespaceSymbol);
-            propertyTypeSymbol.IsValueType.Returns(GetIsValueTypeFlag(typeName));
-            propertyTypeSymbol.NullableAnnotation.Returns(NullableAnnotation.NotAnnotated);
-            return propertyTypeSymbol;
-        }
-
-        private INamedTypeSymbol GetNullableType(ITypeSymbol typeParameter)
-        {
-            var type = Substitute.For<INamedTypeSymbol>();
-            type.IsGenericType.Returns(true);
-            type.IsAnonymousType.Returns(false);
-            type.IsAbstract.Returns(false);
-            type.SpecialType.Returns(SpecialType.System_Nullable_T);
-            type.TypeArguments.Returns(ImmutableArray.Create<ITypeSymbol>(typeParameter));
-            string name = $"System.Nullable<{typeParameter.ToDisplayString()}>";
-            type.ToDisplayString(GeneratedTypeFilter.SymbolFormat).ReturnsForAnyArgs(name);
-            type.NullableAnnotation.Returns(NullableAnnotation.Annotated);
-            return type;
-        }
-
-        private ITypeSymbol GetNullableReferenceType(ITypeSymbol typeParameter)
-        {
-            typeParameter.NullableAnnotation.Returns(NullableAnnotation.Annotated);
-            return typeParameter;
-        }
-
-        private IPropertySymbol GetProperty(string namespaceName, string typeName, string name, AttributeData attribute = null)
-        {
-            var propertyTypeSymbol = GetType(namespaceName, typeName);
-            var property = Substitute.For<IPropertySymbol>();
-            property.Name.Returns(name);
-            property.Type.Returns(propertyTypeSymbol);
-            property.GetAttributes().Returns(attribute == null ? ImmutableArray.Create<AttributeData>() : ImmutableArray.Create(attribute));
-            return property;
-        }
-
-        private IPropertySymbol GetGenericProperty(string namespaceName, string typeName, string name, ITypeSymbol propertyTypeSymbol0, ITypeSymbol propertyTypeSymbol1)
-        {
-            return GetGenericProperty(namespaceName, typeName, name, new[] { propertyTypeSymbol0, propertyTypeSymbol1 });
-        }
-
-        private IPropertySymbol GetGenericProperty(string namespaceName, string typeName, string name, ITypeSymbol propertyTypeSymbol0)
-        {
-            return GetGenericProperty(namespaceName, typeName, name, new[] { propertyTypeSymbol0 });
-        }
-
-        private IPropertySymbol GetGenericProperty(string namespaceName, string typeName, string name, ITypeSymbol[] genericTypes)
-        {
-            var propertyTypeSymbol = Substitute.For<INamedTypeSymbol>();
-            propertyTypeSymbol.Name.Returns(typeName);
-            SpecialType specialType = GetSpecialTypeFlag(typeName);
-            propertyTypeSymbol.SpecialType.Returns(specialType);
-            propertyTypeSymbol.ToDisplayString().ReturnsForAnyArgs($"{namespaceName}.{typeName}");
-            var namespaceSymbol = Substitute.For<INamespaceSymbol>();
-            namespaceSymbol.ToDisplayString().Returns(namespaceName);
-            propertyTypeSymbol.ContainingNamespace.Returns(namespaceSymbol);
-            propertyTypeSymbol.IsValueType.Returns(GetIsValueTypeFlag(typeName));
-            propertyTypeSymbol.IsGenericType.Returns(true);
-            propertyTypeSymbol.TypeArguments.Returns(ImmutableArray.Create<ITypeSymbol>(genericTypes, 0, genericTypes.Length));
-            var property = Substitute.For<IPropertySymbol>();
-            property.Name.Returns(name);
-            property.Type.Returns(propertyTypeSymbol);
-            property.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
-            return property;
-        }
-
-        private SpecialType GetSpecialTypeFlag(string typeName) =>
-            typeName switch
-            {
-                "Int32" => SpecialType.System_Int32,
-                "String" => SpecialType.System_String,
-                "Dictionary<System.String, System.Int32>" => SpecialType.None,
-                _ => SpecialType.None,
-            };
-
-        private bool GetIsValueTypeFlag(string typeName) =>
-            typeName switch
-            {
-                "Int32" => true,
-                "String" => false,
-                _ => false,
-            };
     }
+
+    private ITypeSymbol GetType(string namespaceName, string typeName)
+    {
+        var propertyTypeSymbol = Substitute.For<INamedTypeSymbol>();
+        propertyTypeSymbol.Name.Returns(typeName);
+        SpecialType specialType = GetSpecialTypeFlag(typeName);
+        propertyTypeSymbol.SpecialType.Returns(specialType);
+        propertyTypeSymbol.ToDisplayString().ReturnsForAnyArgs($"{namespaceName}.{typeName}");
+        var namespaceSymbol = Substitute.For<INamespaceSymbol>();
+        namespaceSymbol.ToDisplayString().Returns(namespaceName);
+        propertyTypeSymbol.ContainingNamespace.Returns(namespaceSymbol);
+        propertyTypeSymbol.IsValueType.Returns(GetIsValueTypeFlag(typeName));
+        propertyTypeSymbol.NullableAnnotation.Returns(NullableAnnotation.NotAnnotated);
+        return propertyTypeSymbol;
+    }
+
+    private INamedTypeSymbol GetNullableType(ITypeSymbol typeParameter)
+    {
+        var type = Substitute.For<INamedTypeSymbol>();
+        type.IsGenericType.Returns(true);
+        type.IsAnonymousType.Returns(false);
+        type.IsAbstract.Returns(false);
+        type.SpecialType.Returns(SpecialType.System_Nullable_T);
+        type.TypeArguments.Returns(ImmutableArray.Create<ITypeSymbol>(typeParameter));
+        string name = $"System.Nullable<{typeParameter.ToDisplayString()}>";
+        type.ToDisplayString(GeneratedTypeFilter.SymbolFormat).ReturnsForAnyArgs(name);
+        type.NullableAnnotation.Returns(NullableAnnotation.Annotated);
+        return type;
+    }
+
+    private ITypeSymbol GetNullableReferenceType(ITypeSymbol typeParameter)
+    {
+        typeParameter.NullableAnnotation.Returns(NullableAnnotation.Annotated);
+        return typeParameter;
+    }
+
+    private IPropertySymbol GetProperty(string namespaceName, string typeName, string name, AttributeData attribute = null)
+    {
+        var propertyTypeSymbol = GetType(namespaceName, typeName);
+        var property = Substitute.For<IPropertySymbol>();
+        property.Name.Returns(name);
+        property.Type.Returns(propertyTypeSymbol);
+        property.GetAttributes().Returns(attribute == null ? ImmutableArray.Create<AttributeData>() : ImmutableArray.Create(attribute));
+        return property;
+    }
+
+    private IPropertySymbol GetGenericProperty(string namespaceName, string typeName, string name, ITypeSymbol propertyTypeSymbol0, ITypeSymbol propertyTypeSymbol1)
+    {
+        return GetGenericProperty(namespaceName, typeName, name, new[] { propertyTypeSymbol0, propertyTypeSymbol1 });
+    }
+
+    private IPropertySymbol GetGenericProperty(string namespaceName, string typeName, string name, ITypeSymbol propertyTypeSymbol0)
+    {
+        return GetGenericProperty(namespaceName, typeName, name, new[] { propertyTypeSymbol0 });
+    }
+
+    private IPropertySymbol GetGenericProperty(string namespaceName, string typeName, string name, ITypeSymbol[] genericTypes)
+    {
+        var propertyTypeSymbol = Substitute.For<INamedTypeSymbol>();
+        propertyTypeSymbol.Name.Returns(typeName);
+        SpecialType specialType = GetSpecialTypeFlag(typeName);
+        propertyTypeSymbol.SpecialType.Returns(specialType);
+        propertyTypeSymbol.ToDisplayString().ReturnsForAnyArgs($"{namespaceName}.{typeName}");
+        var namespaceSymbol = Substitute.For<INamespaceSymbol>();
+        namespaceSymbol.ToDisplayString().Returns(namespaceName);
+        propertyTypeSymbol.ContainingNamespace.Returns(namespaceSymbol);
+        propertyTypeSymbol.IsValueType.Returns(GetIsValueTypeFlag(typeName));
+        propertyTypeSymbol.IsGenericType.Returns(true);
+        propertyTypeSymbol.TypeArguments.Returns(ImmutableArray.Create<ITypeSymbol>(genericTypes, 0, genericTypes.Length));
+        var property = Substitute.For<IPropertySymbol>();
+        property.Name.Returns(name);
+        property.Type.Returns(propertyTypeSymbol);
+        property.GetAttributes().Returns(ImmutableArray.Create<AttributeData>());
+        return property;
+    }
+
+    private SpecialType GetSpecialTypeFlag(string typeName) =>
+        typeName switch
+        {
+            "Int32" => SpecialType.System_Int32,
+            "String" => SpecialType.System_String,
+            "Dictionary<System.String, System.Int32>" => SpecialType.None,
+            _ => SpecialType.None,
+        };
+
+    private bool GetIsValueTypeFlag(string typeName) =>
+        typeName switch
+        {
+            "Int32" => true,
+            "String" => false,
+            _ => false,
+        };
 }

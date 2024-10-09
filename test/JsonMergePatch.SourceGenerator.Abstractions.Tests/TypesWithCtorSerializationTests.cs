@@ -100,8 +100,10 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         private readonly string _vanillaRecordTypesProperties = @"
 namespace TestCode
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record SubDto(System.Int32 NumberProp, System.DateTime? NullableDateTimeProperty, System.Double CamelCaseProperty);
 
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record ParentDto(System.String ParentStringProperty, SubDto OtherDto, System.Collections.Generic.IEnumerable<int> Values);
 
     public class Program

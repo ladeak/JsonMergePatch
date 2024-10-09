@@ -1,9 +1,6 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using LaDeak.JsonMergePatch.Abstractions;
 using NSubstitute;
 using Xunit;
@@ -16,14 +13,14 @@ public class HttpContentExtensionsTests
     public async Task NullContent_ReadJsonPatchAsync_ThrowsArgumentNullException()
     {
         HttpContent content = null;
-        await Assert.ThrowsAsync<ArgumentNullException>(() => content.ReadJsonPatchAsync<TestDto>()).ConfigureAwait(false);
+        await Assert.ThrowsAsync<ArgumentNullException>(() => content.ReadJsonPatchAsync<TestDto>());
     }
 
     [Fact]
     public async Task NullRepository_ReadJsonPatchAsync_ThrowsArgumentNullException()
     {
         var content = Substitute.For<HttpContent>();
-        await Assert.ThrowsAsync<ArgumentNullException>(() => content.ReadJsonPatchAsync<TestDto>(typeRepository: null)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<ArgumentNullException>(() => content.ReadJsonPatchAsync<TestDto>(typeRepository: null));
     }
 
     [Fact]
@@ -32,7 +29,7 @@ public class HttpContentExtensionsTests
         var content = Substitute.For<HttpContent>();
         var typeRepository = Substitute.For<ITypeRepository>();
         typeRepository.TryGet(typeof(TestDto), out Arg.Any<Type>()).Returns(false);
-        await Assert.ThrowsAsync<ArgumentException>(() => content.ReadJsonPatchAsync<TestDto>(typeRepository)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<ArgumentException>(() => content.ReadJsonPatchAsync<TestDto>(typeRepository));
     }
 
     [Fact]
@@ -42,7 +39,7 @@ public class HttpContentExtensionsTests
         content.Headers.ContentType = new MediaTypeHeaderValue("application/not-merge-patch+json");
         var typeRepository = Substitute.For<ITypeRepository>();
         typeRepository.TryGet(typeof(TestDto), out Arg.Any<Type>()).Returns(callInfo => { callInfo[1] = typeof(TestDtoWrapped); return true; });
-        var result = await content.ReadJsonPatchAsync<TestDto>(typeRepository).ConfigureAwait(false);
+        var result = await content.ReadJsonPatchAsync<TestDto>(typeRepository);
         Assert.Null(result);
     }
 
@@ -53,7 +50,7 @@ public class HttpContentExtensionsTests
         content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/merge-patch+json; charset=Invalid");
         var typeRepository = Substitute.For<ITypeRepository>();
         typeRepository.TryGet(typeof(TestDto), out Arg.Any<Type>()).Returns(callInfo => { callInfo[1] = typeof(TestDtoWrapped); return true; });
-        await Assert.ThrowsAsync<ArgumentException>(() => content.ReadJsonPatchAsync<TestDto>(typeRepository)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<ArgumentException>(() => content.ReadJsonPatchAsync<TestDto>(typeRepository));
     }
 
     [Fact]
@@ -63,7 +60,7 @@ public class HttpContentExtensionsTests
         content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/merge-patch+json");
         var typeRepository = Substitute.For<ITypeRepository>();
         typeRepository.TryGet(typeof(TestDto), out Arg.Any<Type>()).Returns(callInfo => { callInfo[1] = typeof(TestDtoWrapped); return true; });
-        var result = await content.ReadJsonPatchAsync<TestDto>(typeRepository).ConfigureAwait(false);
+        var result = await content.ReadJsonPatchAsync<TestDto>(typeRepository);
         Assert.NotNull(result);
         Assert.Equal(1, result.ApplyOnDefault().Prop1);
     }
@@ -75,7 +72,7 @@ public class HttpContentExtensionsTests
         content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/merge-patch+json; charset=utf-32");
         var typeRepository = Substitute.For<ITypeRepository>();
         typeRepository.TryGet(typeof(TestDto), out Arg.Any<Type>()).Returns(callInfo => { callInfo[1] = typeof(TestDtoWrapped); return true; });
-        var result = await content.ReadJsonPatchAsync<TestDto>(typeRepository).ConfigureAwait(false);
+        var result = await content.ReadJsonPatchAsync<TestDto>(typeRepository);
         Assert.NotNull(result);
         Assert.Equal(1, result.ApplyOnDefault().Prop1);
     }
@@ -87,7 +84,7 @@ public class HttpContentExtensionsTests
         content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/merge-patch+json; charset=\"utf-32\"");
         var typeRepository = Substitute.For<ITypeRepository>();
         typeRepository.TryGet(typeof(TestDto), out Arg.Any<Type>()).Returns(callInfo => { callInfo[1] = typeof(TestDtoWrapped); return true; });
-        var result = await content.ReadJsonPatchAsync<TestDto>(typeRepository).ConfigureAwait(false);
+        var result = await content.ReadJsonPatchAsync<TestDto>(typeRepository);
         Assert.NotNull(result);
         Assert.Equal(1, result.ApplyOnDefault().Prop1);
     }

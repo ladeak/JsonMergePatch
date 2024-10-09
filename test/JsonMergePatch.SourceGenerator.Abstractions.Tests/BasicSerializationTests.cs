@@ -119,12 +119,16 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         private readonly string _classesWithReadWriteProperties = @"
 namespace TestCode
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class SubDto { public System.Int32 NumberProp { get; set; } public System.DateTime? NullableDateTimeProperty { get; set; } [System.Text.Json.Serialization.JsonPropertyNameAttribute(""camelCaseProperty"")] public System.Double CamelCaseProperty { get; set; } }
 
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class ParentDto { public System.String ParentStringProperty { get; set; } public SubDto OtherDto { get; set; } public System.Collections.Generic.IEnumerable<int> Values { get; set; } }
 
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class SomeBase {  public System.Int32 NumberPropBase { get; set; } }
 
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class SomeDerived : SomeBase {  public System.String SomeDerivedProp { get; set; } }
 
     public class Program
@@ -143,8 +147,10 @@ namespace TestCode
         private readonly string _classesWithInitOnlyProperties = @"
 namespace TestCode
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class SubDto { public System.Int32 NumberProp { get; init; } public System.DateTime? NullableDateTimeProperty { get; init; } [System.Text.Json.Serialization.JsonPropertyNameAttribute(""camelCaseProperty"")] public System.Double CamelCaseProperty { get; init; } }
 
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class ParentDto { public System.String ParentStringProperty { get; init; } public SubDto OtherDto { get; init; } public System.Collections.Generic.IEnumerable<int> Values { get; init; } }
 
     public class Program
@@ -159,8 +165,10 @@ namespace TestCode
         private readonly string _recordsWithInitOnlyProperties = @"
 namespace TestCode
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record SubDto { public System.Int32 NumberProp { get; init; } public System.DateTime? NullableDateTimeProperty { get; init; } [System.Text.Json.Serialization.JsonPropertyNameAttribute(""camelCaseProperty"")] public System.Double CamelCaseProperty { get; init; } }
 
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record ParentDto { public System.String ParentStringProperty { get; init; } public SubDto OtherDto { get; init; } public System.Collections.Generic.IEnumerable<int> Values { get; init; } }
 
     public class Program
@@ -175,8 +183,10 @@ namespace TestCode
         private readonly string _vanillaRecordTypesProperties = @"
 namespace TestCode
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record SubDto(System.Int32 NumberProp, System.DateTime? NullableDateTimeProperty, System.Double CamelCaseProperty);
 
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record ParentDto(System.String ParentStringProperty, SubDto OtherDto, System.Collections.Generic.IEnumerable<int> Values);
 
     public class Program

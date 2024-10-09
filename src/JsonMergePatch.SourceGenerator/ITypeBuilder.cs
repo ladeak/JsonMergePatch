@@ -1,9 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿namespace LaDeak.JsonMergePatch.SourceGenerator;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator
+public interface ITypeBuilder
 {
-    public interface ITypeBuilder
-    {
-        GeneratedWrapper BuildWrapperType(ITypeSymbol typeInfo, string sourceTypeName);
-    }
+    GeneratedWrapper BuildWrapperType(GeneratorClassInfo typeInfo);
 }
