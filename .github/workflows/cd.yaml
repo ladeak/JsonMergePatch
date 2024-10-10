@@ -1,5 +1,4 @@
 name: CD
-
 on:
   release:
     types: [created]
@@ -12,14 +11,12 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '9.0.x'
         include-prerelease: true
     - name: Set VERSION variable from tag
       run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
-    - name: Restore dependencies
-      run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore -p:Version=${VERSION}
+      run: dotnet build --configuration Release -p:Version=${VERSION}
     - name: Test
       run: dotnet test
     - name: Create package

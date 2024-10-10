@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator
+namespace LaDeak.JsonMergePatch.SourceGenerator;
+
+public class TypeRepositoryGenerator
 {
-    public class TypeRepositoryGenerator
+    public string CreateTypeRepository(IEnumerable<(string, string)> typeRegistrations, string assemblyName)
     {
-        public string CreateTypeRepository(IEnumerable<(string, string)> typeRegistrations, string assemblyName)
-        {
-            StringBuilder sb = new StringBuilder(@$"
+        StringBuilder sb = new StringBuilder(@$"
 namespace {NameBuilder.GetNamespace(assemblyName)}");
-            sb.Append(@"
+        sb.Append(@"
 {
     public class TypeRepository : LaDeak.JsonMergePatch.Abstractions.ITypeRepository
     {       
@@ -19,10 +17,10 @@ namespace {NameBuilder.GetNamespace(assemblyName)}");
         private TypeRepository()
         {
 ");
-            foreach ((var originalType, var generatedType) in typeRegistrations ?? Enumerable.Empty<(string, string)>())
-                sb.AppendLine($"            Add<{originalType}, {generatedType}>();");
+        foreach ((var originalType, var generatedType) in typeRegistrations ?? Enumerable.Empty<(string, string)>())
+            sb.AppendLine($"            Add<{originalType}, {generatedType}>();");
 
-            sb.Append(@"
+        sb.Append(@"
         }
 
         public static LaDeak.JsonMergePatch.Abstractions.ITypeRepository Instance { get; } = new TypeRepository();
@@ -46,8 +44,7 @@ namespace {NameBuilder.GetNamespace(assemblyName)}");
         public System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<System.Type, System.Type>> GetAll() => _repository;
     }
 }");
-            return sb.ToString();
-        }
+        return sb.ToString();
     }
 }
 

@@ -17,6 +17,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode1
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto { public int Property { get; set; }  }
     public class Program
     {
@@ -45,7 +46,9 @@ namespace TestCode1
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode2
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto0 { public double Property { get; set; }  }
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto1 { public Dto0 Property { get; set; } }
 
     public class Program
@@ -80,6 +83,7 @@ namespace TestCode2
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode3
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto4 { public System.String Property { get; set; } }
 
     public class Program2
@@ -106,6 +110,7 @@ namespace TestCode3
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode1
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record Dto { public int Property { get; set; }  }
     public class Program
     {
@@ -135,6 +140,7 @@ namespace TestCode1
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode1
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record Dto { public int Property { get; set; }  }
     public class Program
     {
@@ -163,7 +169,9 @@ namespace TestCode1
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode2
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record Dto0 { public double Property { get; set; }  }
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record Dto1 { public Dto0 Property { get; set; } }
 
     public class Program
@@ -199,6 +207,7 @@ namespace TestCode2
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode1
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record Dto { public string Property { get; set; }  }
     public class Program
     {
@@ -228,6 +237,7 @@ namespace TestCode1
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode1
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto { public int Property { get; set; }  }
     public class Program
     {
@@ -256,7 +266,9 @@ namespace TestCode1
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode2
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto0 { public double Property { get; set; }  }
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto1 { public Dto0 Property { get; set; } }
 
     public class Program
@@ -292,6 +304,7 @@ namespace TestCode2
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode1
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto { public string Property { get; set; }  }
     public class Program
     {
@@ -321,6 +334,7 @@ namespace TestCode1
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode1
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto { public string Property { get; set; }  public string Property1 { get; set; }  }
     public class Program
     {
@@ -350,6 +364,7 @@ namespace TestCode1
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode1
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record Dto(int Property0, string Property1);
     public class Program
     {

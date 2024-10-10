@@ -1,9 +1,5 @@
-﻿using System;
-using System.Net.Http;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using LaDeak.JsonMergePatch.Abstractions;
 
 namespace LaDeak.JsonMergePatch.Http;
@@ -16,21 +12,18 @@ public static class HttpContentExtensions
 
     public static async Task<Patch<TResult>?> ReadJsonPatchAsync<TResult>(this HttpContent content, ITypeRepository typeRepository, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
     {
-        if (content == null)
-            throw new ArgumentNullException(nameof(content));
-        if (typeRepository == null)
-            throw new ArgumentNullException(nameof(typeRepository));
+        ArgumentNullException.ThrowIfNull(content);
+        ArgumentNullException.ThrowIfNull(typeRepository);
         if (!typeRepository.TryGet(typeof(TResult), out var wrapperType))
             throw new ArgumentException($"{typeof(TResult)} is missing generated wrapper type. Check if all members of the type definition is supported.");
         if (content.Headers.ContentType?.MediaType != "application/merge-patch+json" && content.Headers.ContentType?.MediaType != "application/json" && !string.IsNullOrWhiteSpace(content.Headers.ContentType?.MediaType))
             return null;
 
         var contentStream = await content.ReadAsStreamAsync().ConfigureAwait(false);
-#if NET5_0_OR_GREATER
         Encoding? encoding = content.Headers.ContentType?.CharSet != null ? GetEncoding(content.Headers.ContentType.CharSet) : null;
         if (encoding != null && encoding != Encoding.UTF8)
             contentStream = Encoding.CreateTranscodingStream(contentStream, encoding, Encoding.UTF8);
-#endif
+
         await using (contentStream.ConfigureAwait(false))
         {
             var contentData = await JsonSerializer.DeserializeAsync(contentStream, wrapperType, options ?? _serializerOptions, cancellationToken).ConfigureAwait(false);

@@ -64,6 +64,7 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
         private const string NullableType = @"
 namespace TestCode
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto { public System.Collections.Generic.Dictionary<string, int?> Values { get; set; } }
 
     public class Program
@@ -78,6 +79,7 @@ namespace TestCode
         private const string ValueType = @"
 namespace TestCode
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto { public System.Collections.Generic.Dictionary<string, int> Values { get; set; } }
 
     public class Program
@@ -93,6 +95,7 @@ namespace TestCode
         private const string ReferenceType = @"
 namespace TestCode
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto { public System.Collections.Generic.Dictionary<string, string> Values { get; set; } }
 
     public class Program
@@ -107,6 +110,7 @@ namespace TestCode
         private const string NullableReferenceType = @"
 namespace TestCode
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto { public System.Collections.Generic.Dictionary<string, string?> Values { get; set; } }
 
     public class Program
@@ -121,6 +125,7 @@ namespace TestCode
         private const string RecordWithDictionaryType = @"
 namespace TestCode
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record Dto { public System.Collections.Generic.Dictionary<string, string> Values { get; set; } }
 
     public class Program
@@ -135,6 +140,7 @@ namespace TestCode
         private const string InitOnlyDictionaryOnRecordType = @"
 namespace TestCode
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public record Dto { public System.Collections.Generic.Dictionary<string, string> Values { get; init; } }
 
     public class Program
@@ -149,6 +155,7 @@ namespace TestCode
         private const string InitOnlyDictionaryOnClassType = @"
 namespace TestCode
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto { public System.Collections.Generic.Dictionary<string, string> Values { get; init; } }
 
     public class Program

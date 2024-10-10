@@ -1,7 +1,6 @@
-﻿namespace LaDeak.JsonMergePatch.Http.Tests
+﻿namespace LaDeak.JsonMergePatch.Http.Tests;
+
+public class TestDto
 {
-    public class TestDto
-    {
-        public int Prop1 { get; set; }
-    }
+    public int Prop1 { get; set; }
 }

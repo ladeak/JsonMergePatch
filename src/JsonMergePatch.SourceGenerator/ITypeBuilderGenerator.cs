@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
+﻿namespace LaDeak.JsonMergePatch.SourceGenerator;
 
-namespace LaDeak.JsonMergePatch.SourceGenerator
+public interface ITypeBuilderGenerator
 {
-    public interface ITypeBuilderGenerator
-    {
-        IEnumerable<GeneratedWrapper> Generate();
-    }
+    IEnumerable<GeneratedWrapper> Generate();
 }

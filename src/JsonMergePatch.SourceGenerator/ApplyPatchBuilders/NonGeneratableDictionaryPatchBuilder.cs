@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 
 namespace LaDeak.JsonMergePatch.SourceGenerator.ApplyPatchBuilders;
 
@@ -9,41 +8,42 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.ApplyPatchBuilders;
 public class NonGeneratableDictionaryPatchBuilder : ApplyPatchBuilder
 {
     private readonly INamedTypeSymbol _namedType;
-    private readonly IPropertySymbol _property;
+    private readonly string _propertyName;
+    private readonly bool _hasGeneratableType;
     private readonly bool _isConvertedToNullableType;
 
-    public NonGeneratableDictionaryPatchBuilder(INamedTypeSymbol namedType, IPropertySymbol property, bool isConvertedToNullableType)
+    public NonGeneratableDictionaryPatchBuilder(INamedTypeSymbol namedType, string propertyName, bool hasGeneratableType, bool isConvertedToNullableType)
     {
         if (!namedType.Name.Contains("Dictionary") || namedType.ContainingNamespace.ToDisplayString() != "System.Collections.Generic")
             throw new ArgumentException($"Input argument type is not a valid for {nameof(NonGeneratableDictionaryPatchBuilder)}");
         _namedType = namedType;
-        _property = property;
+        _propertyName = propertyName;
+        _hasGeneratableType = hasGeneratableType;
         _isConvertedToNullableType = isConvertedToNullableType;
     }
 
     public override BuilderState BuildInitOnly(BuilderState state, int i)
     {
-        state.AppendLine($"{_property.Name} = Properties[{i}] && input.{_property.Name} == null ? new() : input.Values,");
+        state.AppendLine($"{_propertyName} = Properties[{i}] && input.{_propertyName} == null ? new() : input.Values,");
         return state;
     }
 
     public override BuilderState BuildInstantiation(BuilderState state, int i)
     {
         state.AppendLine($"if (Properties[{i}])");
-        state.IncrementIdentation().AppendLine($"input.{_property.Name} ??= new();");
+        state.IncrementIdentation().AppendLine($"input.{_propertyName} ??= new();");
         return state;
     }
 
     public override BuilderState BuildPatch(BuilderState state)
     {
-        if (!GeneratedTypeFilter.IsGeneratableType(_property.Type))
-            PopulateDictionary(state, _property);
+        if (!_hasGeneratableType)
+            PopulateDictionary(state, _propertyName);
         return state;
     }
 
-    private void PopulateDictionary(BuilderState state, IPropertySymbol property)
+    private void PopulateDictionary(BuilderState state, string propertyName)
     {
-        var propertyName = property.Name;
         state.AppendLine($"if({propertyName} != null)");
         state.AppendLine("{");
         var ifBody = state.IncrementIdentation();

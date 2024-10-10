@@ -171,8 +171,10 @@ namespace LaDeak.JsonMergePatch.SourceGenerator.Tests
             Compilation inputCompilation = CreateCompilation(@"
 namespace TestCode
 {
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto1 { public System.Int32 NumberProp { get; set; } }
 
+    [LaDeak.JsonMergePatch.Abstractions.Patchable]
     public class Dto2 { public System.String Property { get; set; } public Dto1 OtherDto { get; set; } }
 
     public class Program2

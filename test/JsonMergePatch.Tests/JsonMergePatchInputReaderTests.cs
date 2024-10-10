@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using LaDeak.JsonMergePatch.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
@@ -68,7 +65,7 @@ public class JsonMergePatchInputReaderTests
     public async Task InvalidJson_ReadRequestBodyAsync_ReturnsFailure()
     {
         var sut = new JsonMergePatchInputReader(new JsonOptions(), CreateTypeRepository());
-        DefaultHttpContext httpContext = await CreateHttpContextAsync("invalid").ConfigureAwait(false);
+        DefaultHttpContext httpContext = await CreateHttpContextAsync("invalid");
         var inputContext = CreateInputFormatterContext(typeof(Patch<TestDto>), httpContext);
 
         var result = await sut.ReadRequestBodyAsync(inputContext, Encoding.UTF8);
@@ -81,7 +78,7 @@ public class JsonMergePatchInputReaderTests
     public async Task ValidJson_ReadRequestBodyAsync_ReturnsFailure()
     {
         var sut = new JsonMergePatchInputReader(new JsonOptions(), CreateTypeRepository());
-        DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }").ConfigureAwait(false);
+        DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }");
         var inputContext = CreateInputFormatterContext(typeof(Patch<TestDto>), httpContext);
 
         var result = await sut.ReadRequestBodyAsync(inputContext, Encoding.UTF8);
@@ -93,7 +90,7 @@ public class JsonMergePatchInputReaderTests
     public async Task OtherEncodingJson_ReadRequestBodyAsync_ReturnsFailure()
     {
         var sut = new JsonMergePatchInputReader(new JsonOptions(), CreateTypeRepository());
-        DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }", Encoding.Unicode).ConfigureAwait(false);
+        DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }", Encoding.Unicode);
         var inputContext = CreateInputFormatterContext(typeof(Patch<TestDto>), httpContext);
 
         var result = await sut.ReadRequestBodyAsync(inputContext, Encoding.Unicode);
@@ -105,7 +102,7 @@ public class JsonMergePatchInputReaderTests
     public async Task NoPatchInputType_ReadRequestBodyAsync_ReturnsFailure()
     {
         var sut = new JsonMergePatchInputReader(new JsonOptions(), CreateTypeRepository());
-        DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }").ConfigureAwait(false);
+        DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }");
         var inputContext = CreateInputFormatterContext(typeof(TestDto), httpContext);
 
         var result = await sut.ReadRequestBodyAsync(inputContext, Encoding.UTF8);
@@ -117,7 +114,7 @@ public class JsonMergePatchInputReaderTests
     public async Task OpenPatchType_CanRead_ReturnsTrue()
     {
         var sut = new JsonMergePatchInputReader(new JsonOptions(), CreateTypeRepository());
-        DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }").ConfigureAwait(false);
+        DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }");
         var inputContext = CreateInputFormatterContext(typeof(Patch<>), httpContext);
 
         Assert.True(sut.CanRead(inputContext));
@@ -127,7 +124,7 @@ public class JsonMergePatchInputReaderTests
     public async Task ClosedPatchType_CanRead_ReturnsTrue()
     {
         var sut = new JsonMergePatchInputReader(new JsonOptions(), CreateTypeRepository());
-        DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }").ConfigureAwait(false);
+        DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }");
         var inputContext = CreateInputFormatterContext(typeof(Patch<TestDto>), httpContext);
 
         Assert.True(sut.CanRead(inputContext));
@@ -137,7 +134,7 @@ public class JsonMergePatchInputReaderTests
     public async Task NonPatchType_CanRead_ReturnsFalse()
     {
         var sut = new JsonMergePatchInputReader(new JsonOptions(), CreateTypeRepository());
-        DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }").ConfigureAwait(false);
+        DefaultHttpContext httpContext = await CreateHttpContextAsync("{ \"Prop1\" : 5 }");
         var inputContext = CreateInputFormatterContext(typeof(TestDto), httpContext);
 
         Assert.False(sut.CanRead(inputContext));
@@ -159,7 +156,7 @@ public class JsonMergePatchInputReaderTests
 
         var memoryStream = new MemoryStream();
         using var writer = new StreamWriter(memoryStream, encoding: encoding ?? Encoding.UTF8, leaveOpen: true);
-        await writer.WriteAsync(requestBody).ConfigureAwait(false);
+        await writer.WriteAsync(requestBody);
         await writer.FlushAsync();
         memoryStream.Seek(0, SeekOrigin.Begin);
         httpContext.Request.Body = memoryStream;

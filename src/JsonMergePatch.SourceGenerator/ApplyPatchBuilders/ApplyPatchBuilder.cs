@@ -3,7 +3,7 @@
 public abstract class ApplyPatchBuilder
 {
     /// <summary>
-    /// Generates logic to instantiate object for init property.
+    /// Generates logic to instantiate object with init property.
     /// </summary>
     /// <param name="state">The state representing the ApplyPatch method.</param>
     /// <param name="i">The index of the property in the 'Properties' collection.</param>
@@ -11,7 +11,7 @@ public abstract class ApplyPatchBuilder
     public abstract BuilderState BuildInitOnly(BuilderState state, int i);
 
     /// <summary>
-    /// Generates logic to instantiate object for non-init property.
+    /// Generates logic to instantiate object with non-init property.
     /// </summary>
     /// <param name="state">The state representing the ApplyPatch method.</param>
     /// <param name="i">The index of the property in the 'Properties' collection.</param>

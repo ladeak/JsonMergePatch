@@ -2,7 +2,7 @@
 
 JsonMergePatch library provides an implementation for json merge patch operations, detailed in RFC7396. This library uses C# source generators to generate the types required for serialization. The Http package provides extension methods for HTTP requests and responses, while the AspNetCore package provides an InputReader implementation.
 
-[![CI](https://github.com/ladeak/JsonMergePatch/workflows/CI/badge.svg)](https://github.com/ladeak/JsonMergePatch/actions) [![CodeCoverage](https://codecov.io/gh/ladeak/JsonMergePatch/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ladeak/JsonMergePatch) [![NuGet](https://img.shields.io/nuget/v/LaDeak.JsonMergePatch.AspNetCore.svg)](https://www.nuget.org/packages/LaDeak.JsonMergePatch.AspNetCore/)
+[![CI](https://github.com/ladeak/JsonMergePatch/workflows/CI/badge.svg)](https://github.com/ladeak/JsonMergePatch/actions) [![NuGet](https://img.shields.io/nuget/v/LaDeak.JsonMergePatch.AspNetCore.svg)](https://www.nuget.org/packages/LaDeak.JsonMergePatch.AspNetCore/)
 
 ## Getting Started
 
@@ -10,7 +10,7 @@ JsonMergePatch library helps to deserialize http requests' and responses' json b
 
 JsonMergePatch library is based on C# source generators. For the http body content to be deserialized into a type, the SourceGenerator library generates helper classes. Helper classes are called Wrappers, capturing all the features of the type intended to be used for the deserialization. Once the request is deserialized into a Wrapper object, the object can be used to apply the patch on the user defined target object. The JsonMergePatch library is designed to be used with POCO classes and record types.
 
-Source Generations requires Visual Studio 16.9 or later.
+Source Generations requires Visual Studio 17.12 or later.
 
 Based on the given application type different packages may be installed from NuGet by running one or more of the following commands:
 
@@ -24,7 +24,7 @@ dotnet add package LaDeak.JsonMergePatch.AspNetCore
 
 1. Install AspNetCore package via NuGet
 1. Add the required usings
-1. Add a new controller with a parameter types ```Patch<T>``` where ```T``` is a custom target type chosen by the user
+1. Add a new controller with a parameter types ```Patch<T>``` where ```T``` is a custom target type chosen by the user. Make sure that `[Patchable]` is applied on the `T` target type.
 1. Extend application startup
 
 ### Install AspNetCore packages via NuGet
@@ -58,7 +58,7 @@ public WeatherForecast PatchForecast(Patch<WeatherForecast> input)
 }
 ```
 
-During build, the source generator scans for methods with type parameters of ```Patch<T>```. When such a parameter is found a Wrapper type is generated for ```T```. The base class of the generated type provides the necessary operations to work with the type.
+During build, the source generator scans types has `[Patchable]` attribute applied. When such a type is found a Wrapper type is generated for it.
 
 ### Extend application startup
 
@@ -86,9 +86,7 @@ The AspNetCore input reader supports requests with ```application/merge-patch+js
 
 ### Patchable
 
-Certain use-cases require to generate wrapper types with the source generation for assemblies that do not directly use `Patch<T>` (where T is the wrapped source type). This could be a reason for having separate assemblies for entity types, or because of the need of stacking multiple source generators on top of each other.
-In thie case types may be attributed with `[Patchable]` attribute:
-
+To generate wrapper types with the source generation add the `[Patchable]` attribute:
 ```csharp
 [Patchable]
 public class WeatherForecast
@@ -96,8 +94,6 @@ public class WeatherForecast
   //...
 }
 ```
-
-`[Patchable]` makes sure to generate wrapper types for source types not used in HTTP requests or method arguments of `Patch<T>`.
 
 ### Using it with System.Text.Json source generation
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace LaDeak.JsonMergePatch.Abstractions;
+﻿namespace LaDeak.JsonMergePatch.Abstractions;
 
 public static class ITypeRepositoryExtensions
 {
