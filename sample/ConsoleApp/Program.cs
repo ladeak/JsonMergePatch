@@ -1,5 +1,4 @@
-﻿using ConsoleAppLibrary;
-using LaDeak.JsonMergePatch.Abstractions;
+﻿using LaDeak.JsonMergePatch.Abstractions;
 using LaDeak.JsonMergePatch.Http;
 
 namespace ReadJsonPatchAsync;
@@ -25,11 +24,8 @@ public class Program
         var httpClient = new HttpClient();
         var response = await httpClient.GetAsync("https://localhost:5001/Sample/Weather", HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
         var responseData = await response.Content.ReadJsonPatchAsync<WeatherForecast>().ConfigureAwait(false);
-        var target = new WeatherForecast() { Date = DateTime.UtcNow, Summary = "Sample weather forecast", Temp = 24 };
+        var target = new WeatherForecast() { Date = DateTime.UtcNow, Summary = "Sample weather forecast", Temp = 22 };
         var result = responseData.ApplyPatch(target);
         Console.WriteLine($"Patched: Date={result.Date}, Summary={result.Summary}, Temp={result.Temp}");
-
-        var client = new Client();
-        await client.ReadAsJsonMergePatchAsync();
     }
 }

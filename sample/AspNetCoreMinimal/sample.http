@@ -1,0 +1,29 @@
+﻿###
+
+GET https://localhost:5001/Sample/Weather
+
+###
+
+PATCH https://localhost:5001/Sample/PatchWeather
+Content-Type: application/merge-patch+json
+
+{
+    "temp":23,
+    "summary":null
+}
+###
+
+PATCH https://localhost:5001/Sample/PatchCities
+Content-Type: application/merge-patch+json
+
+{
+    "cities":
+    {
+        "Dublin":"Ireland",
+        "London":"GB",
+        "New York":null
+    }
+}
+###
+
+GET https://localhost:5001/Sample/ReadJsonPatchAsync

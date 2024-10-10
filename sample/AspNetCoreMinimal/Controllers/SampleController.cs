@@ -39,7 +39,7 @@ public class SampleController : ControllerBase
     [HttpGet("ReadJsonPatchAsync")]
     public async Task<WeatherForecast> GetReadJsonPatchAsync()
     {
-        var target = new WeatherForecast() { Date = DateTime.UtcNow, Summary = "Sample weather forecast", TemperatureC = 24 };
+        var target = new WeatherForecast() { Date = DateTime.UtcNow, Summary = "Sample weather forecast", TemperatureC = 22 };
         var httpClient = _clientFactory.CreateClient();
         var response = await httpClient.GetAsync("https://localhost:5001/Sample/Weather", HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
         var responseData = await response.Content.ReadJsonPatchAsync<WeatherForecast>(new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }).ConfigureAwait(false);
